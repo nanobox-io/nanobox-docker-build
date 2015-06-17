@@ -1,8 +1,9 @@
-env_vars = File.read("/etc/environment.d/nanobox")
+env_vars = payload[:env]
+engine = registry('engine')
 
 execute "run cleanup" do
-  command '/var/nanobox/engines/cleanup'
-  cwd '/data'
+  command "/opt/engines/#{engine}/bin/clean"
+  cwd "/opt/engines/#{engine}/bin"
   environment env_vars
   path GOPAGODA_PATH
   user 'gopagoda'

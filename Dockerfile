@@ -9,13 +9,15 @@ RUN mkdir -p /data
 # Install pkgin packages
 RUN curl -k http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | gunzip -c | tar -C / -xf -
 RUN echo "http://pkgsrc.nanobox.io/nanobox/base/Linux/" > /data/etc/pkgin/repositories.conf
-#TEMP
-# RUN echo "http://packages.pagodabox.io/pkgsrc/public/Linux/x86_64/All/" >> /data/etc/pkgin/repositories.conf
-RUN mkdir -p /data/var/db/pkgin
+RUN mkdir -p /data/var/db
+RUN /data/sbin/pkg_admin rebuild
 RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up
 RUN /data/bin/pkgin -y in build-essential
 #TEMP
-RUN ln -s /opt/local/bin/gmake /data/bin/make
+RUN ln -s /data/bin/gmake /data/bin/make
+
+# Install engines/plugins
+# RUN nanobox fetch | tar -C /opt/engines/ -zxf -
 
 # Cleanup disk
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /data/var/db/pkgin

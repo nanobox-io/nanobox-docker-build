@@ -1,10 +1,14 @@
-env_vars = File.read("/etc/environment.d/nanobox")
-execute "run boxfile" do
-  command '/var/nanobox/engines/boxfile'
-  cwd '/data'
+env_vars = payload[:env]
+engine = registry('engine')
+
+boxfile = execute "run boxfile" do
+  command "/opt/engines/#{engine}/bin/boxfile"
+  cwd "/opt/engines/#{engine}/bin"
   environment env_vars
   path GOPAGODA_PATH
   user 'gopagoda'
-  stream true
-  on_data {|data| logvac.print data}
 end
+
+# sanitize and validate
+# return boxfile to nanobox
+puts boxfile.to_json
