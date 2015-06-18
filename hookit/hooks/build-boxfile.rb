@@ -1,14 +1,21 @@
-env_vars = payload[:env]
+# import some logic/helpers from lib/engine.rb
+include NanoBox::Engine
+
+# By this point, engine should be set in the registry
 engine = registry('engine')
 
-boxfile = execute "run boxfile" do
-  command "/opt/engines/#{engine}/bin/boxfile"
-  cwd "/opt/engines/#{engine}/bin"
-  environment env_vars
-  path GOPAGODA_PATH
-  user 'gopagoda'
+boxfile = begin
+  if ::File.exist? "/opt/engines/#{engine}/bin/boxfile"
+    execute "generating boxfile" do
+      command %Q(/opt/local/engines/#{engine}/bin/boxfile "#{engine_payload}")
+      cwd "/opt/engines/#{engine}/bin"
+      path GONANO_PATH
+      user 'gonano'
+    end
+  end
 end
 
-# sanitize and validate
+# todo: sanitize and validate
+
 # return boxfile to nanobox
-puts boxfile.to_json
+puts boxfile

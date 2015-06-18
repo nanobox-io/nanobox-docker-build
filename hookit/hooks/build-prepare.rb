@@ -1,41 +1,81 @@
-env_vars = payload[:env]
+# import some logic/helpers from lib/engine.rb
+include NanoBox::Engine
+
+# If an engine is specified, let's run the "sniff" script of that
+# specific engine. Otherwise we need to iterate through the installed
+# engines calling the "sniff" script until one of them exits with 0
+
+# By this point, engine should be set in the registry
+# if an engine is specified in the Boxfile
 engine = registry('engine')
 
 if engine
-  execute "run sniff" do
-    command "/opt/engines/#{engine}/bin/sniff"
+  if not ::File.exist? "/opt/engines/#{engine}/bin/sniff"
+    # todo: log message about specified engine not existing
+    exit HOOKIT::ABORT
+  end
+
+  # execute 'sniff' even though we already know
+  execute 'sniff' do
+    command %Q(/opt/local/engines/#{engine}/bin/sniff "#{engine_payload}")
+    cwd "/opt/local/engines/#{engine}/bin"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logvac.print data}
+    on_exit Proc.new do |code|
+      if code != 0
+        # todo: log message about specified engine not accepting this app
+        exit HOOKIT::ABORT
+      end
+    end
+  end
+else
+  # since we don't have an engine selected yet, we need to iterate through
+  # all of the available ones until we have a suiter.
+  ::Dir.glob('/opt/engines/*').select { |f| ::File.directory?(f) }.each do |e|
+
+    # once engine is set, we can stop looping
+    break if engine
+
+    # make sure we have a sniff script
+    next if not ::File.exist? "#{e}/bin/sniff"
+
+    # for convenience, we only want the engine name
+    basename = ::File.basename(e)
+
+    # todo: we need to think about logging and if we want to wire-up the stdout
+    # from the sniff script into the deploy stream
+
+    # execute 'sniff' to see if we qualify
+    execute 'sniff' do
+      command %Q(#{e}/bin/sniff "#{engine_payload}")
+      cwd "#{e}/bin"
+      path GONANO_PATH
+      user 'gonano'
+      stream true
+      on_data {|data| logvac.print data}
+      on_exit { |code| engine = basename if code == 0 }
+    end
+  end
+
+  if engine
+    # set the engine in the registry for later use
+    registry('engine', engine)
+    # todo: display a message indicating an engine was selected
+  else
+    # todo: if we don't have an engine at this point, we need to log an error
+    exit HOOKIT::ABORT
+  end
+end
+
+if ::File.exist? "/opt/engines/#{engine}/bin/prepare"
+  execute "prepare" do
+    command %Q(/opt/local/engines/#{engine}/bin/prepare "#{engine_payload}")
     cwd "/opt/engines/#{engine}/bin"
-    environment env_vars
-    path GOPAGODA_PATH
-    user 'gopagoda'
+    path GONANO_PATH
+    user 'gonano'
     stream true
     on_data {|data| logvac.print data}
   end
-else
-  # i call it rub-ash
-  for engine in `ls -l /opt/engines`; do
-
-    execute "run sniff" do
-      command "/opt/engines/#{engine}/bin/sniff"
-      cwd "/opt/engines/#{engine}/bin"
-      environment env_vars
-      path GOPAGODA_PATH
-      user 'gopagoda'
-      stream true
-      on_data {|data| logvac.print data}
-    end
-
-  done # need to ruby-ize
 end
-
-execute "run prepare" do
-  command "/opt/engines/#{engine}/bin/prepare"
-  cwd "/opt/engines/#{engine}/bin"
-  environment env_vars
-  path GOPAGODA_PATH
-  user 'gopagoda'
-  stream true
-  on_data {|data| logvac.print data}
-end
-
-# reset engine in registry to successfully sniffed one

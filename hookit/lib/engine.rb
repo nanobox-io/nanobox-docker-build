@@ -3,7 +3,7 @@ require 'multi_json'
 
 module NanoBox
   module Engine
-    GONANO_PATH = ''
+    GONANO_PATH = '/data/sbin:/data/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/sbin:/opt/local/bin:/opt/gonano/sbin:/opt/gonano/bin'
 
     # This payload will serialized as JSON and passed into each of the
     # engine scripts as the first and only argument. 
@@ -11,7 +11,7 @@ module NanoBox
 
       data = {
         code_dir: '/mnt/code',
-        build_dir: '/mnt/deploy',
+        build_dir: '/data',
         cache_dir: '/mnt/cache',
         app: payload[:app],
         env: payload[:env],
@@ -33,11 +33,5 @@ module NanoBox
     def is_filepath?(path)
       path =~ /^[~|\.|\/|\\]/
     end
-
-    # This is just a shortcut method to make consumption a bit more compact
-    def basename(path)
-      ::File.basename(path)
-    end
-
   end
 end

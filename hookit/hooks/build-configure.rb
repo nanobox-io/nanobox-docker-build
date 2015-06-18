@@ -1,4 +1,3 @@
-
 # import some logic/helpers from lib/engine.rb
 include NanoBox::Engine
 
@@ -56,9 +55,14 @@ if boxfile[:plugin] and is_filepath?(boxfile[:plugin])
       action :delete
     end
 
+    # ensure we have a parent directory for the plugin
+    directory "/opt/engines/#{engine}/plugins" do
+      recursive true
+    end
+
     # copy the mounted plugin into place
     execute 'move plugin into place' do
-      command "cp -r /share/plugins/#{basename} /opt/plugins/"
+      command "cp -r /share/plugins/#{basename} /opt/engines/#{engine}/plugins/"
     end
   end
 
@@ -79,45 +83,11 @@ if boxfile[:plugin] and not is_filepath?(boxfile[:plugin])
 end
 
 # 3)
-# If an engine is specified, let's run the "sniff" script of that
-# specific engine. Otherwise we need to iterate through the installed
-# engines calling the "sniff" script until one of them exits with 0
-
-# By this point, engine should be set in the registry
-# if an engine is specified in the Boxfile
-engine = registry('plugin')
-
-if engine
-  # todo: ask Braxton
-else
-  # since we don't have an engine selected yet, we need to iterate through
-  # all of the available ones until we have a suiter.
-  ::Dir.glob('/opt/engines/*').select { |f| ::File.directory?(f) }.each do |e|
-
-    # once engine is set, we can stop looping
-    break if engine
-
-    # make sure we have a sniff script
-    next if not ::File.exist? "#{e}/bin/sniff"
-
-    # for convenience, we only want the engine name
-    basename = ::File.basename(e)
-
-    # todo: we need to think about logging and if we want to wire-up the stdout
-    # from the sniff script into the deploy stream
-
-    # execute 'sniff' to see if we qualify
-    execute 'sniff' do
-      command %Q(#{e}/bin/sniff "#{engine_payload}")
-      cwd "#{e}/bin"
-      on_exit { |code| engine = basename if code == 0 }
-    end
-  end
-
-  if engine
-    # todo: display a message indicating an engine was selected
-  else
-    # todo: if we don't have an engine at this point, we need to log an error
-    exit HOOKIT::ABORT
+# Finally, let's move the pkgin cache into place if this is a subsequent deploy
+# todo: mv might not be safe in case the deploy fails, it will be gone
+if ::File.exist? '/mnt/cache/pkgin'
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extrace pkgin packages from cache for quick access" do
+    command 'cp -r /mnt/cache/pkgin/ /data/var/db/pkgin'
   end
 end
