@@ -21,13 +21,13 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
   if ::File.exist?(path)
 
     # remove any official engine that may be in the way
-    directory "/opt/engines/#{basename}" do
+    directory "#{ENGINE_DIR}/#{basename}" do
       action :delete
     end
 
     # copy the mounted engine into place
     execute 'move engine into place' do
-      command "cp -r /share/engines/#{basename} /opt/engines/"
+      command "cp -r /share/engines/#{basename} #{ENGINE_DIR}/"
     end
   end
 
@@ -46,9 +46,9 @@ end
 # 3)
 # Finally, let's move the pkgin cache into place if this is a subsequent deploy
 # todo: mv might not be safe in case the deploy fails, it will be gone
-if ::File.exist? '/mnt/cache/pkgin'
+if ::File.exist? "#{CACHE_DIR}/pkgin"
   # fetch the pkgin cache & db from cache for a quick deploy
   execute "extrace pkgin packages from cache for quick access" do
-    command 'cp -r /mnt/cache/pkgin/. /data/var/db/pkgin'
+    command "cp -r #{CACHE_DIR}/pkgin/. #{BUILD_DIR}/var/db/pkgin"
   end
 end

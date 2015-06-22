@@ -5,10 +5,10 @@ include NanoBox::Engine
 engine = registry('engine')
 
 boxfile = begin
-  if ::File.exist? "/opt/engines/#{engine}/bin/boxfile"
+  if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/boxfile"
     execute "generating boxfile" do
-      command %Q(/opt/local/engines/#{engine}/bin/boxfile "#{engine_payload}")
-      cwd "/opt/engines/#{engine}/bin"
+      command %Q(#{ENGINE_DIR}/#{engine}/bin/boxfile "#{engine_payload}")
+      cwd "#{ENGINE_DIR}/#{engine}/bin"
       path GONANO_PATH
       user 'gonano'
     end

@@ -8,7 +8,7 @@ engine = registry('engine')
 # If an engine is not already specified, we need to iterate through the
 # installed engines calling the "sniff" script until one of them exits with 0
 if not engine
-  ::Dir.glob('/opt/engines/*').select { |f| ::File.directory?(f) }.each do |e|
+  ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.each do |e|
 
     # once engine is set, we can stop looping
     break if engine
@@ -24,7 +24,7 @@ if not engine
 
     # execute 'sniff' to see if we qualify
     execute 'sniff' do
-      command %Q(#{e}/bin/sniff "#{engine_payload}")
+      command %Q(#{e}/bin/sniff "#{CODE_DIR}")
       cwd "#{e}/bin"
       path GONANO_PATH
       user 'gonano'
@@ -44,10 +44,10 @@ if not engine
   end
 end
 
-if ::File.exist? "/opt/engines/#{engine}/bin/prepare"
+if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
   execute "prepare" do
-    command %Q(/opt/local/engines/#{engine}/bin/prepare "#{engine_payload}")
-    cwd "/opt/engines/#{engine}/bin"
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/prepare "#{engine_payload}")
+    cwd "#{ENGINE_DIR}/#{engine}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

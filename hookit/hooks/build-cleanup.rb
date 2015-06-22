@@ -4,11 +4,11 @@ include NanoBox::Engine
 # By this point, engine should be set in the registry
 engine = registry('engine')
 
-if ::File.exist? "/opt/engines/#{engine}/bin/cleanup"
+if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
 
   execute "cleanup code" do
-    command %Q(/opt/local/engines/#{engine}/bin/cleanup "#{engine_payload}")
-    cwd "/opt/engines/#{engine}/bin"
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup "#{engine_payload}")
+    cwd "#{ENGINE_DIR}/#{engine}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

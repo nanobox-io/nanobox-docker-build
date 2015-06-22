@@ -6,6 +6,7 @@ module NanoBox
     CODE_DIR    = '/mnt/code'
     BUILD_DIR   = '/data'
     CACHE_DIR   = '/mnt/cache'
+    ENGINE_DIR  = '/opt/engines'
     GONANO_PATH = [
       '/data/sbin',
       '/data/bin',
