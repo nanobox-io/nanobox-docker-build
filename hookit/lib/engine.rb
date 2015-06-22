@@ -3,16 +3,32 @@ require 'multi_json'
 
 module NanoBox
   module Engine
-    GONANO_PATH = '/data/sbin:/data/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/local/sbin:/opt/local/bin:/opt/gonano/sbin:/opt/gonano/bin'
+    CODE_DIR    = '/mnt/code'
+    BUILD_DIR   = '/data'
+    CACHE_DIR   = '/mnt/cache'
+    GONANO_PATH = [
+      '/data/sbin',
+      '/data/bin',
+      '/usr/local/sbin',
+      '/usr/local/bin',
+      '/usr/sbin',
+      '/usr/bin',
+      '/sbin',
+      '/bin',
+      '/opt/local/sbin',
+      '/opt/local/bin',
+      '/opt/gonano/sbin',
+      '/opt/gonano/bin'
+    ].join (':')
 
     # This payload will serialized as JSON and passed into each of the
     # engine scripts as the first and only argument. 
     def engine_payload
 
       data = {
-        code_dir: '/mnt/code',
-        build_dir: '/data',
-        cache_dir: '/mnt/cache',
+        code_dir: CODE_DIR,
+        build_dir: BUILD_DIR,
+        cache_dir: CACHE_DIR,
         app: payload[:app],
         env: payload[:env],
         dns: payload[:dns],
