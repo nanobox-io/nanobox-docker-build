@@ -27,7 +27,7 @@ directory "/mnt/cache/pkgin" do
   recursive true
 end
 
-# copy the pkgin cache & db for quick subsequent deploys
+# copy (and remove) the pkgin cache & db for quick subsequent deploys
 execute "stash pkgin packages into cache for quick access" do
-  command 'cp -r /data/var/db/pkgin/ /mnt/cache/pkgin'
+  command 'mv /data/var/db/pkgin/. /mnt/cache/pkgin'
 end

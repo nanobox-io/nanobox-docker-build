@@ -88,6 +88,6 @@ end
 if ::File.exist? '/mnt/cache/pkgin'
   # fetch the pkgin cache & db from cache for a quick deploy
   execute "extrace pkgin packages from cache for quick access" do
-    command 'cp -r /mnt/cache/pkgin/ /data/var/db/pkgin'
+    command 'cp -r /mnt/cache/pkgin/. /data/var/db/pkgin'
   end
 end
