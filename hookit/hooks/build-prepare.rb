@@ -1,38 +1,13 @@
 # import some logic/helpers from lib/engine.rb
 include NanoBox::Engine
 
-# If an engine is specified, let's run the "sniff" script of that
-# specific engine. Otherwise we need to iterate through the installed
-# engines calling the "sniff" script until one of them exits with 0
-
 # By this point, engine should be set in the registry
 # if an engine is specified in the Boxfile
 engine = registry('engine')
 
-if engine
-  if not ::File.exist? "/opt/engines/#{engine}/bin/sniff"
-    # todo: log message about specified engine not existing
-    exit HOOKIT::ABORT
-  end
-
-  # execute 'sniff' even though we already know
-  execute 'sniff' do
-    command %Q(/opt/local/engines/#{engine}/bin/sniff "#{engine_payload}")
-    cwd "/opt/local/engines/#{engine}/bin"
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logvac.print data}
-    on_exit Proc.new do |code|
-      if code != 0
-        # todo: log message about specified engine not accepting this app
-        exit HOOKIT::ABORT
-      end
-    end
-  end
-else
-  # since we don't have an engine selected yet, we need to iterate through
-  # all of the available ones until we have a suiter.
+# If an engine is not already specified, we need to iterate through the
+# installed engines calling the "sniff" script until one of them exits with 0
+if not engine
   ::Dir.glob('/opt/engines/*').select { |f| ::File.directory?(f) }.each do |e|
 
     # once engine is set, we can stop looping

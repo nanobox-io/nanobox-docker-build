@@ -16,7 +16,7 @@ RUN /data/bin/pkgin -y in build-essential
 #TEMP
 RUN ln -s /data/bin/gmake /data/bin/make
 
-# Install engines/plugins
+# Install engines
 # RUN nanobox fetch | tar -C /opt/engines/ -zxf -
 
 # Cleanup disk

@@ -18,8 +18,7 @@ module NanoBox
         dns: payload[:dns],
         port: payload[:port],
         boxfile: payload[:boxfile],
-        engine: registry('engine'),
-        plugin: registry('plugin')
+        engine: registry('engine')
       }
 
       ::MultiJson.dump(data)

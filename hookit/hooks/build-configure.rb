@@ -9,16 +9,9 @@ include NanoBox::Engine
 # 'build' section of the Boxfile provided by the app
 boxfile = payload[:boxfile] || {}
 
-# If a plugin is specified, an engine must also be
-if boxfile[:plugin] and not boxfile[:engine]
-  # todo: log
-  exit HOOKIT::ABORT
-end
-
 # 1)
-# If an engine or plugin is mounted from the workstation,
-# let's put those in place first. This process will replace any default engine
-# if the names collide.
+# If an engine is mounted from the workstation, let's put those in place first.
+# This process will replace any default engine if the names collide.
 if boxfile[:engine] and is_filepath?(boxfile[:engine])
 
   basename = ::File.basename(boxfile[:engine])
@@ -42,44 +35,12 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
   registry('engine', basename)
 end
 
-if boxfile[:plugin] and is_filepath?(boxfile[:plugin])
-
-  basename = ::File.basename(boxfile[:plugin])
-  path     = "/share/plugins/#{basename}"
-
-  # if the plugin has been shared with us, then let's copy it over
-  if ::File.exist?(path)
-
-    # remove any official plugin that may be in the way
-    directory "/opt/plugins/#{basename}" do
-      action :delete
-    end
-
-    # ensure we have a parent directory for the plugin
-    directory "/opt/engines/#{engine}/plugins" do
-      recursive true
-    end
-
-    # copy the mounted plugin into place
-    execute 'move plugin into place' do
-      command "cp -r /share/plugins/#{basename} /opt/engines/#{engine}/plugins/"
-    end
-  end
-
-  # now let's set the plugin in the registry for later consumption
-  registry('plugin', basename)
-end
-
 # 2)
-# If a custom engine or plugin is specified, and is not mounted from
-# the workstation, let's fetch those from warehouse.nanobox.io. 
+# If a custom engine is specified, and is not mounted from
+# the workstation, let's fetch it from warehouse.nanobox.io. 
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and not is_filepath?(boxfile[:engine])
   # todo: wait until nanobox-cli can fetch engine
-end
-
-if boxfile[:plugin] and not is_filepath?(boxfile[:plugin])
-  # todo: wait until nanobox-cli can fetch plugin
 end
 
 # 3)
