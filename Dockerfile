@@ -7,7 +7,9 @@ ADD hookit/. /opt/gonano/hookit/mod/
 RUN mkdir -p /data
 
 # Install pkgin packages
-RUN curl -k http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | gunzip -c | tar -C / -xf -
+ADD http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz /data/
+RUN gunzip -c /data/bootstrap.tar.gz | tar -C / -xf -
+# RUN curl -k http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | gunzip -c | tar -C / -xf -
 RUN echo "http://pkgsrc.nanobox.io/nanobox/base/Linux/" > /data/etc/pkgin/repositories.conf
 RUN mkdir -p /data/var/db
 RUN /data/sbin/pkg_admin rebuild
@@ -20,7 +22,7 @@ RUN ln -s /data/bin/gmake /data/bin/make
 # RUN nanobox fetch | tar -C /opt/engines/ -zxf -
 
 # Cleanup disk
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /data/var/db/pkgin
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Allow ssh
 EXPOSE 22
