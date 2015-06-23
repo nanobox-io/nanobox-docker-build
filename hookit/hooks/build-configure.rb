@@ -15,7 +15,7 @@ boxfile = payload[:boxfile] || {}
 if boxfile[:engine] and is_filepath?(boxfile[:engine])
 
   basename = ::File.basename(boxfile[:engine])
-  path     = "/share/engines/#{basename}"
+  path     = "#{SHARE_DIR}/engines/#{basename}"
 
   # if the engine has been shared with us, then let's copy it over
   if ::File.exist?(path)
@@ -27,7 +27,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
 
     # copy the mounted engine into place
     execute 'move engine into place' do
-      command "cp -r /share/engines/#{basename} #{ENGINE_DIR}/"
+      command "cp -r #{SHARE_DIR}/engines/#{basename} #{ENGINE_DIR}/"
     end
   end
 

@@ -5,9 +5,13 @@ module NanoBox
   module Engine
     CODE_DIR    = '/mnt/code'
     BUILD_DIR   = '/data'
+    DEPLOY_DIR  = '/mnt/deploy'
     CACHE_DIR   = '/mnt/cache'
     ENGINE_DIR  = '/opt/engines'
+    SHARE_DIR   = '/share'
     GONANO_PATH = [
+      CODE_DIR,
+      "#{CODE_DIR}/bin",
       '/data/sbin',
       '/data/bin',
       '/usr/local/sbin',
