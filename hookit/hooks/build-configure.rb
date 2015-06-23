@@ -9,7 +9,18 @@ include NanoBox::Engine
 # 'build' section of the Boxfile provided by the app
 boxfile = payload[:boxfile] || {}
 
-# 1)
+# 1) 
+# move the code from the user's workstation into the build dir so that
+# the engine doesn't mess with their codebase
+directory "#{CODE_DIR}" do
+  recursive true
+end
+
+execute "copy code into build" do
+  command "cp -r #{CODE_LIVE_DIR}/ #{CODE_DIR}"
+end
+
+# 2)
 # If an engine is mounted from the workstation, let's put those in place first.
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and is_filepath?(boxfile[:engine])
@@ -35,7 +46,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
   registry('engine', basename)
 end
 
-# 2)
+# 3)
 # If a custom engine is specified, and is not mounted from
 # the workstation, let's fetch it from warehouse.nanobox.io. 
 # This process will replace any default engine if the names collide.
@@ -43,12 +54,12 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
   # todo: wait until nanobox-cli can fetch engine
 end
 
-# 3)
+# 4)
 # Finally, let's move the pkgin cache into place if this is a subsequent deploy
 # todo: mv might not be safe in case the deploy fails, it will be gone
 if ::File.exist? "#{CACHE_DIR}/pkgin"
   # fetch the pkgin cache & db from cache for a quick deploy
   execute "extrace pkgin packages from cache for quick access" do
-    command "cp -r #{CACHE_DIR}/pkgin/. #{BUILD_DIR}/var/db/pkgin"
+    command "cp -r #{CACHE_DIR}/pkgin/ #{BUILD_DIR}/var/db/pkgin"
   end
 end
