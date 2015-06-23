@@ -9,7 +9,7 @@ RUN mkdir -p /data
 # Install pkgin packages
 ADD http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz /data/
 RUN gunzip -c /data/bootstrap.tar.gz | tar -C / -xf -
-# RUN curl -k http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | gunzip -c | tar -C / -xf -
+RUN rm -f /data/bootstrap.tar.gz
 RUN echo "http://pkgsrc.nanobox.io/nanobox/base/Linux/" > /data/etc/pkgin/repositories.conf
 RUN mkdir -p /data/var/db
 RUN /data/sbin/pkg_admin rebuild
