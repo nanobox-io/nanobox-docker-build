@@ -48,12 +48,15 @@ end
 # ie: not a pkgsrc bootstrap
 
 # make sure required directories exist
-directory "#{ETC_DIR}" do
-  recursive true
-end
-
-directory "#{ENV_DIR}" do
-  recursive true
+[
+  "#{BUILD_DIR}/sbin",
+  "#{BUILD_DIR}/bin",
+  "#{ETC_DIR}",
+  "#{ENV_DIR}"
+].each do |dir|
+  directory dir do
+    recursive true
+  end
 end
 
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
