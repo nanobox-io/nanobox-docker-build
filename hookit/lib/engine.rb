@@ -4,7 +4,7 @@ require 'multi_json'
 module NanoBox
   module Engine
     BUILD_DIR       = '/data'
-    CODE_DIR        = "#{CODE_DIR}/code"
+    CODE_DIR        = "#{BUILD_DIR}/code"
     DEPLOY_DIR      = '/mnt/deploy'
     CACHE_DIR       = '/mnt/cache'
     ENGINE_DIR      = '/opt/engines'
@@ -42,8 +42,7 @@ module NanoBox
         env: payload[:env],
         dns: payload[:dns],
         port: payload[:port],
-        boxfile: payload[:boxfile],
-        engine: registry('engine')
+        boxfile: payload[:boxfile]
       }
 
       ::MultiJson.dump(data)
