@@ -20,11 +20,15 @@ Vagrant.configure(2) do |config|
   # Add docker credentials
   config.vm.provision "file", source: "~/.dockercfg", destination: "/root/.dockercfg"
 
-  # Build base image
+  # Build pre-build image
+  config.vm.provision "shell", inline: "docker build -t #{ENV['docker_user']}/pre-build /vagrant/pre-build"
+
+  # Build build image
   config.vm.provision "shell", inline: "docker build -t #{ENV['docker_user']}/build /vagrant"
 
-  # Publish image to dockerhub
+  # Publish images to dockerhub
   config.vm.provision "shell", inline: "docker push #{ENV['docker_user']}/build"
+  config.vm.provision "shell", inline: "docker push #{ENV['docker_user']}/pre-build"
 
   config.vm.provider "virtualbox" do |v|
     v.customize ["modifyvm", :id, "--memory", "1024"]
