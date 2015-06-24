@@ -1,4 +1,4 @@
-nanobox base
+nanobox build
 ============
 
 This repo contains the files necessary to create a build docker image for [nanobox](nanobox.io) consumption.
@@ -16,7 +16,7 @@ Requirements
 Usage
 -----
 
-To create and publish the image to nanobox/base simply run      
+To create and publish the image to nanobox/build simply run      
 `make` or `vagrant up && vagrant destroy -f`    
 If the creation/publication fails for any reason, you may       
 modify the proper files and run `make publish` or `vagrant provision`    
@@ -28,8 +28,8 @@ pass: gonano
 ```
         
 TIP: If you forget to create a `docker_user` environment variable,      
-you can `vagrant ssh` and run `docker tag nanobox/base ${YOUR_USER}/base`      
-then push with `docker push ${YOUR_USER}/base`   
+you can `vagrant ssh` and run `docker tag nanobox/build ${YOUR_USER}/build`      
+then push with `docker push ${YOUR_USER}/build`   
 
 
 License

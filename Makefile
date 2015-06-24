@@ -1,6 +1,6 @@
-all: base
+all: build
 
-base:
+build:
 ifdef docker_user
 	vagrant up && vagrant destroy -f
 else
