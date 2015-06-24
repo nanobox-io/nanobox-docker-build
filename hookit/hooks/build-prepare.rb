@@ -48,6 +48,17 @@ end
 # 2)
 # todo: parse the selected engine's Enginefile and see if they want a minimal base
 # ie: not a pkgsrc bootstrap
+if false
+  
+else
+  # move the pkgin cache into place if this is a subsequent deploy
+  if ::File.exist? "#{CACHE_DIR}/pkgin"
+    # fetch the pkgin cache & db from cache for a quick deploy
+    execute "extrace pkgin packages from cache for quick access" do
+      command "cp -r #{CACHE_DIR}/pkgin/ #{BUILD_DIR}/var/db/pkgin"
+    end
+  end
+end
 
 # 3)
 # make sure required directories exist
