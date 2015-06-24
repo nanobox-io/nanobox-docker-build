@@ -24,7 +24,7 @@ if not engine
 
     # execute 'sniff' to see if we qualify
     execute 'sniff' do
-      command %Q(#{e}/bin/sniff "#{CODE_DIR}")
+      command %Q(#{e}/bin/sniff "#{CODE_LIVE_DIR}")
       cwd "#{e}/bin"
       path GONANO_PATH
       user 'gonano'
@@ -52,11 +52,17 @@ end
   "#{BUILD_DIR}/sbin",
   "#{BUILD_DIR}/bin",
   "#{ETC_DIR}",
-  "#{ENV_DIR}"
+  "#{ENV_DIR}",
+  "#{CODE_DIR}"
 ].each do |dir|
   directory dir do
     recursive true
   end
+end
+
+# copy the read-only mounted code into the build
+execute "copy code into build" do
+  command "cp -r #{CODE_LIVE_DIR}/ #{CODE_DIR}"
 end
 
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
