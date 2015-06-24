@@ -5,6 +5,7 @@ include NanoBox::Engine
 # if an engine is specified in the Boxfile
 engine = registry('engine')
 
+# 1)
 # If an engine is not already specified, we need to iterate through the
 # installed engines calling the "sniff" script until one of them exits with 0
 if not engine
@@ -44,9 +45,11 @@ if not engine
   end
 end
 
+# 2)
 # todo: parse the selected engine's Enginefile and see if they want a minimal base
 # ie: not a pkgsrc bootstrap
 
+# 3)
 # make sure required directories exist
 [
   "#{BUILD_DIR}/sbin",
@@ -60,11 +63,13 @@ end
   end
 end
 
+# 4)
 # copy the read-only mounted code into the build
 execute "copy code into build" do
   command "cp -r #{CODE_LIVE_DIR}/ #{CODE_DIR}"
 end
 
+# 5)
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
   execute "prepare" do
     command %Q(#{ENGINE_DIR}/#{engine}/bin/prepare "#{engine_payload}")
