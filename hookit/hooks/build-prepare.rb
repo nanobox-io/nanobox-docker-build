@@ -44,6 +44,18 @@ if not engine
   end
 end
 
+# todo: parse the selected engine's Enginefile and see if they want a minimal base
+# ie: not a pkgsrc bootstrap
+
+# make sure required directories exist
+directory "#{ETC_DIR}" do
+  recursive true
+end
+
+directory "#{ENV_DIR}" do
+  recursive true
+end
+
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
   execute "prepare" do
     command %Q(#{ENGINE_DIR}/#{engine}/bin/prepare "#{engine_payload}")
