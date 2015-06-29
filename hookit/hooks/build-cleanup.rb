@@ -12,7 +12,8 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
     path GONANO_PATH
     user 'gonano'
     stream true
-    on_data {|data| logvac.print data}
+    # on_data {|data| logvac.print data}
+    on_data {|data| print data}
   end
 
 end

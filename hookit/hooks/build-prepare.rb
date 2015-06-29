@@ -30,6 +30,7 @@ if not engine
       path GONANO_PATH
       user 'gonano'
       stream true
+      # on_data {|data| logvac.print data}
       on_data {|data| logvac.print data}
       on_exit { |code| engine = basename if code == 0 }
     end
@@ -88,6 +89,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
     path GONANO_PATH
     user 'gonano'
     stream true
+    # on_data {|data| logvac.print data}
     on_data {|data| logvac.print data}
   end
 end
