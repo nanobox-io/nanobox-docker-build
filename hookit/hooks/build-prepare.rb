@@ -81,8 +81,8 @@ execute "copy code into build" do
   command "cp -r #{CODE_LIVE_DIR}/* #{CODE_DIR}"
 end
 
-execute "ensure gopagoda owns code" do
-  command "chown -R gopagoda #{CODE_DIR}"
+execute "ensure gonano owns code" do
+  command "chown -R gonano #{CODE_DIR}"
 end
 
 # 5)
