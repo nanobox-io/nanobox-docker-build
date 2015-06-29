@@ -91,3 +91,5 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
     on_data {|data| logvac.print data}
   end
 end
+
+exit HOOKIT::ABORT
