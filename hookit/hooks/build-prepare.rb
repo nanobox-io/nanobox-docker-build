@@ -49,7 +49,7 @@ end
 # 2)
 # todo: parse the selected engine's Enginefile and see if they want a minimal base
 # ie: not a pkgsrc bootstrap
-if false
+if true
   
 else
   # move the pkgin cache into place if this is a subsequent deploy
