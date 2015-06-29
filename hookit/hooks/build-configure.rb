@@ -9,6 +9,12 @@ include NanoBox::Engine
 # 'build' section of the Boxfile provided by the app
 boxfile = payload[:boxfile] || {}
 
+# 0) temporary
+# ensure engine dir exists
+directory "#{ENGINE_DIR}" do
+  recursive true
+end
+
 # 1)
 # If an engine is mounted from the workstation, let's put those in place first.
 # This process will replace any default engine if the names collide.
