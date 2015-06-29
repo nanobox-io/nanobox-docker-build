@@ -31,7 +31,7 @@ if not engine
       user 'gonano'
       stream true
       # on_data {|data| logvac.print data}
-      on_data {|data| logvac.print data}
+      on_data {|data| print data}
       on_exit { |code| engine = basename if code == 0 }
     end
   end
@@ -90,6 +90,6 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
     user 'gonano'
     stream true
     # on_data {|data| logvac.print data}
-    on_data {|data| logvac.print data}
+    on_data {|data| print data}
   end
 end

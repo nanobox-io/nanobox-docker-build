@@ -16,5 +16,5 @@ execute "build code" do
   user 'gonano'
   stream true
   # on_data {|data| logvac.print data}
-  on_data {|data| logvac.print data}
+  on_data {|data| print data}
 end
