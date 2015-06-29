@@ -19,7 +19,7 @@ end
 
 # copy /data (current build) to /mnt/deploy for host access
 execute "copy build into place" do
-  command "cp -r #{BUILD_DIR}/ #{DEPLOY_DIR}"
+  command "cp -r #{BUILD_DIR}/* #{DEPLOY_DIR}"
 end
 
 # ensure the directory exists for pkgin cache
@@ -29,5 +29,5 @@ end
 
 # copy (and remove) the pkgin cache & db for quick subsequent deploys
 execute "stash pkgin packages into cache for quick access" do
-  command 'cp -r #{BUILD_DIR}/var/db/pkgin/ #{CACHE_DIR}/pkgin'
+  command 'cp -r #{BUILD_DIR}/var/db/pkgin/* #{CACHE_DIR}/pkgin'
 end

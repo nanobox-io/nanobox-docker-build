@@ -55,7 +55,7 @@ else
   if ::File.exist? "#{CACHE_DIR}/pkgin"
     # fetch the pkgin cache & db from cache for a quick deploy
     execute "extrace pkgin packages from cache for quick access" do
-      command "cp -r #{CACHE_DIR}/pkgin/ #{BUILD_DIR}/var/db/pkgin"
+      command "cp -r #{CACHE_DIR}/pkgin/* #{BUILD_DIR}/var/db/pkgin"
     end
   end
 end
@@ -77,7 +77,7 @@ end
 # 4)
 # copy the read-only mounted code into the build
 execute "copy code into build" do
-  command "cp -r #{CODE_LIVE_DIR}/ #{CODE_DIR}"
+  command "cp -r #{CODE_LIVE_DIR}/* #{CODE_DIR}"
 end
 
 # 5)
