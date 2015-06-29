@@ -12,9 +12,11 @@ RUN mkdir -p /data/var/db
 RUN /data/sbin/pkg_admin rebuild
 RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up
 RUN /data/bin/pkgin -y in build-essential
-RUN /data/bin/pkgin -y in shon
 #TEMP
 RUN ln -s /data/bin/gmake /data/bin/make
+
+# install tools required for engine
+RUN /opt/gonano/bin/pkgin -y in shon
 
 # Cleanup disk
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/gonano/db/pkgin /data/var/db/pkgin
