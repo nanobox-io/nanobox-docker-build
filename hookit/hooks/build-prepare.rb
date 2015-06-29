@@ -81,6 +81,10 @@ execute "copy code into build" do
   command "cp -r #{CODE_LIVE_DIR}/* #{CODE_DIR}"
 end
 
+execute "ensure gopagoda owns code" do
+  command "chown -R gopagoda #{CODE_DIR}"
+end
+
 # 5)
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
   execute "prepare" do
