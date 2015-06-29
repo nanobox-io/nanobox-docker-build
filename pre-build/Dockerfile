@@ -18,6 +18,9 @@ RUN ln -s /data/bin/gmake /data/bin/make
 # install tools required for engine
 RUN /opt/gonano/bin/pkgin -y in shon
 
+# chown /data to gonano
+RUN chown -R gonano /data
+
 # Cleanup disk
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/gonano/db/pkgin /data/var/db/pkgin
 
