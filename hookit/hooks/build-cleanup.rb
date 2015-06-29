@@ -36,6 +36,3 @@ end
 #   end
 
 # end
-
-# temporarily exit to inspect
-exit 1
