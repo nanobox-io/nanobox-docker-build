@@ -10,7 +10,7 @@ if not ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/build"
 end
 
 execute "build code" do
-  command %Q(#{ENGINE_DIR}/#{engine}/bin/build "#{engine_payload}")
+  command %Q(#{ENGINE_DIR}/#{engine}/bin/build '#{engine_payload}')
   cwd "#{ENGINE_DIR}/#{engine}/bin"
   path GONANO_PATH
   user 'gonano'

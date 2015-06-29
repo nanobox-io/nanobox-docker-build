@@ -7,7 +7,7 @@ engine = registry('engine')
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
 
   execute "cleanup code" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup "#{engine_payload}")
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup '#{engine_payload}')
     cwd "#{ENGINE_DIR}/#{engine}/bin"
     path GONANO_PATH
     user 'gonano'

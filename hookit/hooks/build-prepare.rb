@@ -84,7 +84,7 @@ end
 # 5)
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
   execute "prepare" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/prepare "#{engine_payload}")
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/prepare '#{engine_payload}')
     cwd "#{ENGINE_DIR}/#{engine}/bin"
     path GONANO_PATH
     user 'gonano'
