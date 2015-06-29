@@ -41,7 +41,7 @@ if not engine
     # todo: display a message indicating an engine was selected
   else
     # todo: if we don't have an engine at this point, we need to log an error
-    exit HOOKIT::ABORT
+    exit HOOKIT::EXIT::ABORT
   end
 end
 

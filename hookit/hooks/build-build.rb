@@ -6,7 +6,7 @@ engine = registry('engine')
 
 if not ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/build"
   # todo: log a message explaining that the build script is required
-  exit HOOKIT::ABORT
+  exit HOOKIT::EXIT::ABORT
 end
 
 execute "build code" do
