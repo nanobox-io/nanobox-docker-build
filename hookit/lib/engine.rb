@@ -7,6 +7,7 @@ module NanoBox
     CODE_DIR        = "#{BUILD_DIR}/code"
     DEPLOY_DIR      = '/mnt/deploy'
     CACHE_DIR       = '/mnt/cache'
+    APP_CACHE_DIR   = "#{CACHE_DIR}/app"
     ENGINE_DIR      = '/opt/engines'
     SHARE_DIR       = '/share'
     CODE_LIVE_DIR   = "#{SHARE_DIR}/code"
@@ -35,7 +36,7 @@ module NanoBox
       data = {
         code_dir: CODE_DIR,
         build_dir: BUILD_DIR,
-        cache_dir: CACHE_DIR,
+        cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,
         app: payload[:app],

@@ -33,7 +33,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
 
     # copy the mounted engine into place
     execute 'move engine into place' do
-      command "cp -r #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
+      command "rsync -a #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
     end
   end
 

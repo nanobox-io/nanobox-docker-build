@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# 1) create a digest of the /data pkgsrc bootstrap
+find /data | sed 's/\/data\///;s/\[/\\\[/' > /var/nanobox/build-excludes.txt
+
+# 2) parse the list of exceptions and remove any matching entries
+for entry in $(cat /var/nanobox/build-exceptions.txt | grep -v '#'); do
+  echo "excluding: $entry"
+  rule=$(echo $entry | sed 's/\//\\\//')
+  sed -i "/${rule}/d" /var/nanobox/build-excludes.txt
+done

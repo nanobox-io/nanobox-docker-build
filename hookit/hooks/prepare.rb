@@ -49,14 +49,22 @@ end
 # 2)
 # todo: parse the selected engine's Enginefile and see if they want a minimal base
 # ie: not a pkgsrc bootstrap
-if true
+if false
   
 else
   # move the pkgin cache into place if this is a subsequent deploy
   if ::File.exist? "#{CACHE_DIR}/pkgin"
     # fetch the pkgin cache & db from cache for a quick deploy
-    execute "extrace pkgin packages from cache for quick access" do
-      command "cp -r #{CACHE_DIR}/pkgin/* #{BUILD_DIR}/var/db/pkgin"
+    execute "extract pkgin packages from cache for quick access" do
+      command <<-EOF
+        rsync \
+          -v \
+          -a \
+          #{CACHE_DIR}/pkgin/ \
+          #{BUILD_DIR}/var/db/pkgin
+      EOF
+      stream true
+      on_data {|data| print data}
     end
   end
 end
@@ -68,17 +76,30 @@ end
   "#{BUILD_DIR}/bin",
   "#{ETC_DIR}",
   "#{ENV_DIR}",
-  "#{CODE_DIR}"
+  "#{CODE_DIR}",
+  "#{APP_CACHE_DIR}"
 ].each do |dir|
   directory dir do
     recursive true
   end
 end
 
+# ensure app cache dir is owned by gonano
+execute "ensure gonano owns app cache" do
+  command "chown gonano #{APP_CACHE_DIR}"
+end
+
 # 4)
 # copy the read-only mounted code into the build
+# todo: exclude git directory
 execute "copy code into build" do
-  command "cp -r #{CODE_LIVE_DIR}/* #{CODE_DIR}"
+  command <<-EOF
+    rsync \
+      -a \
+      --delete \
+      #{CODE_LIVE_DIR}/ \
+      #{CODE_DIR}
+  EOF
 end
 
 execute "ensure gonano owns code" do
