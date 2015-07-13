@@ -1,5 +1,3 @@
-require ''
-
 module NanoBox
   module Output
     
