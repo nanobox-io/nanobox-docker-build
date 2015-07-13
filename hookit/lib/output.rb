@@ -105,7 +105,7 @@ module NanoBox
       label = "end #{label}".upcase
       max_len = 70
       left = 3
-      right = label.len + 1
+      right = label.length + 1
       middle = max_len - (left + right)
 
       res = ""
