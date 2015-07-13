@@ -219,7 +219,7 @@ module NanoBox
     # 
     # Oh snap the deploy stream just disconnected. No worries, you can
     # visit the dashboard to view the complete output stream.
-    def fatal(title, message)
+    def fatal(title, message=nil)
       res = "\n! #{title.upcase} !\n"
 
       if message
