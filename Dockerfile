@@ -20,8 +20,10 @@ RUN mkdir -p /opt/nos
 RUN curl \
   -k \
   -s \
-  https://github.com/pagodabox/nanobox-nos/archive/v0.1.0.tar.gz
-    | tar -xzf - -C /opt/nos/
+  https://github.com/pagodabox/nanobox-nos/archive/v0.1.0.tar.gz \
+    | tar \
+        -xzf - \
+        -C /opt/nos/
 
 # Install engines
 # RUN nanobox fetch | tar -C /opt/engines/ -zxf -
