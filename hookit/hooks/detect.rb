@@ -44,7 +44,7 @@ if not engine
   else
     logtap.print fatal('unable to find a compatible engine')
     # todo: if we don't have an engine at this point, we need to log an error
-    exit HOOKIT::EXIT::ABORT
+    exit Hookit::Exit::ABORT
   end
 end
 

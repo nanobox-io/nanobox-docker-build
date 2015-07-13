@@ -7,7 +7,7 @@ engine = registry('engine')
 
 if not ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/build"
   logtap.print fatal('build script is required, but missing')
-  exit HOOKIT::EXIT::ABORT
+  exit Hookit::Exit::ABORT
 end
 
 logtap.print bullet('build script detected, running now'), 'debug'

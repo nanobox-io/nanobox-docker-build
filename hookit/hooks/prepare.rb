@@ -7,7 +7,7 @@ engine = registry('engine')
 
 if not ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
   logtap.print fatal('prepare script is required, but missing')
-  exit HOOKIT::EXIT::ABORT
+  exit Hookit::Exit::ABORT
 end
 
 logtap.print bullet('prepare script detected, running now'), 'debug'
