@@ -8,7 +8,8 @@ ADD files/build-exceptions.txt /var/nanobox/build-exceptions.txt
 RUN /var/tmp/generate-build-excludes
 
 # update pkgin
-RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up
+RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
+    rm -rf /var/tmp/* /data/var/db/pkgin/cache
 RUN chown -R gonano /data/var/db/pkgin
 
 # Copy files
@@ -16,9 +17,6 @@ ADD hookit/. /opt/gonano/hookit/mod/
 
 # Install engines
 # RUN nanobox fetch | tar -C /opt/engines/ -zxf -
-
-# Cleanup disk
-RUN rm -rf /var/tmp/* /data/var/db/pkgin/cache 
 
 # Allow ssh
 EXPOSE 22

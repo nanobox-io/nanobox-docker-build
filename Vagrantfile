@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+version = `curl -s https://api.github.com/repos/pagodabox/nanobox-boot2docker/releases/latest | json name`.strip
+
 $wait = <<SCRIPT
 echo "Waiting for docker sock file"
 while [ ! -S /var/run/docker.sock ]; do
@@ -10,7 +12,7 @@ SCRIPT
 
 Vagrant.configure(2) do |config|
   config.vm.box     = "nanobox/boot2docker"
-  config.vm.box_url = "https://github.com/pagodabox/nanobox-boot2docker/releases/download/v0.0.4/nanobox-boot2docker.box"
+  config.vm.box_url = "https://github.com/pagodabox/nanobox-boot2docker/releases/download/#{version}/nanobox-boot2docker.box"
 
   config.vm.synced_folder ".", "/vagrant"
 
@@ -27,11 +29,11 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: "docker build -t #{ENV['docker_user']}/build /vagrant"
 
   # Publish images to dockerhub
-  config.vm.provision "shell", inline: "docker push #{ENV['docker_user']}/build"
   config.vm.provision "shell", inline: "docker push #{ENV['docker_user']}/pre-build"
+  config.vm.provision "shell", inline: "docker push #{ENV['docker_user']}/build"
 
   config.vm.provider "virtualbox" do |v|
-    v.customize ["modifyvm", :id, "--memory", "1024"]
+    v.customize ["modifyvm", :id, "--memory", "1024", "--ioapic", "on"]
   end
 
 end
