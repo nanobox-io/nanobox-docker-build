@@ -12,7 +12,7 @@
 ^sbin$
 ^var$
 # gcclibs
-^gcc47/x86_64-debian-linux
+^gcc49/x86_64-debian-linux
 # ncurses
 ^lib/libform
 ^lib/libmenu
