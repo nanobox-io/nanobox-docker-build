@@ -253,7 +253,7 @@ module NanoBox
         char = message[i]
 
         if char == " "
-          if j =< max_line_len
+          if j <= max_line_len
             # terminate the current line
             res << "\n"
             res << "#{word} "
@@ -264,7 +264,7 @@ module NanoBox
             word = ""
           end
         elsif i == message.length - 1
-          if j =< max_line_len
+          if j <= max_line_len
             # terminate the current line
             res << "\n"
           end
