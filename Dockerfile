@@ -24,6 +24,7 @@ RUN curl \
   https://github.com/pagodabox/nanobox-nos/archive/v0.1.0.tar.gz \
     | tar \
         -xzf - \
+        --strip-components=1 \
         -C /opt/nos/
 
 # Install engines
