@@ -1,5 +1,6 @@
-# import some logic/helpers from lib/engine.rb
+# import some logic/helpers from lib/*.rb
 include NanoBox::Engine
+include NanoBox::Output
 
 # 'payload' is a helper function within the hookit framework that will parse
 # input provided as JSON into a hash with symbol keys.
@@ -10,6 +11,8 @@ include NanoBox::Engine
 boxfile = payload[:boxfile] || {}
 
 # 0) temporary
+logtap.print bullet('ensuring the engine dir exists'), 'debug'
+
 # ensure engine dir exists
 directory "#{ENGINE_DIR}" do
   recursive true
@@ -23,6 +26,8 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
   basename = ::File.basename(boxfile[:engine])
   path     = "#{SHARE_DIR}/engines/#{basename}"
 
+  logtap.print bullet('detecting engine from local workstation')
+
   # if the engine has been shared with us, then let's copy it over
   if ::File.exist?(path)
 
@@ -31,10 +36,18 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
       action :delete
     end
 
+    logtap.print bullet('copying engine from workstation into into build container')
+
     # copy the mounted engine into place
+    logtap.print process_start('copy mounted engine'), 'debug'
+
     execute 'move engine into place' do
       command "rsync -a #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
+      stream true
+      on_data { |data| logtap.print data, 'debug' }
     end
+
+    logtap.print process_end('copy mounted engine'), 'debug'
   end
 
   # now let's set the engine in the registry for later consumption
@@ -47,4 +60,77 @@ end
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and not is_filepath?(boxfile[:engine])
   # todo: wait until nanobox-cli can fetch engine
+end
+
+# 3)
+# move the pkgin cache into place if this is a subsequent deploy
+if ::File.exist? "#{CACHE_DIR}/pkgin"
+
+  logtap.print process_start('extract pkgin cache'), 'debug'
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract pkgin packages from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -v \
+        -a \
+        #{CACHE_DIR}/pkgin/ \
+        #{BUILD_DIR}/var/db/pkgin
+    EOF
+    stream true
+    on_data { |data| logtap.print data, 'debug' }
+  end
+
+  logtap.print process_end('extract pkgin cache'), 'debug'
+end
+
+# 4)
+# make sure required directories exist
+logtap.print bullet('ensuring all directories required for build exist'), 'debug'
+
+[
+  "#{BUILD_DIR}/sbin",
+  "#{BUILD_DIR}/bin",
+  "#{ETC_DIR}",
+  "#{ENV_DIR}",
+  "#{CODE_DIR}",
+  "#{APP_CACHE_DIR}"
+].each do |dir|
+  directory dir do
+    recursive true
+  end
+end
+
+# 5)
+# ensure app cache dir is owned by gonano
+logtap.print bullet('chowning cache data'), 'debug'
+
+execute "ensure gonano owns app cache" do
+  command "chown gonano #{APP_CACHE_DIR}"
+end
+
+# 6)
+# copy the read-only mounted code into the code dir
+logtap.print process_start('copy raw code into place'), 'debug'
+
+execute "copy raw code into place" do
+  command <<-EOF
+    rsync \
+      -a \
+      --delete \
+      --exclude='.git/' \
+      #{CODE_LIVE_DIR}/ \
+      #{CODE_DIR}
+  EOF
+  stream true
+  on_data { |data| logtap.print data, 'debug' }
+end
+
+logtap.print process_end('copy raw code into place'), 'debug'
+
+# 7)
+logtap.print bullet('chowning cache data'), 'debug'
+
+execute "ensure gonano owns code" do
+  command "chown -R gonano #{CODE_DIR}"
 end

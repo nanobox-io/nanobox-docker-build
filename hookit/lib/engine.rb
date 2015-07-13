@@ -3,13 +3,14 @@ require 'multi_json'
 
 module NanoBox
   module Engine
+    SHARE_DIR       = '/share'
+    MNT_DIR         = '/mnt'
     BUILD_DIR       = '/data'
-    CODE_DIR        = "#{BUILD_DIR}/code"
-    DEPLOY_DIR      = '/mnt/deploy'
-    CACHE_DIR       = '/mnt/cache'
+    CODE_DIR        = "#{MNT_DIR}/code"
+    DEPLOY_DIR      = "#{MNT_DIR}/deploy"
+    CACHE_DIR       = "#{MNT_DIR}/cache"
     APP_CACHE_DIR   = "#{CACHE_DIR}/app"
     ENGINE_DIR      = '/opt/engines'
-    SHARE_DIR       = '/share'
     CODE_LIVE_DIR   = "#{SHARE_DIR}/code"
     ENGINE_LIVE_DIR = "#{SHARE_DIR}/engines"
     ETC_DIR         = "#{BUILD_DIR}/etc"

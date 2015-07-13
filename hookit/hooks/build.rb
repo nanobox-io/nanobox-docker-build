@@ -5,9 +5,11 @@ include NanoBox::Engine
 engine = registry('engine')
 
 if not ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/build"
-  # todo: log a message explaining that the build script is required
+  logtap.print fatal('build script is required, but missing')
   exit HOOKIT::EXIT::ABORT
 end
+
+logtap.print bullet('build script detected, running now'), 'debug'
 
 execute "build code" do
   command %Q(#{ENGINE_DIR}/#{engine}/bin/build '#{engine_payload}')
@@ -15,6 +17,5 @@ execute "build code" do
   path GONANO_PATH
   user 'gonano'
   stream true
-  # on_data {|data| logvac.print data}
-  on_data {|data| print data}
+  on_data {|data| logtap.print data}
 end

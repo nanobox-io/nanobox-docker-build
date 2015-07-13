@@ -224,7 +224,9 @@ module NanoBox
     def fatal(title, message)
       res = "\n! #{title.upcase} !\n"
 
-      res << format_block(message)
+      if message
+        res << format_block(message)
+      end
 
       res
     end
