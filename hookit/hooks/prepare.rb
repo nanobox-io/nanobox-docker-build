@@ -1,5 +1,6 @@
-# import some logic/helpers from lib/engine.rb
+# import some logic/helpers from lib/*.rb
 include NanoBox::Engine
+include NanoBox::Output
 
 # By this point, engine should be set in the registry
 engine = registry('engine')
