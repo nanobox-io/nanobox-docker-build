@@ -44,7 +44,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
     logtap.print process_start('copy mounted engine'), 'debug'
 
     execute 'move engine into place' do
-      command "rsync -a #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
+      command "rsync -v -a #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
       stream true
       on_data { |data| logtap.print data, 'debug' }
     end
