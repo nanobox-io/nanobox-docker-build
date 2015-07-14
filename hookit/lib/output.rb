@@ -184,7 +184,7 @@ module NanoBox
     # would produce:
     # +> Language Detected : Ruby
     def bullet(message)
-      "+> #{message}"
+      "+> #{message}\n"
     end
 
     # warning
