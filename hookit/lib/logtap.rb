@@ -9,7 +9,8 @@ module NanoBox
 
     def post(message, level='info')
       connection.post("/deploy") do |req|
-        req.headers[:x_log_level] = level
+        # req.headers[:x_log_level] = level
+        req.headers['X-Log-Level'] = level
         req.body = message
       end
     end
