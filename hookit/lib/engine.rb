@@ -6,7 +6,7 @@ module NanoBox
     SHARE_DIR       = '/share'
     MNT_DIR         = '/mnt'
     BUILD_DIR       = '/data'
-    CODE_DIR        = "#{MNT_DIR}/code"
+    CODE_DIR        = "#{MNT_DIR}/build"
     DEPLOY_DIR      = "#{MNT_DIR}/deploy"
     CACHE_DIR       = "#{MNT_DIR}/cache"
     APP_CACHE_DIR   = "#{CACHE_DIR}/app"
