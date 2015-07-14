@@ -2,7 +2,7 @@
 include NanoBox::Engine
 include NanoBox::Output
 
-logtap.print bullet('running boxfile hook'), 'debug'
+logtap.print bullet('Running boxfile hook'), 'debug'
 
 # By this point, engine should be set in the registry
 engine = registry('engine')
@@ -10,7 +10,7 @@ engine = registry('engine')
 boxfile = begin
   if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/boxfile"
 
-    logtap.print bullet('boxfile script detected, running now'), 'debug'
+    logtap.print bullet('Boxfile script detected, running now'), 'debug'
 
     execute "generating boxfile" do
       command %Q(#{ENGINE_DIR}/#{engine}/bin/boxfile '#{engine_payload}')
