@@ -2,6 +2,8 @@
 include NanoBox::Engine
 include NanoBox::Output
 
+logtap.print bullet('running configure hook'), 'debug'
+
 # 'payload' is a helper function within the hookit framework that will parse
 # input provided as JSON into a hash with symbol keys.
 # https://github.com/pagodabox/hookit/blob/master/lib/hookit/hook.rb#L7-L17
@@ -36,7 +38,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
       action :delete
     end
 
-    logtap.print bullet('copying engine from workstation into into build container')
+    logtap.print bullet('copying engine from workstation into build container')
 
     # copy the mounted engine into place
     logtap.print process_start('copy mounted engine'), 'debug'

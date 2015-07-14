@@ -2,6 +2,8 @@
 include NanoBox::Engine
 include NanoBox::Output
 
+logtap.print bullet('running prepare hook'), 'debug'
+
 # By this point, engine should be set in the registry
 engine = registry('engine')
 
