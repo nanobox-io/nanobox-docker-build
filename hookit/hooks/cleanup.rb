@@ -2,14 +2,14 @@
 include NanoBox::Engine
 include NanoBox::Output
 
-logtap.print bullet('Running cleanup hook'), 'debug'
+logtap.print bullet('Running cleanup hook...'), 'debug'
 
 # By this point, engine should be set in the registry
 engine = registry('engine')
 
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
 
-  logtap.print bullet('Cleanup script detected, running now'), 'debug'
+  logtap.print bullet('Cleanup script detected, running now...'), 'debug'
 
   execute "cleanup code" do
     command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup '#{engine_payload}')
@@ -44,7 +44,7 @@ logtap.print process_end('Copy build into place'), 'debug'
 if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
 
   # ensure the directory exists for pkgin cache
-  logtap.print bullet('Ensuring the pkgin cache dir exists'), 'debug'
+  logtap.print bullet('Ensuring the pkgin cache dir exists...'), 'debug'
 
   directory "#{CACHE_DIR}/pkgin" do
     recursive true

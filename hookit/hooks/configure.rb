@@ -2,7 +2,7 @@
 include NanoBox::Engine
 include NanoBox::Output
 
-logtap.print bullet('Running configure hook'), 'debug'
+logtap.print bullet('Running configure hook...'), 'debug'
 
 # 'payload' is a helper function within the hookit framework that will parse
 # input provided as JSON into a hash with symbol keys.
@@ -13,7 +13,7 @@ logtap.print bullet('Running configure hook'), 'debug'
 boxfile = payload[:boxfile] || {}
 
 # 0) temporary
-logtap.print bullet('Ensuring the engine dir exists'), 'debug'
+logtap.print bullet('Ensuring the engine dir exists...'), 'debug'
 
 # ensure engine dir exists
 directory "#{ENGINE_DIR}" do
@@ -28,7 +28,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
   basename = ::File.basename(boxfile[:engine])
   path     = "#{SHARE_DIR}/engines/#{basename}"
 
-  logtap.print bullet('Detecting engine from local workstation')
+  logtap.print bullet('Detecting engine from local workstation...')
 
   # if the engine has been shared with us, then let's copy it over
   if ::File.exist?(path)
@@ -38,7 +38,7 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
       action :delete
     end
 
-    logtap.print bullet('Copying engine from workstation into build container')
+    logtap.print bullet('Copying engine from workstation into build container...')
 
     # copy the mounted engine into place
     logtap.print process_start('copy mounted engine'), 'debug'
@@ -105,7 +105,7 @@ end
 
 # 5)
 # ensure app cache dir is owned by gonano
-logtap.print bullet('Chowning cache data'), 'debug'
+logtap.print bullet('Chowning cache data...'), 'debug'
 
 execute "ensure gonano owns app cache" do
   command "chown gonano #{APP_CACHE_DIR}"
