@@ -118,6 +118,7 @@ logtap.print process_start('Copy raw code into place'), 'debug'
 execute "copy raw code into place" do
   command <<-EOF
     rsync \
+      -v \
       -a \
       --delete \
       --exclude='.git/' \

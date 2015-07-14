@@ -28,6 +28,7 @@ logtap.print process_start('Copy build into place'), 'debug'
 execute "copy build into place" do
   command <<-EOF
     rsync \
+      -v \
       -a \
       --delete \
       --exclude-from=/var/nanobox/build-excludes.txt \
