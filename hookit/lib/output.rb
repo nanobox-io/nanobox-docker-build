@@ -31,7 +31,7 @@ module NanoBox
       res = ""
 
       # start with a newline
-      res << "\n"
+      # res << "\n"
 
       # print the left column
       left.times { res << ':' }
@@ -46,7 +46,8 @@ module NanoBox
       right.times { res << ':' }
 
       # end with two newlines
-      res << "\n\n"
+      res << "\n"
+      # res << "\n\n"
 
       res
     end
@@ -86,7 +87,8 @@ module NanoBox
       res << " =>"
 
       # end with two newlines
-      res << "\n\n"
+      res << "\n"
+      # res << "\n\n"
 
       res
     end
@@ -126,7 +128,8 @@ module NanoBox
       res << label
 
       # end with two newlines
-      res << "\n\n"
+      res << "\n"
+      # res << "\n\n"
 
       res
     end
