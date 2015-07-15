@@ -36,10 +36,10 @@ execute "copy build into place" do
       #{DEPLOY_DIR}
   EOF
   stream true
-  on_data {|data| logtap.print data, 'debug'}
+  on_data {|data| logtap.print subtask_info(data), 'debug'}
 end
 
-logtap.print(process_end('Copy build into place'), 'debug')
+logtap.print(process_end, 'debug')
 
 if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
 
@@ -62,9 +62,9 @@ if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
         #{CACHE_DIR}/pkgin
     EOF
     stream true
-    on_data { |data| logtap.print data, 'debug' }
+    on_data { |data| logtap.print subtask_info(data), 'debug' }
   end
 
-  logtap.print(process_end('Copy pkgin cache'), 'debug')
+  logtap.print(process_end, 'debug')
 
 end

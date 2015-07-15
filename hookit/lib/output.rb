@@ -45,9 +45,8 @@ module NanoBox
       # print the right column
       right.times { res << ':' }
 
-      # end with two newlines
+      # end with a newline
       res << "\n"
-      # res << "\n\n"
 
       res
     end
@@ -58,15 +57,15 @@ module NanoBox
     # 
     # Example:
     # 
-    # process_start "build output"
+    # process_start "installing ruby-2.2"
     # 
     # would produce:
-    # BUILD OUTPUT ::::::::::::::::::::::::::::::::::::::::::::::::::::: =>
+    # INSTALLING RUBY-2.2 ------------------------------------------------>
     def process_start(label)
       label = label.upcase
       max_len = 70
       left = label.length + 1
-      right = 3
+      right = 1
       middle = max_len - (left + right)
 
       res = ""
@@ -81,57 +80,22 @@ module NanoBox
       res << " "
 
       # print middle column
-      middle.times { res << ':'}
+      middle.times { res << '-'}
 
       # print the right column
-      res << " =>"
+      res << ">"
 
-      # end with two newlines
-      res << "\n"
-      # res << "\n\n"
+      # end with a newline and the first column
+      res << "\n   "
 
       res
     end
 
     # process_end
     # 
-    # Print a header indicating the end of a process.
-    # 
-    # Example:
-    # 
-    # process_end "build output"
-    # 
-    # would produce:
-    # <= ::::::::::::::::::::::::::::::::::::::::::::::::: END BUILD OUTPUT
-    def process_end(label)
-      label = "end #{label}".upcase
-      max_len = 70
-      left = 3
-      right = label.length + 1
-      middle = max_len - (left + right)
-
-      res = ""
-
-      # start with a newline
-      res << "\n"
-
-      # print the left column
-      res << "<= "
-
-      # print middle column
-      middle.times { res << ':'}
-
-      # print a space
-      res << " "
-
-      # print label
-      res << label
-
-      # end with two newlines
-      res << "\n"
-      # res << "\n\n"
-
-      res
+    # Creates a hard delineation after a process
+    def process_end
+      "\n"
     end
 
     # subtask_start
@@ -143,9 +107,49 @@ module NanoBox
     # subtask_start "after build hook 1"
     # 
     # would produce:
-    # ::::::::: AFTER BUILD HOOK 1
+    # AFTER BUILD HOOK 1 -------------------->
     def subtask_start(label)
-      "\n::::::::: #{label.upcase}\n"
+      label = label.upcase
+      max_len = 40
+      left = label.length + 1
+      right = 1
+      middle = max_len - (left + right)
+
+      res = ""
+
+      # start with a newline
+      res << "\n"
+
+      # print label
+      res << label
+
+      # print a space
+      res << " "
+
+      # print middle column
+      middle.times { res << '-'}
+
+      # print the right column
+      res << ">"
+
+      # end with a newline and the column for the first output
+      res << "\n   "
+
+      res
+    end
+
+    # subtask_info
+    # 
+    # Print subtask info formatted properly
+    # 
+    # Example:
+    # 
+    # subtask_info "blablablablablabla"
+    # 
+    # would produce:
+    #    blablablablablabla
+    def subtask_info(data)
+      data.gsub(//\n/, "\n   ").gsub(/\\n\\n/, "\n")
     end
 
     # subtask_success
@@ -157,9 +161,9 @@ module NanoBox
     # subtask_success
     # 
     # would produce:
-    # <<<<<<<<< [√] SUCCESS
+    #    [√] SUCCESS
     def subtask_success
-      "<<<<<<<<< [√] SUCCESS\n\n"
+      "   [√] SUCCESS\n\n"
     end
 
     # subtask_fail
@@ -171,9 +175,9 @@ module NanoBox
     # subtask_fail
     # 
     # would produce:
-    # <<<<<<<<< [!] FAILED
+    #    [!] FAILED
     def subtask_fail
-      "<<<<<<<<< [!] FAILED\n\n"
+      "   [!] FAILED\n\n"
     end
 
     # bullet
@@ -188,6 +192,34 @@ module NanoBox
     # +> Language Detected : Ruby
     def bullet(message)
       "+> #{message}\n"
+    end
+
+    # bullet_info
+    # 
+    # Print a line item in the form of a bullet point
+    # 
+    # Example:
+    # 
+    # bullet_info "Language Detected : Ruby"
+    # 
+    # would produce:
+    #  Language Detected : Ruby
+    def bullet_info(message)
+      "   #{message}"
+    end
+
+    # bullet_sub
+    # 
+    # Print a line item in the form of a bullet point
+    # 
+    # Example:
+    # 
+    # bullet_sub "Language Detected : Ruby"
+    # 
+    # would produce:
+    #  - Language Detected : Ruby
+    def bullet_sub(message)
+      "   - #{message}"
     end
 
     # warning

@@ -46,10 +46,10 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
     execute 'move engine into place' do
       command "rsync -v -a #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
       stream true
-      on_data { |data| logtap.print data, 'debug' }
+      on_data { |data| logtap.print subtask_info(data), 'debug' }
     end
 
-    logtap.print(process_end('copy mounted engine'), 'debug')
+    logtap.print(process_end, 'debug')
   end
 
   # now let's set the engine in the registry for later consumption
@@ -80,10 +80,10 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
         #{BUILD_DIR}/var/db/pkgin
     EOF
     stream true
-    on_data { |data| logtap.print data, 'debug' }
+    on_data { |data| logtap.print subtask_info(data), 'debug' }
   end
 
-  logtap.print process_end('Extract pkgin cache'), 'debug'
+  logtap.print process_end, 'debug'
 end
 
 # 4)
@@ -126,10 +126,10 @@ execute "copy raw code into place" do
       #{CODE_DIR}
   EOF
   stream true
-  on_data { |data| logtap.print data, 'debug' }
+  on_data { |data| logtap.print subtask_info(data), 'debug' }
 end
 
-logtap.print(process_end('Copy raw code into place'), 'debug')
+logtap.print(process_end, 'debug')
 
 # 7)
 logtap.print(bullet('Chowning cache data'), 'debug')
