@@ -149,7 +149,7 @@ module NanoBox
     # would produce:
     #    blablablablablabla
     def subtask_info(data)
-      data.gsub(//\n/, "\n   ").gsub(/\\n\\n/, "\n")
+      data.gsub(/\\n\\n/, "\n").gsub(/\\n/, "\n   ")
     end
 
     # subtask_success
