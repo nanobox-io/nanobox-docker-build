@@ -2,7 +2,7 @@
 include NanoBox::Engine
 include NanoBox::Output
 
-logtap.print bullet('Running detect hook...'), 'debug'
+logtap.print(bullet("Running detect hook..."), 'debug')
 
 # By this point, engine should be set in the registry
 # if an engine is specified in the Boxfile
@@ -12,7 +12,7 @@ engine = registry('engine')
 # installed engines calling the "sniff" script until one of them exits with 0
 if not engine
 
-  logtap.print bullet('Engine is not specified, attempting to find an engine...'), 'debug'
+  logtap.print(bullet('Engine is not specified, attempting to find an engine...'), 'debug')
 
   ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.each do |e|
 
@@ -39,12 +39,12 @@ if not engine
   end
 
   if engine
-    logtap.print bullet("Engine found : #{engine}"), 'debug'
+    logtap.print(bullet("Engine found : #{engine}"), 'debug')
     # set the engine in the registry for later use
     registry('engine', engine)
     # todo: display a message indicating an engine was selected
   else
-    logtap.print fatal('Unable to find a compatible engine')
+    logtap.print(fatal('Unable to find a compatible engine'))
     # todo: if we don't have an engine at this point, we need to log an error
     exit Hookit::Exit::ABORT
   end

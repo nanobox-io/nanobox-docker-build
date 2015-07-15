@@ -2,14 +2,14 @@
 include NanoBox::Engine
 include NanoBox::Output
 
-logtap.print bullet('Running cleanup hook...'), 'debug'
+logtap.print(bullet("Running cleanup hook..."), 'debug')
 
 # By this point, engine should be set in the registry
 engine = registry('engine')
 
 if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
 
-  logtap.print bullet('Cleanup script detected, running now...'), 'debug'
+  logtap.print(bullet("Cleanup script detected, running now..."), 'debug')
 
   execute "cleanup code" do
     command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup '#{engine_payload}')
@@ -23,7 +23,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
 end
 
 # copy /data (current build) to /mnt/deploy for host access
-logtap.print process_start('Copy build into place'), 'debug'
+logtap.print(process_start('Copy build into place'), 'debug')
 
 execute "copy build into place" do
   command <<-EOF
@@ -39,19 +39,19 @@ execute "copy build into place" do
   on_data {|data| logtap.print data, 'debug'}
 end
 
-logtap.print process_end('Copy build into place'), 'debug'
+logtap.print(process_end('Copy build into place'), 'debug')
 
 if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
 
   # ensure the directory exists for pkgin cache
-  logtap.print bullet('Ensuring the pkgin cache dir exists...'), 'debug'
+  logtap.print(bullet('Ensuring the pkgin cache dir exists...'), 'debug')
 
   directory "#{CACHE_DIR}/pkgin" do
     recursive true
   end
 
   # copy (and remove) the pkgin cache & db for quick subsequent deploys
-  logtap.print process_start('Copy pkgin cache'), 'debug'
+  logtap.print(process_start('Copy pkgin cache'), 'debug')
 
   execute "stash pkgin packages into cache for quick access" do
     command <<-EOF
@@ -65,6 +65,6 @@ if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
     on_data { |data| logtap.print data, 'debug' }
   end
 
-  logtap.print process_end('Copy pkgin cache'), 'debug'
+  logtap.print(process_end('Copy pkgin cache'), 'debug')
 
 end
