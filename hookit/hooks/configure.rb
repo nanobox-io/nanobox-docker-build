@@ -44,7 +44,14 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
     logtap.print(process_start('copy mounted engine'), 'debug')
 
     execute 'move engine into place' do
-      command "rsync -v -a #{ENGINE_LIVE_DIR}/#{basename} #{ENGINE_DIR}/"
+      command <<-EOF
+        rsync \
+          -v \
+          -a \
+          --exclude='.git/' \
+          #{ENGINE_LIVE_DIR}/#{basename} \
+          #{ENGINE_DIR}/
+      EOF
       stream true
       on_data { |data| logtap.print subtask_info(data), 'debug' }
     end
