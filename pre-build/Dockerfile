@@ -19,9 +19,3 @@ RUN /opt/gonano/bin/pkgin -y in shon rsync && \
 
 # link make to gmake
 RUN ln -s /data/bin/gmake /data/bin/make
-
-# Allow ssh
-EXPOSE 22
-
-# Run runit automatically
-CMD /sbin/my_init
