@@ -11,11 +11,12 @@ RUN curl -s http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | tar -
     /data/sbin/pkg_admin rebuild && \
     rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
     /data/bin/pkgin -y in gcc49 build-essential && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/gonano/db/pkgin/cache /data/var/db/pkgin/cache && \
+    rm -rf /data/var/db/pkgin/cache && \
     chown -R gonano /data
 
-RUN /opt/gonano/bin/pkgin -y in shon rsync && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/gonano/db/pkgin/cache /data/var/db/pkgin/cache
+RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
+    /opt/gonano/bin/pkgin -y in shon rsync && \
+    rm -rf /var/gonano/db/pkgin/cache
 
 # link make to gmake
 RUN ln -s /data/bin/gmake /data/bin/make
