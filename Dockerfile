@@ -12,8 +12,12 @@ RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
     rm -rf /var/tmp/* /data/var/db/pkgin/cache
 RUN chown -R gonano /data/var/db/pkgin
 
+# Created necessary directories
+RUN mkdir -p /opt/bin
+
 # Copy files
 ADD hookit/. /opt/gonano/hookit/mod/
+ADD files/opt/bin/. /opt/bin/
 
 # install nos
 RUN mkdir -p /opt/nos
