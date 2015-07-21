@@ -11,7 +11,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
 
   logtap.print(bullet("Cleanup script detected, running now..."), 'debug')
 
-  execute "cleanup code" do
+  execute "cleanup environment" do
     command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup '#{engine_payload}')
     cwd "#{ENGINE_DIR}/#{engine}/bin"
     path GONANO_PATH

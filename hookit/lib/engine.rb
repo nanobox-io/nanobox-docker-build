@@ -11,6 +11,7 @@ module NanoBox
     CACHE_DIR       = "#{MNT_DIR}/cache"
     APP_CACHE_DIR   = "#{CACHE_DIR}/app"
     ENGINE_DIR      = '/opt/engines'
+    CODE_STAGE_DIR  = '/opt/code'
     CODE_LIVE_DIR   = "#{SHARE_DIR}/code"
     ENGINE_LIVE_DIR = "#{SHARE_DIR}/engines"
     ETC_DIR         = "#{BUILD_DIR}/etc"
@@ -31,11 +32,11 @@ module NanoBox
     ].join (':')
 
     # This payload will serialized as JSON and passed into each of the
-    # engine scripts as the first and only argument. 
+    # engine scripts as the first and only argument.
     def engine_payload
 
       data = {
-        code_dir: CODE_DIR,
+        code_dir: CODE_STAGE_DIR,
         build_dir: BUILD_DIR,
         cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,

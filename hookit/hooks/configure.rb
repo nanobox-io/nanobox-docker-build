@@ -7,7 +7,7 @@ logtap.print(bullet('Running configure hook...'), 'debug')
 # 'payload' is a helper function within the hookit framework that will parse
 # input provided as JSON into a hash with symbol keys.
 # https://github.com/pagodabox/hookit/blob/master/lib/hookit/hook.rb#L7-L17
-# 
+#
 # Now we extract the 'boxfile' section of the payload, which is only the
 # 'build' section of the Boxfile provided by the app
 boxfile = payload[:boxfile] || {}
@@ -28,10 +28,10 @@ if boxfile[:engine] and is_filepath?(boxfile[:engine])
   basename = ::File.basename(boxfile[:engine])
   path     = "#{SHARE_DIR}/engines/#{basename}"
 
-  logtap.print(bullet("Detecting engine from local workstation..."))
-
   # if the engine has been shared with us, then let's copy it over
   if ::File.exist?(path)
+
+    logtap.print(bullet("Detected engine from local workstation..."))
 
     # remove any official engine that may be in the way
     directory "#{ENGINE_DIR}/#{basename}" do
@@ -65,7 +65,7 @@ end
 
 # 2)
 # If a custom engine is specified, and is not mounted from
-# the workstation, let's fetch it from warehouse.nanobox.io. 
+# the workstation, let's fetch it from warehouse.nanobox.io.
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and not is_filepath?(boxfile[:engine])
   # todo: wait until nanobox-cli can fetch engine
@@ -116,31 +116,4 @@ logtap.print(bullet("Chowning cache data..."), 'debug')
 
 execute "ensure gonano owns app cache" do
   command "chown gonano #{APP_CACHE_DIR}"
-end
-
-# 6)
-# copy the read-only mounted code into the code dir
-logtap.print(process_start('Copy raw code into place'), 'debug')
-
-execute "copy raw code into place" do
-  command <<-EOF
-    rsync \
-      -v \
-      -a \
-      --delete \
-      --exclude='.git/' \
-      #{CODE_LIVE_DIR}/ \
-      #{CODE_DIR}
-  EOF
-  stream true
-  on_data { |data| logtap.print subtask_info(data), 'debug' }
-end
-
-logtap.print(process_end, 'debug')
-
-# 7)
-logtap.print(bullet('Chowning cache data'), 'debug')
-
-execute "ensure gonano owns code" do
-  command "chown -R gonano #{CODE_DIR}"
 end
