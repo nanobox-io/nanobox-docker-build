@@ -1,4 +1,4 @@
-# All entries in this list will be used to remove entries in the 
+# All entries in this list will be used to remove entries in the
 # build-exclude.txt list which is given to rsync. Essentially,
 # the build-exclude.txt list is meant to remove as much as possible from the
 # final /data pkgsrc bootstrap from the final build. There are a few exceptions
@@ -13,6 +13,7 @@
 ^var$
 # gcclibs
 ^gcc49/x86_64-debian-linux
+^gcc49$
 # ncurses
 ^lib/libform
 ^lib/libmenu
