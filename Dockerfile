@@ -25,7 +25,7 @@ RUN curl \
   -k \
   -s \
   -L \
-  https://github.com/pagodabox/nanobox-nos/archive/v0.2.4.tar.gz \
+  https://github.com/pagodabox/nanobox-nos/archive/v0.2.5.tar.gz \
     | tar \
         -xzf - \
         --strip-components=1 \
