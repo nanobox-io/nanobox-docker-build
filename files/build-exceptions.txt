@@ -6,28 +6,28 @@
 # replace function.
 #
 # general directory structure
-^bin$
-^etc$
-^lib$
-^sbin$
-^var$
+^/bin$
+^/etc$
+^/lib$
+^/sbin$
+^/var$
 # gcclibs
-^gcc49/x86_64-debian-linux
-^gcc49$
+^/gcc49$
+^/gcc49/x86_64-debian-linux
 # ncurses
-^lib/libform
-^lib/libmenu
-^lib/libncurses
-^lib/libpanel
+^/lib/libform
+^/lib/libmenu
+^/lib/libncurses
+^/lib/libpanel
 # openssl
-^lib/engines
-^lib/libcrypto
-^lib/libssl
+^/lib/engines
+^/lib/libcrypto
+^/lib/libssl
 # readline
-^lib/libhistory
-^lib/libreadline
+^/lib/libhistory
+^/lib/libreadline
 # zlib
-^lib/libz
+^/lib/libz
 # gmp
-^lib/libgmp
-^lib/libgmpxx
+^/lib/libgmp
+^/lib/libgmpxx
