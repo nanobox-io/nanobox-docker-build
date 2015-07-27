@@ -7,7 +7,7 @@ RUN mkdir -p /data/var/db
 
 # install gcc and build tools
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential rsync && \
+    apt-get install -y --no-install-recommends build-essential git rsync && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
