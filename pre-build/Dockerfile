@@ -21,5 +21,11 @@ RUN curl -s http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | tar -
     echo "http://pkgsrc.nanobox.io/nanobox/base/Linux/" > /data/etc/pkgin/repositories.conf && \
     /data/sbin/pkg_admin rebuild && \
     rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
-    rm -rf /data/var/db/pkgin/cache && \
+    rm -rf \
+      /data/var/db/pkgin \
+      /data/share/doc \
+      /data/share/ri \
+      /data/share/examples \
+      /data/opt/gonano/man \
+      /data/var/db/pkgin/cache && \
     chown -R gonano /data

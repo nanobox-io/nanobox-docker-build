@@ -33,3 +33,6 @@ RUN curl \
 
 # Install engines
 # RUN nanobox fetch | tar -C /opt/engines/ -zxf -
+
+# Cleanup disk
+RUN rm -rf /tmp/* /var/tmp/*
