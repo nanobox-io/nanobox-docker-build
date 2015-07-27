@@ -7,13 +7,13 @@ RUN mkdir -p /data/var/db
 
 # install gcc and build tools
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential && \
+    apt-get install -y --no-install-recommends build-essential rsync && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon rsync && \
+    /opt/gonano/bin/pkgin -y in shon && \
     rm -rf /var/gonano/db/pkgin/cache
 
 # install pkgsrc "base" bootstrap
