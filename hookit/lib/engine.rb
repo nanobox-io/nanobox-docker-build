@@ -18,7 +18,6 @@ module NanoBox
     ENV_DIR         = "#{ETC_DIR}/environment.d"
     GONANO_PATH     = [
       CODE_DIR,
-      "#{BUILD_DIR}/gcc49/bin",
       "#{BUILD_DIR}/sbin",
       "#{BUILD_DIR}/bin",
       '/opt/gonano/sbin',

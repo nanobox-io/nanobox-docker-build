@@ -5,24 +5,21 @@ RUN mkdir -p /data
 RUN mkdir -p /var/nanobox
 RUN mkdir -p /data/var/db
 
-# install libc6 for build headers
+# install gcc and build tools
 RUN apt-get update -qq && \
-    apt-get install -y libc6-dev && \
+    apt-get install -y --no-install-recommends build-essential && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
-# install build and other tools required for engine
+# install other tools required for engine
+RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
+    /opt/gonano/bin/pkgin -y in shon rsync && \
+    rm -rf /var/gonano/db/pkgin/cache
+
+# install pkgsrc "base" bootstrap
 RUN curl -s http://pkgsrc.nanobox.io/nanobox/base/Linux/bootstrap.tar.gz | tar -C / -zxf - && \
     echo "http://pkgsrc.nanobox.io/nanobox/base/Linux/" > /data/etc/pkgin/repositories.conf && \
     /data/sbin/pkg_admin rebuild && \
     rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
-    /data/bin/pkgin -y in gcc49 build-essential && \
     rm -rf /data/var/db/pkgin/cache && \
     chown -R gonano /data
-
-RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon rsync && \
-    rm -rf /var/gonano/db/pkgin/cache
-
-# link make to gmake
-RUN ln -s /data/bin/gmake /data/bin/make

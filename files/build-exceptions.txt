@@ -11,9 +11,6 @@
 ^/lib$
 ^/sbin$
 ^/var$
-# gcclibs
-^/gcc49$
-^/gcc49/x86_64-debian-linux
 # ncurses
 ^/lib/libform
 ^/lib/libmenu
