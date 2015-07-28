@@ -119,3 +119,7 @@ logtap.print(bullet("Chowning cache data..."), 'debug')
 execute "ensure gonano owns app cache" do
   command "chown gonano #{APP_CACHE_DIR}"
 end
+
+execute "ensure gonano owns live code" do
+  command "chown gonano #{LIVE_DIR}"
+end
