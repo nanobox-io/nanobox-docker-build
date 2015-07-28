@@ -15,7 +15,7 @@ execute "copy staged code into final directory" do
       -v \
       -a \
       --delete \
-      #{CODE_STAGE_DIR}/ \
+      #{LIVE_DIR}/ \
       #{CODE_DIR}
   EOF
   stream true

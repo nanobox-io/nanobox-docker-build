@@ -6,6 +6,7 @@ module NanoBox
     SHARE_DIR       = '/share'
     MNT_DIR         = '/mnt'
     BUILD_DIR       = '/data'
+    LIVE_DIR        = '/code'
     CODE_DIR        = "#{MNT_DIR}/build"
     DEPLOY_DIR      = "#{MNT_DIR}/deploy"
     CACHE_DIR       = "#{MNT_DIR}/cache"
@@ -17,7 +18,6 @@ module NanoBox
     ETC_DIR         = "#{BUILD_DIR}/etc"
     ENV_DIR         = "#{ETC_DIR}/environment.d"
     GONANO_PATH     = [
-      CODE_DIR,
       "#{BUILD_DIR}/sbin",
       "#{BUILD_DIR}/bin",
       '/opt/gonano/sbin',
@@ -37,6 +37,7 @@ module NanoBox
       data = {
         code_dir: CODE_STAGE_DIR,
         build_dir: BUILD_DIR,
+        live_dir: LIVE_DIR,
         cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,
@@ -44,7 +45,8 @@ module NanoBox
         env: payload[:env],
         dns: payload[:dns],
         port: payload[:port],
-        boxfile: payload[:boxfile]
+        boxfile: payload[:boxfile],
+        platform: 'nanobox'
       }
 
       ::MultiJson.dump(data)
