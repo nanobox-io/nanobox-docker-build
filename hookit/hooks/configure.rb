@@ -98,8 +98,10 @@ end
 logtap.print(bullet('ensuring all directories required for build exist'), 'debug')
 
 [
+  "#{BUILD_DIR}",
   "#{BUILD_DIR}/sbin",
   "#{BUILD_DIR}/bin",
+  "#{LIVE_DIR}",
   "#{ETC_DIR}",
   "#{ENV_DIR}",
   "#{CODE_DIR}",
