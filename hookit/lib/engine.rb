@@ -16,7 +16,7 @@ module NanoBox
     CODE_LIVE_DIR   = "#{SHARE_DIR}/code"
     ENGINE_LIVE_DIR = "#{SHARE_DIR}/engines"
     ETC_DIR         = "#{BUILD_DIR}/etc"
-    ENV_DIR         = "#{ETC_DIR}/environment.d"
+    ENV_DIR         = "#{ETC_DIR}/env.d"
     GONANO_PATH     = [
       "#{BUILD_DIR}/sbin",
       "#{BUILD_DIR}/bin",
