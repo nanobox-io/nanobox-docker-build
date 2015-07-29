@@ -64,7 +64,7 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
 end
 
 # 3)
-# make sure required directories exist
+# make sure required directories exist and are owned by gonano
 logtap.print(bullet('ensuring all directories required for build exist'), 'debug')
 
 [
@@ -80,6 +80,8 @@ logtap.print(bullet('ensuring all directories required for build exist'), 'debug
   directory dir do
     recursive true
   end
+
+  execute "chown gonano #{dir}"
 end
 
 # 4)
@@ -133,16 +135,4 @@ lib_dirs.each do |dir|
 
     logtap.print(process_end, 'debug')
   end
-end
-
-# 6)
-# ensure app cache dir is owned by gonano
-logtap.print(bullet("Chowning cache data..."), 'debug')
-
-execute "ensure gonano owns app cache" do
-  command "chown gonano #{APP_CACHE_DIR}"
-end
-
-execute "ensure gonano owns live code" do
-  command "chown gonano #{LIVE_DIR}"
 end
