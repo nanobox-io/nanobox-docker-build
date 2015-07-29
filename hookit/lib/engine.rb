@@ -60,5 +60,29 @@ module NanoBox
     def is_filepath?(path)
       path =~ /^[~|\.|\/|\\]/
     end
+
+    # Extract the 'boxfile' section of the payload, which is only the
+    # 'build' section of the Boxfile provided by the app
+    def boxfile
+      $boxfile ||= payload[:boxfile] || {}
+    end
+
+    # A helper to retrieve the lib_dirs value from the Boxfile 'build' section.
+    # An array will always be returned, even if the Boxfile value is empty
+    def lib_dirs
+      $lib_dirs ||= begin
+        dirs = boxfile[:lib_dirs]
+
+        if dirs.nil?
+          return []
+        end
+
+        if dirs.is_a? String
+          return [dirs]
+        end
+
+        dirs
+      end
+    end
   end
 end

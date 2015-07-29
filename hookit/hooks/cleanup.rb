@@ -41,6 +41,37 @@ end
 
 logtap.print(process_end, 'debug')
 
+# copy lib_dirs into cache
+lib_dirs.each do |dir|
+  if ::File.exist? "#{LIVE_DIR}/#{dir}"
+
+    # ensure the directory exists
+    logtap.print(bullet("Ensuring the #{dir} dir exists..."), 'debug')
+
+    directory "#{CACHE_DIR}/#{dir}" do
+      recursive true
+    end
+
+    # copy (and remove) the lib dir for quick subsequent deploys
+    logtap.print(process_start("Copy #{dir}"), 'debug')
+
+    execute "stash pkgin packages into cache for quick access" do
+      command <<-EOF
+        rsync \
+          -v \
+          -a \
+          #{LIVE_DIR}/#{dir}/ \
+          #{CACHE_DIR}/#{dir}
+      EOF
+      stream true
+      on_data { |data| logtap.print subtask_info(data), 'debug' }
+    end
+
+    logtap.print(process_end, 'debug')
+
+  end
+end
+
 if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
 
   # ensure the directory exists for pkgin cache

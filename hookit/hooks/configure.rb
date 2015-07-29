@@ -4,14 +4,6 @@ include NanoBox::Output
 
 logtap.print(bullet('Running configure hook...'), 'debug')
 
-# 'payload' is a helper function within the hookit framework that will parse
-# input provided as JSON into a hash with symbol keys.
-# https://github.com/pagodabox/hookit/blob/master/lib/hookit/hook.rb#L7-L17
-#
-# Now we extract the 'boxfile' section of the payload, which is only the
-# 'build' section of the Boxfile provided by the app
-boxfile = payload[:boxfile] || {}
-
 # 0) temporary
 logtap.print(bullet("Ensuring the engine dir exists..."), 'debug')
 
@@ -72,28 +64,6 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
 end
 
 # 3)
-# move the pkgin cache into place if this is a subsequent deploy
-if ::File.exist? "#{CACHE_DIR}/pkgin"
-
-  logtap.print(process_start('Extract pkgin cache'), 'debug')
-
-  # fetch the pkgin cache & db from cache for a quick deploy
-  execute "extract pkgin packages from cache for quick access" do
-    command <<-EOF
-      rsync \
-        -v \
-        -a \
-        #{CACHE_DIR}/pkgin/ \
-        #{BUILD_DIR}/var/db/pkgin
-    EOF
-    stream true
-    on_data { |data| logtap.print subtask_info(data), 'debug' }
-  end
-
-  logtap.print process_end, 'debug'
-end
-
-# 4)
 # make sure required directories exist
 logtap.print(bullet('ensuring all directories required for build exist'), 'debug')
 
@@ -112,7 +82,60 @@ logtap.print(bullet('ensuring all directories required for build exist'), 'debug
   end
 end
 
+# 4)
+# move the pkgin cache into place if this is a subsequent deploy
+if ::File.exist? "#{CACHE_DIR}/pkgin"
+
+  logtap.print(process_start('Extract pkgin cache...'), 'debug')
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract pkgin packages from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -v \
+        -a \
+        #{CACHE_DIR}/pkgin/ \
+        #{BUILD_DIR}/var/db/pkgin
+    EOF
+    stream true
+    on_data { |data| logtap.print subtask_info(data), 'debug' }
+  end
+
+  logtap.print process_end, 'debug'
+end
+
 # 5)
+# move the lib_dirs into place if this is a subsequent deploy
+lib_dirs.each do |dir|
+  if ::File.exist? "#{CACHE_DIR}/#{dir}"
+
+    # ensure the directory exists
+    logtap.print(bullet("Extracting #{dir} from cache..."), 'debug')
+
+    directory "#{LIVE_DIR}/#{dir}" do
+      recursive true
+    end
+
+    # copy (and remove) the lib dir for quick subsequent deploys
+    logtap.print(process_start("Extract #{dir}"), 'debug')
+
+    execute "extract #{dir} from cache for quick access" do
+      command <<-EOF
+        rsync \
+          -v \
+          -a \
+          #{CACHE_DIR}/#{dir}/ \
+          #{LIVE_DIR}/#{dir}
+      EOF
+      stream true
+      on_data { |data| logtap.print subtask_info(data), 'debug' }
+    end
+
+    logtap.print(process_end, 'debug')
+  end
+end
+
+# 6)
 # ensure app cache dir is owned by gonano
 logtap.print(bullet("Chowning cache data..."), 'debug')
 

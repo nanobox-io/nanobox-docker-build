@@ -15,13 +15,17 @@ end
 logtap.print(bullet('Copying raw code into staging directory...'))
 logtap.print(process_start('Copy raw code into place'), 'debug')
 
+excludes = (lib_dirs + %w(.git)).inject("") do |result, exclude|
+  result << "--exclude='#{exclude}' "
+end
+
 execute "copy raw code into staging directory" do
   command <<-EOF
     rsync \
       -v \
       -a \
       --delete \
-      --exclude='.git/' \
+      #{excludes} \
       #{CODE_LIVE_DIR}/ \
       #{CODE_STAGE_DIR}
   EOF
