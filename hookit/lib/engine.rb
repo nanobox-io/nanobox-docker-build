@@ -1,5 +1,6 @@
 require 'oj'
 require 'multi_json'
+require 'yaml'
 
 module NanoBox
   module Engine
@@ -67,11 +68,39 @@ module NanoBox
       $boxfile ||= payload[:boxfile] || {}
     end
 
+    # reads and parses the enginefile from the current engine
+    def enginefile
+      $boxfile ||= begin
+        # pull the engine from the registry
+        engine = registry('engine')
+
+        # if it's not set, there's nothing we can do
+        if not engine
+          return {}
+        end
+
+        # use the Enginefile from the selected Engine
+        enginefile = "#{ENGINE_DIR}/#{engine}/Enginefile"
+
+        # if the Enginefile doesn't exist, then there's nothing to do
+        if not ::File.exists? enginefile
+          return {}
+        end
+
+        # now let's parse the Enginefile, but safely
+        begin
+          symbolize_keys(YAML.load(::File.read(enginefile)))
+        rescue Exception
+          return {}
+        end
+      end
+    end
+
     # A helper to retrieve the lib_dirs value from the Boxfile 'build' section.
     # An array will always be returned, even if the Boxfile value is empty
     def lib_dirs
       $lib_dirs ||= begin
-        dirs = boxfile[:lib_dirs]
+        dirs = enginefile[:lib_dirs]
 
         if dirs.nil?
           return []
@@ -84,5 +113,33 @@ module NanoBox
         dirs
       end
     end
+
+    protected
+
+    # helper function to recursively convert hash keys from strings to symbols
+    def symbolize_keys(h1)
+
+      # if for some reason a Hash wasn't passed, let's return the original
+      if not h1.is_a? Hash
+        return h1
+      end
+
+      # create a new hash, to contain the symbol'ed keys
+      h2 = {}
+
+      # iterate through all of the key/value pairs and convert
+      h1.each do |k, v|
+        h2[k.to_sym] = begin
+          if v.is_a? Hash
+            symbolize_keys(v)
+          else
+            v
+          end
+        end
+      end
+
+      h2
+    end
+
   end
 end

@@ -27,7 +27,7 @@ if not engine
 
     # execute 'sniff' to see if we qualify
     execute 'sniff' do
-      command %Q(#{e}/bin/sniff "#{CODE_STAGE_DIR}")
+      command %Q(#{e}/bin/sniff "#{CODE_LIVE_DIR}")
       cwd "#{e}/bin"
       path GONANO_PATH
       user 'gonano'

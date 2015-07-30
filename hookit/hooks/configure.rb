@@ -105,34 +105,3 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
 
   logtap.print process_end, 'debug'
 end
-
-# 5)
-# move the lib_dirs into place if this is a subsequent deploy
-lib_dirs.each do |dir|
-  if ::File.exist? "#{CACHE_DIR}/#{dir}"
-
-    # ensure the directory exists
-    logtap.print(bullet("Extracting #{dir} from cache..."), 'debug')
-
-    directory "#{LIVE_DIR}/#{dir}" do
-      recursive true
-    end
-
-    # copy (and remove) the lib dir for quick subsequent deploys
-    logtap.print(process_start("Extract #{dir}"), 'debug')
-
-    execute "extract #{dir} from cache for quick access" do
-      command <<-EOF
-        rsync \
-          -v \
-          -a \
-          #{CACHE_DIR}/#{dir}/ \
-          #{LIVE_DIR}/#{dir}
-      EOF
-      stream true
-      on_data { |data| logtap.print subtask_info(data), 'debug' }
-    end
-
-    logtap.print(process_end, 'debug')
-  end
-end
