@@ -12,6 +12,7 @@ module NanoBox
     DEPLOY_DIR      = "#{MNT_DIR}/deploy"
     CACHE_DIR       = "#{MNT_DIR}/cache"
     APP_CACHE_DIR   = "#{CACHE_DIR}/app"
+    LIB_CACHE_DIR   = "#{CACHE_DIR}/lib_dirs"
     ENGINE_DIR      = '/opt/engines'
     CODE_STAGE_DIR  = '/opt/code'
     CODE_LIVE_DIR   = "#{SHARE_DIR}/code"

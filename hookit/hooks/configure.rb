@@ -75,7 +75,8 @@ logtap.print(bullet('ensuring all directories required for build exist'), 'debug
   "#{ETC_DIR}",
   "#{ENV_DIR}",
   "#{CODE_DIR}",
-  "#{APP_CACHE_DIR}"
+  "#{APP_CACHE_DIR}",
+  "#{LIB_CACHE_DIR}"
 ].each do |dir|
   directory dir do
     recursive true

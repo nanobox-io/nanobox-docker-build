@@ -48,7 +48,7 @@ lib_dirs.each do |dir|
     # ensure the directory exists
     logtap.print(bullet("Ensuring the #{dir} dir exists..."), 'debug')
 
-    directory "#{CACHE_DIR}/#{dir}" do
+    directory "#{LIB_CACHE_DIR}/#{dir}" do
       recursive true
     end
 
@@ -61,7 +61,7 @@ lib_dirs.each do |dir|
           -v \
           -a \
           #{CODE_STAGE_DIR}/#{dir}/ \
-          #{CACHE_DIR}/#{dir}
+          #{LIB_CACHE_DIR}/#{dir}
       EOF
       stream true
       on_data { |data| logtap.print subtask_info(data), 'debug' }
