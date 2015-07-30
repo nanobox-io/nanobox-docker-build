@@ -89,6 +89,10 @@ end
 # move the pkgin cache into place if this is a subsequent deploy
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
+  directory "#{BUILD_DIR}/var/db/pkgin/cache" do
+    recursive true
+  end
+
   logtap.print(process_start('Extract pkgin cache...'), 'debug')
 
   # fetch the pkgin cache & db from cache for a quick deploy
@@ -98,7 +102,7 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
         -v \
         -a \
         #{CACHE_DIR}/pkgin/ \
-        #{BUILD_DIR}/var/db/pkgin
+        #{BUILD_DIR}/var/db/pkgin/cache
     EOF
     stream true
     on_data { |data| logtap.print subtask_info(data), 'debug' }

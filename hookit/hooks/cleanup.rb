@@ -89,7 +89,7 @@ if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
       rsync \
         -v \
         -a \
-        #{BUILD_DIR}/var/db/pkgin/ \
+        #{BUILD_DIR}/var/db/pkgin/cache/ \
         #{CACHE_DIR}/pkgin
     EOF
     stream true
