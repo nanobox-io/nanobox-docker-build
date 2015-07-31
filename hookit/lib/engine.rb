@@ -97,21 +97,44 @@ module NanoBox
       end
     end
 
+    def engine_boxfile
+      # pull the engine from the registry
+      engine = registry('engine')
+
+      # if it's not set, there's nothing we can do
+      if not engine
+        return {}
+      end
+
+      boxfile_script = "#{ENGINE_DIR}/#{engine}/bin/boxfile"
+
+      # if the boxfile binscript doesn't exist, then there's nothing to do
+      if not ::File.exist? boxfile_script
+        return {}
+      end
+
+      yaml = execute %Q(#{boxfile_script} '#{engine_payload}') do
+        cwd "#{ENGINE_DIR}/#{engine}/bin"
+        path GONANO_PATH
+        user 'gonano'
+        on_exit { |code| return {} if not code == 0 }
+      end
+
+      # now let's parse the response, but safely
+      begin
+        symbolize_keys(YAML.load(yaml))
+      rescue Exception
+        return {}
+      end
+    end
+
     # A helper to retrieve the lib_dirs value from the Boxfile 'build' section.
     # An array will always be returned, even if the Boxfile value is empty
     def lib_dirs
       $lib_dirs ||= begin
-        dirs = enginefile[:lib_dirs]
-
-        if dirs.nil?
-          return []
-        end
-
-        if dirs.is_a? String
-          return [dirs]
-        end
-
-        dirs
+        app_dirs = boxfile[:lib_dirs] || []
+        engine_dirs = engine_boxfile[:build][:lib_dirs] || [] rescue []
+        (app_dirs + engine_dirs).uniq
       end
     end
 
