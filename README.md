@@ -1,38 +1,130 @@
-nanobox build
-============
+## nanobox-docker-build
 
-This repo contains the files necessary to create a build docker image for [nanobox](nanobox.io) consumption.
+This repo contains the files necessary to create a docker 'build' image for [Nanobox](http://nanobox.io) consumption.
 
+#### Requirements
 
-Requirements
-------------
-
-* `docker_user` environment variable `export docker_user='nanobox'`
-* `~/.dockercfg` file with credentials for `docker_user`
 * [vagrant](vagrantup.com)
 * [dockerhub](hub.docker.com) account
 
+## Overview
 
-Usage
------
+The nanobox/build image is split into two separate images:
 
-To create and publish the image to nanobox/build simply run      
-`make` or `vagrant up && vagrant destroy -f`    
-If the creation/publication fails for any reason, you may       
-modify the proper files and run `make publish` or `vagrant provision`    
-        
-To login to the zone:
+- nanobox/build-pre
+- nanobox/build
+
+The build image is split into two images for the express purpose of development iteration. Since the build environment requires the build tools, which are very large in size compared to other images, the upload process for incremental script changes would be largely incumbered. 
+
+Essentially, the build-pre image includes the build tools, whereas the build image contains the scripts. The build image also includes the build tools since the build image inherits from the build-pre image. 
+
+## Usage
+
+#### Vagrant
+
+Before building docker containers, we must initialize the virtual machine with vagrant:
+
+```bash
+vagrant up
 ```
-user: gonano
-pass: gonano
+
+#### Build
+
+To build the image:
+
+```bash
+make build
 ```
-        
-TIP: If you forget to create a `docker_user` environment variable,      
-you can `vagrant ssh` and run `docker tag nanobox/build ${YOUR_USER}/build`      
-then push with `docker push ${YOUR_USER}/build`   
 
+To build the pre image:
 
-License
--------
+```bash
+make build-pre
+```
+
+#### Publish
+
+To publish the image:
+
+```bash
+make publish
+```
+
+To publish the pre image:
+
+```bash
+make publish-pre
+```
+
+To publish the image tagged as alpha:
+
+```bash
+make publish-alpha
+```
+
+#### Combo
+
+To build and publish the image:
+
+```bash
+make
+```
+
+To build and publish the pre image:
+
+```bash
+make pre
+```
+
+To build and publish the image tagged as alpha:
+
+```bash
+make alpha
+```
+
+#### Cleaning
+
+To remove all images from the Vagrant machine:
+
+```bash
+make clean
+```
+
+## Testing
+
+All changes, experimental or not, should be published using the alpha tag. The alpha image can be tested by using [Nanobox](http://nanobox.io), and adding the following to an application's Boxfile:
+
+```yaml
+build:
+  stability: alpha
+```
+
+## Caveat
+
+#### Authentication
+
+If during a publish, you receive the error:
+
+```bash
+unauthorized: access to the requested resource is not authorized
+```
+
+Run the following command and follow the login prompt:
+
+```bash
+make login
+```
+
+Subsequent publishes will use a stored api token.
+
+#### Cleanup
+
+Don't forget to halt the Vagrant machine when you're done:
+
+```bash
+vagrant halt
+```
+
+## License
 
 Mozilla Public License, version 2.0

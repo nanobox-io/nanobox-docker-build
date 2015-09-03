@@ -1,18 +1,36 @@
-all: build
+all: stable
+
+login:
+	@vagrant ssh -c "docker login"
 
 build:
-ifdef docker_user
-	vagrant up && vagrant destroy -f
-else
-	export docker_user='nanobox' && vagrant up && vagrant destroy -f
-endif
+	@echo "Building 'build' image..."
+	@vagrant ssh -c "docker build -t nanobox/build /vagrant"
+
+build-pre:
+	@echo "Building 'pre-build' image..."
+	@vagrant ssh -c "docker build -t nanobox/pre-build /vagrant/pre-build"
 
 publish:
-ifdef docker_user
-	vagrant provision
-else
-	export docker_user='nanobox' && vagrant provision
-endif
+	@echo "Publishing 'build' image..."
+	@vagrant ssh -c "docker push nanobox/build"
+
+publish-alpha:
+	@echo "Tagging 'build' image..."
+	@vagrant ssh -c "docker tag nanobox/build nanobox/build:alpha"
+	@echo "Publishing 'build:alpha'..."
+	@vagrant ssh -c "docker push nanobox/build:alpha"
+
+publish-pre:
+	@echo "Publishing 'pre-build'..."
+	@vagrant ssh -c "docker push nanobox/pre-build"
+
+pre: build-pre publish-pre
+
+stable: build publish
+
+alpha: build publish-alpha
 
 clean:
-	vagrant destroy -f
+	@echo "Removing all images..."
+	@vagrant ssh -c "docker rmi $(docker images -q)"
