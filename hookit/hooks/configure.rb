@@ -110,3 +110,18 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
 
   logtap.print process_end, 'debug'
 end
+
+# 5)
+# update pkgin packages db
+logtap.print(process_start('Updating pkgin database...'), 'debug')
+
+execute "update pkgin packages" do
+  command <<-EOF
+    rm -f #{BUILD_DIR}/var/db/pkgin/pkgin.db && \
+    #{BUILD_DIR}/bin/pkgin -y up
+  EOF
+  stream true
+  on_data { |data| logtap.print subtask_info(data), 'debug' }
+end
+
+logtap.print process_end, 'debug'

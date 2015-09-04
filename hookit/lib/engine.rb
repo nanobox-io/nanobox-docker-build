@@ -38,7 +38,7 @@ module NanoBox
 
       data = {
         code_dir: CODE_STAGE_DIR,
-        build_dir: BUILD_DIR,
+        deploy_dir: BUILD_DIR,
         live_dir: LIVE_DIR,
         cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,
