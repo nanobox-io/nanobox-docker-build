@@ -90,6 +90,8 @@ end
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
   directory "#{BUILD_DIR}/var/db/pkgin/cache" do
+    owner 'gonano'
+    group 'gonano'
     recursive true
   end
 
@@ -120,6 +122,7 @@ execute "update pkgin packages" do
     rm -f #{BUILD_DIR}/var/db/pkgin/pkgin.db && \
     #{BUILD_DIR}/bin/pkgin -y up
   EOF
+  user 'gonano'
   stream true
   on_data { |data| logtap.print subtask_info(data), 'debug' }
 end
