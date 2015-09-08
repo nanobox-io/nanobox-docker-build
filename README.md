@@ -59,7 +59,7 @@ make publish-pre
 To publish the image tagged as alpha:
 
 ```bash
-make publish-alpha
+make publish stability=alpha
 ```
 
 #### Combo
@@ -79,7 +79,7 @@ make pre
 To build and publish the image tagged as alpha:
 
 ```bash
-make alpha
+make stability=alpha
 ```
 
 #### Cleaning
