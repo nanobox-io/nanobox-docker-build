@@ -2,7 +2,7 @@ module NanoBox
   module Output
     
     def logtap
-      $logtap ||= ::NanoBox::Logtap.new(uri: payload[:logtap_uri])
+      $logtap ||= ::NanoBox::Logtap.new(host: payload[:logtap_host], deploy_id: payload[:deploy_id])
     end
 
     # header
