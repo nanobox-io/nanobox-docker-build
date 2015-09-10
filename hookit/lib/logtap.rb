@@ -8,7 +8,7 @@ module NanoBox
       @deploy_id = opts[:deploy_id]
     end
 
-    def post(message, level='info', deploy_id)
+    def post(message, level='info')
       connection.post("/deploy") do |req|
         req.headers['X-Log-Level'] = level
         if @deploy_id

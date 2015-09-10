@@ -48,7 +48,7 @@ module NanoBox
         dns: payload[:dns],
         port: payload[:port],
         boxfile: payload[:boxfile],
-        platform: 'nanobox'
+        platform: 'local'
       }
 
       ::MultiJson.dump(data)
