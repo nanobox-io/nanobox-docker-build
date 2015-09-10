@@ -21,7 +21,12 @@ boxfile = begin
   end
 end
 
+# print the generated Boxfile for debug
+logtap.print header("Generated Boxfile"), 'debug'
+logtap.print boxfile, 'debug'
+
 # todo: sanitize and validate
+
 
 # return boxfile to nanobox
 puts boxfile
