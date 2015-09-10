@@ -9,8 +9,10 @@
 ^/bin$
 ^/etc$
 ^/lib$
+^/libexec$
 ^/sbin$
 ^/var$
+^/var/db$
 # ncurses
 ^/lib/libform
 ^/lib/libmenu
