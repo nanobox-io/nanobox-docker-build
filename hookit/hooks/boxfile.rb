@@ -1,3 +1,5 @@
+require 'yaml'
+
 # import some logic/helpers from lib/*.rb
 include NanoBox::Engine
 include NanoBox::Output
@@ -28,8 +30,14 @@ end
 logtap.print header("Generated Boxfile"), 'debug'
 logtap.print boxfile, 'debug'
 
-# todo: sanitize and validate
-
-
-# return boxfile to nanobox
-puts boxfile
+# sanitize and validate
+begin
+  # try to parse the YAML
+  YAML.load(boxfile)
+  # return boxfile to nanobox
+  puts boxfile
+rescue Exception => e
+  logtap.print fatal('invalid yaml', e.message)
+  # exit non-zero
+  exit Hookit::Exit::ABORT
+end
