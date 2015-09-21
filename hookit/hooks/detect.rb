@@ -51,3 +51,5 @@ if not engine
 end
 
 # todo: log engine detected and provide information about it
+
+# https://gist.github.com/Tolmark12/bc0dba555b5e710a5fe0
