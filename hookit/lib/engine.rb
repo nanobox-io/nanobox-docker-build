@@ -54,6 +54,29 @@ module NanoBox
       ::MultiJson.dump(data)
     end
 
+    # takes an engine with optional version and strips the versioning
+    def engine_name(name)
+      name = name.gsub(/\s+/, "")
+
+      if name =~ /=/
+        return name.split('=')[0]
+      end
+
+      if name =~ /~/
+        return name.split('~')[0]
+      end
+
+      if name =~ /</
+        return name.split('<')[0]
+      end
+
+      if name =~ />/
+        return name.split('>')[0]
+      end
+
+      return name
+    end
+
     # Detecting a filepath in this context is a bit tricky, as the filepath
     # likely will not match a local filepath since the filepath originates
     # from the development workstation. Rather, we are just looking for

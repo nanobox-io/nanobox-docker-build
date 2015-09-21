@@ -60,7 +60,38 @@ end
 # the workstation, let's fetch it from warehouse.nanobox.io.
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and not is_filepath?(boxfile[:engine])
-  # todo: wait until nanobox-cli can fetch engine
+
+  engine = engine_name(boxfile[:engine])
+
+  # remove any official engine that may be in the way
+  directory "#{ENGINE_DIR}/#{engine}" do
+    action :delete
+  end
+
+  # ensure a directory for this engine exists
+  directory "#{ENGINE_DIR}/#{engine}" do
+    recursive true
+  end
+
+  logtap.print(process_start("Fetch #{boxfile[:engine]}"))
+
+  execute "fetching #{engine}" do
+    command <<-EOF
+      nanobox \
+        fetch \
+        #{boxfile[:engine]} \
+          | tar \
+            -xzf - \
+            --strip-components=1 \
+            -C #{ENGINE_DIR}/#{engine}
+    EOF
+    stream true
+    on_stderr { |data| logtap.print subtask_info(data) }
+  end
+
+  logtap.print(process_end)
+
+  registry('engine', engine)
 end
 
 # 3)
