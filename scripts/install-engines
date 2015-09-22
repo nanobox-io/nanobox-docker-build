@@ -1,0 +1,35 @@
+#!/bin/bash
+
+install_engine() {
+  name=$1
+  incr=$2
+
+  # ensure directory exists
+  mkdir -p /opt/engines/${incr}-${name}
+
+  # fetch engine
+  nanobox \
+    fetch \
+    ${name} \
+      | tar \
+        -xzf - \
+        --strip-components=1 \
+        -C /opt/engines/${incr}-${name}
+}
+
+engines=(
+  ruby
+  python
+  php
+  # nodejs has to be last, because of the package.json
+  nodejs
+)
+
+count=1
+
+for engine in "${engines[@]}"; do
+
+  install_engine $engine $count
+
+  let count++
+done
