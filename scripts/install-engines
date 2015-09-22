@@ -7,15 +7,19 @@ install_engine() {
   # ensure directory exists
   mkdir -p /opt/engines/${incr}-${name}
 
+  echo "Fetching and installing ${name}"
+
   # fetch engine
   nanobox \
     fetch \
     ${name} \
       | tar \
         -xzf - \
-        --strip-components=1 \
         -C /opt/engines/${incr}-${name}
 }
+
+# run nanobox once to create the database
+nanobox > /dev/null
 
 engines=(
   ruby

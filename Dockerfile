@@ -9,7 +9,7 @@ RUN /var/tmp/generate-build-excludes
 
 # update pkgin remote packages
 RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
-    rm -rf /var/tmp/* /data/var/db/pkgin/cache
+    rm -rf /data/var/db/pkgin/cache
 RUN chown -R gonano /data/var/db/pkgin
 
 # Created necessary directories

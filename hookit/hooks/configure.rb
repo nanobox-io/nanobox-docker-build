@@ -82,7 +82,6 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
         #{boxfile[:engine]} \
           | tar \
             -xzf - \
-            --strip-components=1 \
             -C #{ENGINE_DIR}/#{engine}
     EOF
     stream true

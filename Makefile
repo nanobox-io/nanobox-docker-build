@@ -11,7 +11,7 @@ build:
 
 build-pre:
 	@echo "Building 'pre-build' image..."
-	@vagrant ssh -c "docker build -t nanobox/pre-build /vagrant/pre-build"
+	@vagrant ssh -c "docker build --no-cache=true --force-rm=true -t nanobox/pre-build /vagrant/pre-build"
 
 publish:
 	@echo "Tagging 'build' image..."
