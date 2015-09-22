@@ -312,5 +312,39 @@ module NanoBox
       res
     end
 
+    # when no engine is found, this will return a formatted message
+    # explaining why the engine is not found, and what can be done
+    def no_engine
+      <<-END
+
+   :: NO ENGINE DETECTED ::
+
+   You're probably using a language we haven't built an engine for 
+   yet. Good news though, it's a quick and simple process to create 
+   an engine specific to your app or framework. Contact us so we can 
+   ask you a few questions about configuring and running your app 
+   and let's get this rolling!
+
+   IRC   : #nanobox (freenode)
+   EMAIL : engines@nanobox.io
+
+      END
+    end
+
+
+    # when an engine is detected, this will return a formatted message
+    # providing basic details about the engine
+    def engine_info(id, name, language, generic)
+      <<-END
+
+    :: Language    [√] #{language} 
+    :: Engine      [√] #{name} #{generic ? '(generic)' : ''}
+
+    :: #{name} Engine Documentation:
+       http://engines.nanobox.io/engines/#{id}
+
+      END
+    end
+
   end
 end

@@ -92,6 +92,11 @@ module NanoBox
       $boxfile ||= payload[:boxfile] || {}
     end
 
+    # reads the _id file from the engine
+    def engine_id
+      "123"
+    end
+
     # reads and parses the enginefile from the current engine
     def enginefile
       $boxfile ||= begin

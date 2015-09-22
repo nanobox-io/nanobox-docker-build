@@ -11,8 +11,7 @@ engine = registry('engine')
 # If an engine is not already specified, we need to iterate through the
 # installed engines calling the "sniff" script until one of them exits with 0
 if not engine
-
-  logtap.print(bullet('Engine is not specified, attempting to find an engine...'), 'debug')
+  logtap.print(bullet('Detecting App Language & Engine'))
 
   ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.each do |e|
 
@@ -32,24 +31,25 @@ if not engine
       path GONANO_PATH
       user 'gonano'
       stream true
-      # on_data {|data| logvac.print data}
-      # on_data {|data| print data}
       on_exit { |code| engine = basename if code == 0 }
     end
   end
 
   if engine
-    logtap.print(bullet("Engine found : #{engine}"), 'debug')
+    logtap.print(bullet('Language and Engine Detected [√]'))
     # set the engine in the registry for later use
     registry('engine', engine)
-    # todo: display a message indicating an engine was selected
   else
-    logtap.print(fatal('Unable to find a compatible engine'))
-    # todo: if we don't have an engine at this point, we need to log an error
+    logtap.print(no_engine)
     exit Hookit::Exit::ABORT
   end
 end
 
-# todo: log engine detected and provide information about it
+info = engine_info(
+  engine_id, 
+  enginefile[:name], 
+  enginefile[:language], 
+  enginefile[:generic]
+)
 
-# https://gist.github.com/Tolmark12/bc0dba555b5e710a5fe0
+logtap.print info
