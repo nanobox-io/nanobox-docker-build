@@ -13,7 +13,7 @@ engine = registry('engine')
 if not engine
   logtap.print(bullet('Detecting App Language & Engine'))
 
-  ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.each do |e|
+  ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.sort.each do |e|
 
     # once engine is set, we can stop looping
     break if engine
@@ -30,7 +30,6 @@ if not engine
       cwd "#{e}/bin"
       path GONANO_PATH
       user 'gonano'
-      stream true
       on_exit { |code| engine = basename if code == 0 }
     end
   end
