@@ -13,7 +13,7 @@ RUN apt-get update -qq && \
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon mustache && \
+    /opt/gonano/bin/pkgin -y in nanobox-cli shon mustache && \
     rm -rf /var/gonano/db/pkgin/cache
 
 # install pkgsrc "base" bootstrap
