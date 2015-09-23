@@ -335,15 +335,42 @@ module NanoBox
     # when an engine is detected, this will return a formatted message
     # providing basic details about the engine
     def engine_info(id, name, language, generic)
-      <<-END
+      if generic
+        <<-END
 
     :: Language    [√] #{language} 
-    :: Engine      [√] #{name} #{generic ? '(generic)' : ''}
+    :: Engine      [√] #{name} (generic)
 
     :: #{name} Engine Documentation:
        http://engines.nanobox.io/engines/#{id}
 
-      END
+  NOTE :
+    This is a generic #{name} engine. It's likely you will need to 
+    configure your nanobox environment to suit your app via 
+    the Boxfile[1].
+
+    If you're willing to answer a few questions about configuring 
+    and running this particular app, it's a quick and simple process 
+    to create a engine specific to your app or framework. So contact 
+    us and let's get this rolling!
+
+    IRC   : #nanobox (freenode)
+    EMAIL : engines@nanobox.io
+
+    [1] http://engines.nanobox.io/engines/#{id}
+
+        END
+      else
+        <<-END
+
+    :: Language    [√] #{language} 
+    :: Engine      [√] #{name}
+
+    :: #{name} Engine Documentation:
+       http://engines.nanobox.io/engines/#{id}
+
+        END
+      end
     end
 
   end
