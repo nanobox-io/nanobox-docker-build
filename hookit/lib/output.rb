@@ -345,7 +345,7 @@ module NanoBox
        http://engines.nanobox.io/engines/#{id}
 
   NOTE :
-    This is a generic #{name} engine. It's likely you will need to 
+    This is a generic #{language} engine. It's likely you will need to 
     configure your nanobox environment to suit your app via 
     the Boxfile[1].
 
