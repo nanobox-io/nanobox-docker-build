@@ -1,3 +1,14 @@
+# hook order:
+# configure [all]
+# detect    [all]
+# sync      [all]
+# setup     [all]
+# boxfile   [all]
+# prepare   [all]
+# build     [run]
+# publish   [run]
+# cleanup   [all]
+
 # import some logic/helpers from lib/*.rb
 include NanoBox::Engine
 include NanoBox::Output
