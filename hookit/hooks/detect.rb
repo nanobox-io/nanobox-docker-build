@@ -11,7 +11,7 @@ engine = registry('engine')
 # If an engine is not already specified, we need to iterate through the
 # installed engines calling the "sniff" script until one of them exits with 0
 if not engine
-  logtap.print(bullet('Detecting App Language & Engine'))
+  logtap.print(bullet('Detecting app language & engine'))
 
   ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.sort.each do |e|
 
@@ -35,7 +35,7 @@ if not engine
   end
 
   if engine
-    logtap.print(bullet('Language and Engine Detected [√]'))
+    logtap.print(bullet('Language and engine detected [√]'))
     # set the engine in the registry for later use
     registry('engine', engine)
   else
