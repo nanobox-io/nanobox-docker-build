@@ -12,14 +12,14 @@ end
 
 # 2)
 # copy the read-only mounted code into the code stage dir
-logtap.print(bullet('Copying raw code into staging directory...'))
-logtap.print(process_start('Copy raw code into place'), 'debug')
+logtap.print(bullet('Copying code into build container...'))
+logtap.print(process_start('Rsync code'), 'debug')
 
 excludes = (lib_dirs + %w(.git)).inject("") do |result, exclude|
   result << "--exclude='#{exclude}' "
 end
 
-execute "copy raw code into staging directory" do
+execute "copy code into build container" do
   command <<-EOF
     rsync \
       -v \

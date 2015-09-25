@@ -6,8 +6,8 @@ logtap.print(bullet('Running publish hook...'), 'debug')
 
 # 1)
 # copy the staged code into the final code dir
-logtap.print(bullet('Copying staged code into final build...'))
-logtap.print(process_start('Copy staged code into final place'), 'debug')
+logtap.print(bullet('Moving final build into release environment...'))
+logtap.print(process_start('Rsync build'), 'debug')
 
 execute "copy staged code into final directory" do
   command <<-EOF
