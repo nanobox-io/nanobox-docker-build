@@ -316,18 +316,16 @@ module NanoBox
     # explaining why the engine is not found, and what can be done
     def no_engine
       <<-END
-
-   :: NO ENGINE DETECTED ::
-
++> NO ENGINE DETECTED
    You're probably using a language we haven't built an engine for 
    yet. Good news though, it's a quick and simple process to create 
    an engine specific to your app or framework. Contact us so we can 
    ask you a few questions about configuring and running your app 
    and let's get this rolling!
-
+   --------------------------------
    IRC   : #nanobox (freenode)
    EMAIL : engines@nanobox.io
-
+   --------------------------------
       END
     end
 
@@ -337,38 +335,32 @@ module NanoBox
     def engine_info(id, name, language, generic)
       if generic
         <<-END
-
-    :: Language    [√] #{language} 
-    :: Engine      [√] #{name} (generic)
-
-    :: #{name} Engine Documentation:
-       http://engines.nanobox.io/engines/#{id}
-
-  NOTE :
-    This is a generic #{language} engine. It's likely you will need to 
-    configure your nanobox environment to suit your app via 
-    the Boxfile[1].
-
-    If you're willing to answer a few questions about configuring 
-    and running this particular app, it's a quick and simple process 
-    to create a engine specific to your app or framework. So contact 
-    us and let's get this rolling!
-
-    IRC   : #nanobox (freenode)
-    EMAIL : engines@nanobox.io
-
-    [1] http://engines.nanobox.io/engines/#{id}
-
++> LANGUAGE AND ENGINE DETECTED [√]
+   --------------------------------
+   [√] LANGUAGE : #{language}
+   [√] ENGINE   : #{name} (generic)
+   --------------------------------
+   NOTE : This is a generic #{name} engine. It's likely you will need to 
+   configure your nanobox environment to suit your app via the Boxfile[1]. 
+   If you're willing to answer a few questions about configuring and 
+   running this particular app, it's a quick and simple process to create 
+   an engine specific to your app or framework. So contact us and let's 
+   get this rolling!
+   [1] http://engines.nanobox.io/engines/#{id}
+   --------------------------------
+   IRC   : #nanobox (freenode)
+   EMAIL : engines@nanobox.io
+   --------------------------------
         END
       else
         <<-END
-
-    :: Language    [√] #{language} 
-    :: Engine      [√] #{name}
-
-    :: #{name} Engine Documentation:
-       http://engines.nanobox.io/engines/#{id}
-
++> LANGUAGE AND ENGINE DETECTED [√] 
+   --------------------------------
+   [√] LANGUAGE : #{language}
+   [√] ENGINE   : #{name}
+   --------------------------------
+   #{name.upcase} ENGINE DOCUMENTATION:
+   http://engines.nanobox.io/engines/#{id}
         END
       end
     end

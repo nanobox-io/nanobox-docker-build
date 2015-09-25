@@ -35,7 +35,6 @@ if not engine
   end
 
   if engine
-    logtap.print(bullet('Language and engine detected [√]'))
     # set the engine in the registry for later use
     registry('engine', engine)
   else
