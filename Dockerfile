@@ -20,16 +20,16 @@ ADD hookit/. /opt/gonano/hookit/mod/
 ADD files/opt/bin/. /opt/bin/
 
 # install nos
-RUN mkdir -p /opt/nos
-RUN curl \
-  -k \
-  -s \
-  -L \
-  https://github.com/pagodabox/nanobox-nos/archive/v0.7.3.tar.gz \
-    | tar \
-        -xzf - \
-        --strip-components=1 \
-        -C /opt/nos/
+RUN mkdir -p /opt/nos && \
+    curl \
+      -k \
+      -s \
+      -L \
+      https://github.com/pagodabox/nanobox-nos/archive/v0.7.3.tar.gz \
+        | tar \
+            -xzf - \
+            --strip-components=1 \
+            -C /opt/nos/
 
 # Install engines
 RUN /var/tmp/install-engines
