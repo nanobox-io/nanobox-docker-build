@@ -16,7 +16,7 @@ hook_file "/home/gonano/.ssh/config" do
 end
 
 # create file for each file passed in
-payload[:ssh_files].each do |name, body|
+(payload[:ssh_files] || {}).each do |name, body|
 
   file "/home/gonano/.ssh/#{name}" do
     content body
