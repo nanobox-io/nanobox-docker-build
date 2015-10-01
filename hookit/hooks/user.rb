@@ -1,7 +1,7 @@
 
 # ensure the gonano .ssh directory exists
 directory "/home/gonano/.ssh" do
-  parent true
+  recursive true
   mode 700
   owner 'gonano'
   group 'gonano'
