@@ -1,5 +1,3 @@
-# import some logic/helpers from lib/*.rb
-include NanoBox::Engine
 
 # ensure the gonano .ssh directory exists
 directory "/home/gonano/.ssh" do
