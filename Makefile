@@ -27,4 +27,4 @@ pre: build-pre publish-pre
 
 clean:
 	@echo "Removing all images..."
-	@vagrant ssh -c "for image in $(docker images -q); do docker rmi -f $image; done"
+	@vagrant ssh -c "for image in \$$(docker images -q); do docker rmi -f \$$image; done"
