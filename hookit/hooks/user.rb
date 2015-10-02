@@ -2,7 +2,7 @@
 # ensure the gonano .ssh directory exists
 directory "/home/gonano/.ssh" do
   recursive true
-  mode 700
+  mode 0700
   owner 'gonano'
   group 'gonano'
 end
@@ -10,7 +10,7 @@ end
 # set custom ssh configuration
 hook_file "/home/gonano/.ssh/config" do
   source 'ssh/config'
-  mode 600
+  mode 0600
   owner 'gonano'
   group 'gonano'
 end
@@ -20,7 +20,7 @@ end
 
   file "/home/gonano/.ssh/#{name}" do
     content body
-    mode 600
+    mode 0600
     owner 'gonano'
     group 'gonano'
   end
