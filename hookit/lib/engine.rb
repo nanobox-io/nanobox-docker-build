@@ -92,9 +92,9 @@ module NanoBox
       $boxfile ||= payload[:boxfile] || {}
     end
 
-    # reads the _id file from the engine
+    # reads the engine_id attribute from the meta
     def engine_id
-      "123"
+      release_meta[:engine_id]
     end
 
     # reads and parses the enginefile from the current engine
@@ -151,6 +151,31 @@ module NanoBox
       # now let's parse the response, but safely
       begin
         symbolize_keys(YAML.load(yaml))
+      rescue Exception
+        return {}
+      end
+    end
+
+    # reads and parses the meta.json file associated with the engine's release
+    def release_meta
+      # pull the engine from the registry
+      engine = registry('engine')
+
+      # if it's not set, there's nothing we can do
+      if not engine
+        return {}
+      end
+
+      metafile = "#{ENGINE_DIR}/#{engine}/meta.json"
+
+      # if the metafile doesn't exist, then there's nothing to do
+      if not ::File.exist? metafile
+        return {}
+      end
+
+      # now let's read and parse the file, safely
+      begin
+        ::Multijson.load(::File.read(metafile), symbolize_keys: true)
       rescue Exception
         return {}
       end
