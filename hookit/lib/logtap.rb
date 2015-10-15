@@ -9,12 +9,14 @@ module NanoBox
     end
 
     def post(message, level='info')
-      connection.post("/deploy") do |req|
-        req.headers['X-Log-Level'] = level
-        if @deploy_id
-          req.headers['X-Deploy-ID'] = @deploy_id
+      if ! @host.nil?
+        connection.post("/deploy") do |req|
+          req.headers['X-Log-Level'] = level
+          if @deploy_id
+            req.headers['X-Deploy-ID'] = @deploy_id
+          end
+          req.body = message
         end
-        req.body = message
       end
     end
     alias :print :post
