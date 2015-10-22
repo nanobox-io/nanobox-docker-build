@@ -22,6 +22,7 @@ install_engine() {
 nanobox > /dev/null
 
 engines=(
+  wordpress
   ruby
   python
   php
