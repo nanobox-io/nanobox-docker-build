@@ -36,7 +36,7 @@ RUN mkdir -p /opt/nos && \
       -k \
       -s \
       -L \
-      https://github.com/pagodabox/nanobox-nos/archive/v0.7.4.tar.gz \
+      https://github.com/pagodabox/nanobox-nos/archive/v0.7.5.tar.gz \
         | tar \
             -xzf - \
             --strip-components=1 \
