@@ -23,10 +23,15 @@ directory "#{ENGINE_DIR}" do
   recursive true
 end
 
+if boxfile
+  logtap.print(bullet("Boxfile: #{boxfile}..."), 'debug')
+end
+
 # 1)
 # If an engine is mounted from the workstation, let's put those in place first.
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and is_filepath?(boxfile[:engine])
+logtap.print(bullet("Boxfile engine specified is filepath: #{boxfile[:engine]}..."), 'debug')
 
   basename = ::File.basename(boxfile[:engine])
   path     = "#{SHARE_DIR}/engines/#{basename}"
@@ -71,6 +76,7 @@ end
 # the workstation, let's fetch it from warehouse.nanobox.io.
 # This process will replace any default engine if the names collide.
 if boxfile[:engine] and not is_filepath?(boxfile[:engine])
+logtap.print(bullet("Boxfile engine specified not filepath: #{boxfile[:engine]}..."), 'debug')
 
   engine = engine_name(boxfile[:engine])
 
