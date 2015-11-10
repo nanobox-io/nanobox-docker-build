@@ -28,7 +28,6 @@ logtap.print(process_start('Copy build into place'), 'debug')
 execute "copy build into place" do
   command <<-EOF
     rsync \
-      -v \
       -a \
       --delete \
       --exclude-from=/var/nanobox/build-excludes.txt \
@@ -58,7 +57,6 @@ lib_dirs.each do |dir|
     execute "stash #{dir} into cache for quick access" do
       command <<-EOF
         rsync \
-          -v \
           -a \
           #{CODE_STAGE_DIR}/#{dir}/ \
           #{LIB_CACHE_DIR}/#{dir}
@@ -87,7 +85,6 @@ if ::File.exist? "#{BUILD_DIR}/var/db/pkgin"
   execute "stash pkgin packages into cache for quick access" do
     command <<-EOF
       rsync \
-        -v \
         -a \
         #{BUILD_DIR}/var/db/pkgin/cache/ \
         #{CACHE_DIR}/pkgin
