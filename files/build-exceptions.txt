@@ -30,3 +30,5 @@
 # gmp
 ^/lib/libgmp
 ^/lib/libgmpxx
+# oddly, jruby puts it's libs in share/jruby-*
+^/share/jruby
