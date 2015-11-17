@@ -13,6 +13,9 @@
 include NanoBox::Engine
 include NanoBox::Output
 
+# store the original boxfile for later use if needed (this may not be needed forever)
+registry(:original_boxfile, boxfile)
+
 logtap.print(bullet('Running configure hook...'), 'debug')
 
 # 0) temporary
