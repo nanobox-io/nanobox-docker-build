@@ -47,7 +47,7 @@ module NanoBox
         env: payload[:env],
         dns: payload[:dns],
         port: payload[:port],
-        boxfile: payload[:boxfile],
+        boxfile: payload[:boxfile] || original_boxfile,
         platform: 'local'
       }
 
@@ -90,6 +90,12 @@ module NanoBox
     # 'build' section of the Boxfile provided by the app
     def boxfile
       $boxfile ||= payload[:boxfile] || {}
+    end
+
+    # In the event that the boxfile was not provided in the payload,
+    # we can try to extract the original boxfile from the registry
+    def original_boxfile
+      registry :original_boxfile || {}
     end
 
     # reads the engine_id attribute from the meta
