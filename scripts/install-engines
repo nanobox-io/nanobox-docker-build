@@ -26,7 +26,7 @@ engines=(
   ruby
   python
   php
-  golang
+  go
   java
   # nodejs has to be last, because of the package.json
   nodejs

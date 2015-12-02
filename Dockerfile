@@ -11,7 +11,7 @@ RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
     /opt/gonano/bin/pkgin -y in shon mustache && \
     rm -rf /var/gonano/db/pkgin/cache
 
-# install nanobox-cli
+# fetch latest nanobox cli
 RUN wget -qO /opt/gonano/bin/nanobox https://s3.amazonaws.com/tools.nanobox.io/cli/linux/amd64/nanobox && \
     chmod 755 /opt/gonano/bin/nanobox
 

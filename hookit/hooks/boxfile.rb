@@ -21,8 +21,8 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/boxfile"
     path GONANO_PATH
     user 'gonano'
     stream true
-    on_stderr {|data| logtap.print data}
-    on_stdout {|data| boxfile << data}
+    on_stderr {|edata| logtap.print edata}
+    on_stdout {|odata| boxfile << odata}
   end
 end
 
