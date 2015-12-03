@@ -10,8 +10,7 @@ install_engine() {
   echo "Fetching and installing ${name}"
 
   # fetch engine
-  nanobox \
-    fetch \
+  nanobox engine fetch \
     ${name} \
       | tar \
         -xzf - \
