@@ -8,8 +8,12 @@ RUN apt-get update -qq && \
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in nanobox-cli shon mustache && \
+    /opt/gonano/bin/pkgin -y in shon mustache && \
     rm -rf /var/gonano/db/pkgin/cache
+
+# fetch latest nanobox cli
+RUN wget -O /opt/gonano/bin/nanobox https://s3.amazonaws.com/tools.nanobox.io/cli/linux/amd64/nanobox &&\
+chmod 755 /opt/gonano/bin/nanobox
 
 # add temporary scripts
 ADD scripts/. /var/tmp/
