@@ -1,0 +1,34 @@
+# All entries in this list will be used to remove entries in the
+# build-exclude.txt list which is given to rsync. Essentially,
+# the build-exclude.txt list is meant to remove as much as possible from the
+# final /data pkgsrc bootstrap from the final build. There are a few exceptions
+# to this, and they go in this list. All entries are passed to sed in a regex
+# replace function.
+#
+# general directory structure
+^/bin$
+^/etc$
+^/lib$
+^/libexec$
+^/sbin$
+^/var$
+^/var/db$
+# ncurses
+^/lib/libform
+^/lib/libmenu
+^/lib/libncurses
+^/lib/libpanel
+# openssl
+^/lib/engines
+^/lib/libcrypto
+^/lib/libssl
+# readline
+^/lib/libhistory
+^/lib/libreadline
+# zlib
+^/lib/libz
+# gmp
+^/lib/libgmp
+^/lib/libgmpxx
+# oddly, jruby puts it's libs in share/jruby-*
+^/share/jruby

@@ -1,11 +1,10 @@
-nanobox build
-============
+## nanobox-docker-build
 
-This repo contains the files necessary to create a build docker image for [nanobox](nanobox.io) consumption.
+This repo contains the files necessary to create a docker 'build' image for [Nanobox](http://nanobox.io) consumption.
 
+## Testing
 
-Requirements
-------------
+All changes, are tested through Travi-ci. The image will be built, and tests will be run against it.
 
 * `docker_user` environment variable `export docker_user='nanobox'`
 * `~/.dockercfg` file with credentials for `docker_user`

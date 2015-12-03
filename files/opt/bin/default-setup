@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/opt/gonano/bin/hookit setup "${1}"
