@@ -43,6 +43,10 @@ if not engine
   end
 end
 
+if not engine_id
+  logtap.print no_enginefile
+end
+
 info = engine_info(
   engine_id, 
   enginefile[:name], 
