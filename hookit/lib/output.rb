@@ -329,6 +329,22 @@ module NanoBox
       END
     end
 
+    # when no enginefile is found, this will return a formatted message
+    # explaining why the enginefile is not found, and what can be done
+    def no_enginefile
+      <<-END
++> NO ENGINEFILE FOUND
+   We couldn't read the Enginefile for the engine your app is using.
+   If you just added a custom engine to your Boxfile, you will need to
+   `nanobox reload` to mount it into the build container.
+   If this persists, contact us on IRC or submit an issue on github
+   at nanobox-io/nanobox/issues.
+   --------------------------------
+   IRC   : #nanobox (freenode)
+   --------------------------------
+      END
+    end
+
 
     # when an engine is detected, this will return a formatted message
     # providing basic details about the engine
