@@ -91,8 +91,7 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
 
   execute "fetching #{engine}" do
     command <<-EOF
-      nanobox \
-        fetch \
+      nanobox engine fetch \
         #{boxfile[:engine]} \
           | tar \
             -xzf - \
