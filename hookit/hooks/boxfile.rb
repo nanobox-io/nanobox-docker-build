@@ -4,7 +4,7 @@ require 'yaml'
 include NanoBox::Engine
 include NanoBox::Output
 
-logtap.print(bullet('Running boxfile hook'), 'debug')
+logtap.print(bullet('Running boxfile hook...'), 'debug')
 
 # By this point, engine should be set in the registry
 engine = registry('engine')

@@ -97,8 +97,7 @@ logtap.print(bullet("Boxfile engine specified not filepath: #{boxfile[:engine]}.
 
   execute "fetching #{engine}" do
     command <<-EOF
-      nanobox \
-        fetch \
+      nanobox engine fetch \
         #{boxfile[:engine]} \
           | tar \
             -xzf - \

@@ -46,6 +46,12 @@ if not engine
   end
 end
 
+# Can't use engine_id because that is added by nanobox
+# and won't exist in their local dev engine
+if not enginefile[:name]
+  logtap.print no_enginefile
+end
+
 info = engine_info(
   engine_id, 
   enginefile[:name], 
