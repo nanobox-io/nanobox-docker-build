@@ -18,8 +18,8 @@ when 'mount'
   # look for the 'config_files' node within the 'boxfile' payload, and
   # bind mount each of the entries
   (boxfile[:config_files] || []).each do |f|
+    logtap.print(bullet("Temporarily overwriting #{f}..."))
     execute "mount #{f}" do
-      logtap.print(bullet("Temporarily overwriting #{f}..."))
       command %Q(mount --bind /mnt/build/#{f} /code/#{f})
     end
   end
@@ -30,8 +30,8 @@ when 'copy'
 
   # copy each of the values in the 'config_files' node into the raw source
   (boxfile[:config_files] || []).each do |f|
+    logtap.print(bullet("Permanently overwriting #{f}..."))
     execute "copy #{f}" do
-      logtap.print(bullet("Permanently overwriting #{f}..."))
       command %Q(cp -f /mnt/build/#{f} /code/#{f})
     end
   end
