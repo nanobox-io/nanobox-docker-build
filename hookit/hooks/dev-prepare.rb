@@ -12,31 +12,29 @@ when 'none'
   logtap.print(bullet("Config 'none' detected, exiting now..."), 'debug')
   exit 0
 when 'mount'
+
   logtap.print(bullet("Config 'mount' detected, running now..."), 'debug')
 
   # look for the 'config_files' node within the 'boxfile' payload, and
   # bind mount each of the entries
-  execute "bind mount configs" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/dev-mount '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{engine}/bin"
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logtap.print data}
+  (boxfile[:config_files] || {}).each do |f|
+    execute "mount #{f}" do
+      command %Q(mount --bind /mnt/build/#{f} /code/#{f})
+    end
   end
+
 when 'copy'
+
   logtap.print(bullet("Config 'copy' detected, running now..."), 'debug')
 
   # copy each of the values in the 'config_files' node into the raw source
-  execute "copy configs" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/dev-copy '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{engine}/bin"
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logtap.print data}
+  (boxfile[:config_files] || {}).each do |f|
+    execute "copy #{f}" do
+      command %Q(cp -f /mnt/build/#{f} /code/#{f})
+    end
   end
+
 else
   logtap.print(bullet("Config not detected, exiting now..."), 'debug')
-  exit 0
+  exit Hookit::Exit::ABORT
 end
