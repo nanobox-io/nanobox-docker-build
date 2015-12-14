@@ -2,6 +2,35 @@
 include NanoBox::Engine
 include NanoBox::Output
 
+# user-defined packages
+if boxfile[:packages]
+  logtap.print(bullet("Packages declared, installing now..."), 'debug')
+
+  execute "install packages" do
+    command "pkgin -y in #{[boxfile[:packages]].join(' ')}"
+    path GONANO_PATH
+    stream true
+    on_data {|data| logtap.print(data, 'debug')}
+  end
+end
+
+# user prepare
+logtap.print(bullet("Running user prepare hook..."), 'debug')
+
+if boxfile[:prepare]
+  logtap.print(bullet("'Prepare' detected, running now..."), 'debug')
+
+  execute "prepare code" do
+    command boxfile[:prepare]
+    cwd "#{CODE_DIR}"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logtap.print data}
+  end
+end
+
+
 logtap.print(bullet("Running prepare hook..."), 'debug')
 
 # By this point, engine should be set in the registry
