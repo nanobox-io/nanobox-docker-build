@@ -2,6 +2,23 @@
 include NanoBox::Engine
 include NanoBox::Output
 
+# user prepare
+logtap.print(bullet("Running user prepare hook..."), 'debug')
+
+if boxfile[:prepare]
+  logtap.print(bullet("'prepare' detected, running now..."), 'debug')
+
+  execute "prepare code" do
+    command boxfile[:prepare]
+    cwd "#{CODE_DIR}"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logtap.print data}
+  end
+end
+
+
 logtap.print(bullet("Running prepare hook..."), 'debug')
 
 # By this point, engine should be set in the registry
