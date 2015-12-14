@@ -2,11 +2,23 @@
 include NanoBox::Engine
 include NanoBox::Output
 
+# user-defined packages
+if boxfile[:packages]
+  logtap.print(bullet("Packages declared, installing now..."), 'debug')
+
+  execute "install packages" do
+    command "pkgin -y in #{[boxfile[:packages]].join(' ')}"
+    path GONANO_PATH
+    stream true
+    on_data {|data| logtap.print(data, 'debug')}
+  end
+end
+
 # user prepare
 logtap.print(bullet("Running user prepare hook..."), 'debug')
 
 if boxfile[:prepare]
-  logtap.print(bullet("'prepare' detected, running now..."), 'debug')
+  logtap.print(bullet("'Prepare' detected, running now..."), 'debug')
 
   execute "prepare code" do
     command boxfile[:prepare]
