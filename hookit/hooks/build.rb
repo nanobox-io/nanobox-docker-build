@@ -6,18 +6,16 @@ include NanoBox::Output
 logtap.print(bullet("Running before hook..."), 'debug')
 
 if not boxfile[:before]
-  exit 0
-end
+  logtap.print(bullet("'Before' detected, running now..."), 'debug')
 
-logtap.print(bullet("'Before' detected, running now..."), 'debug')
-
-execute "before code" do
-  command boxfile[:before]
-  cwd "#{CODE_DIR}"
-  path GONANO_PATH
-  user 'gonano'
-  stream true
-  on_data {|data| logtap.print data}
+  execute "before code" do
+    command boxfile[:before]
+    cwd "#{CODE_DIR}"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logtap.print data}
+  end
 end
 
 
@@ -47,17 +45,15 @@ end
 # after
 logtap.print(bullet("Running after hook..."), 'debug')
 
-if not boxfile[:after]
-  exit 0
-end
+if boxfile[:after]
+  logtap.print(bullet("'After' detected, running now..."), 'debug')
 
-logtap.print(bullet("'After' detected, running now..."), 'debug')
-
-execute "after code" do
-  command boxfile[:after]
-  cwd "#{CODE_DIR}"
-  path GONANO_PATH
-  user 'gonano'
-  stream true
-  on_data {|data| logtap.print data}
+  execute "after code" do
+    command boxfile[:after]
+    cwd "#{CODE_DIR}"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logtap.print data}
+  end
 end
