@@ -7,14 +7,14 @@ module NanoBox
     SHARE_DIR       = '/share'
     MNT_DIR         = '/mnt'
     BUILD_DIR       = '/data'
-    LIVE_DIR        = '/code'
+    LIVE_DIR        = '/live'
     CODE_DIR        = "#{MNT_DIR}/build"
     DEPLOY_DIR      = "#{MNT_DIR}/deploy"
     CACHE_DIR       = "#{MNT_DIR}/cache"
     APP_CACHE_DIR   = "#{CACHE_DIR}/app"
     LIB_CACHE_DIR   = "#{CACHE_DIR}/lib_dirs"
     ENGINE_DIR      = '/opt/engines'
-    CODE_STAGE_DIR  = '/opt/code'
+    CODE_STAGE_DIR  = '/code'
     CODE_LIVE_DIR   = "#{SHARE_DIR}/code"
     ENGINE_LIVE_DIR = "#{SHARE_DIR}/engines"
     ETC_DIR         = "#{BUILD_DIR}/etc"
