@@ -6,7 +6,7 @@ include NanoBox::Output
 if boxfile[:packages]
   logtap.print(bullet("Packages declared, installing now..."), 'debug')
 
-  logtap.print subtask_start "Package install"
+  logtap.print subtask_start "Installing custom packages"
   logtap.print bullet_info "$ pkgin -y in #{[boxfile[:packages]].join(' ')}"
 
   execute "install packages" do
@@ -30,7 +30,7 @@ if boxfile[:prepare]
 
   boxfile[:prepare].each_with_index do |prepare_hook, i|
 
-    logtap.print subtask_start "Prepare hook #{i}"
+    logtap.print subtask_start "Running prepare hook #{i}"
     logtap.print bullet_info "$ #{prepare_hook}"
 
     execute "prepare code" do

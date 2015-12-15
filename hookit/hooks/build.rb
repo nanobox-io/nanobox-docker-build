@@ -13,7 +13,7 @@ if boxfile[:before]
   end
 
   boxfile[:before].each_with_index do |before_hook, i|
-    logtap.print subtask_start "Before hook #{i}"
+    logtap.print subtask_start "Running before hook #{i}"
     logtap.print bullet_info "$ #{before_hook}"
 
     execute "before code" do
@@ -64,7 +64,7 @@ if boxfile[:after]
   end
 
   boxfile[:after].each_with_index do |after_hook, i|
-    logtap.print subtask_start "After hook #{i}"
+    logtap.print subtask_start "Running after hook #{i}"
     logtap.print bullet_info "$ #{after_hook}"
 
     execute "after code" do
