@@ -8,9 +8,7 @@ logtap.print (bullet("Running before hook..."), 'debug')
 if boxfile[:before]
   logtap.print (bullet("'Before' detected, running now..."), 'debug')
 
-  logtap.print 'what is before'
   if boxfile[:before].is_a?(String)
-    logtap.print 'before is a string'
     boxfile[:before]=[boxfile[:before]]
   end
 

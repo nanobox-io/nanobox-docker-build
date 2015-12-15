@@ -6,11 +6,15 @@ include NanoBox::Output
 if boxfile[:packages]
   logtap.print(bullet("Packages declared, installing now..."), 'debug')
 
+  logtap.print subtask_start "Package install"
+  logtap.print bullet_info "$ pkgin -y in #{[boxfile[:packages]].join(' ')}"
+
   execute "install packages" do
     command "pkgin -y in #{[boxfile[:packages]].join(' ')}"
     path GONANO_PATH
     stream true
-    on_data {|data| logtap.print(data, 'debug')}
+    on_data { |data| logtap.print(data, 'debug') }
+    on_exit { |code| logtap.print code == 0 ? subtask_success : subtask_fail }
   end
 end
 
