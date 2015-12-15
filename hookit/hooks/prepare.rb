@@ -15,21 +15,32 @@ if boxfile[:packages]
 end
 
 # user prepare
-logtap.print(bullet("Running user prepare hook..."), 'debug')
+logtap.print (bullet("Running user prepare hook..."), 'debug')
 
 if boxfile[:prepare]
-  logtap.print(bullet("'Prepare' detected, running now..."), 'debug')
+  logtap.print (bullet("'Prepare' detected, running now..."), 'debug')
 
-  execute "prepare code" do
-    command boxfile[:prepare]
-    cwd "#{CODE_DIR}"
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logtap.print data}
+  if boxfile[:prepare].is_a?(String)
+    boxfile[:prepare]=[boxfile[:prepare]]
+  end
+
+  boxfile[:prepare].each_with_index do |prepare_hook, i|
+
+    logtap.print subtask_start "Prepare hook #{i}"
+    logtap.print bullet_info "$ #{prepare_hook}"
+
+    execute "prepare code" do
+      command prepare_hook
+      cwd "#{CODE_DIR}"
+      path GONANO_PATH
+      user 'gonano'
+      stream true
+      on_data {|data| logtap.print data}
+      on_exit { |code| logtap.print code == 0 ? subtask_success : subtask_fail }
+    end
+
   end
 end
-
 
 logtap.print(bullet("Running prepare hook..."), 'debug')
 

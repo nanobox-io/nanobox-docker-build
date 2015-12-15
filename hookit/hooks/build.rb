@@ -3,18 +3,31 @@ include NanoBox::Engine
 include NanoBox::Output
 
 # before
-logtap.print(bullet("Running before hook..."), 'debug')
+logtap.print (bullet("Running before hook..."), 'debug')
 
 if boxfile[:before]
-  logtap.print(bullet("'Before' detected, running now..."), 'debug')
+  logtap.print (bullet("'Before' detected, running now..."), 'debug')
 
-  execute "before code" do
-    command boxfile[:before]
-    cwd "#{CODE_DIR}"
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logtap.print data}
+  logtap.print 'what is before'
+  if boxfile[:before].is_a?(String)
+    logtap.print 'before is a string'
+    boxfile[:before]=[boxfile[:before]]
+  end
+
+  boxfile[:before].each_with_index do |before_hook, i|
+    logtap.print subtask_start "Before hook #{i}"
+    logtap.print bullet_info "$ #{before_hook}"
+
+    execute "before code" do
+      command before_hook
+      cwd "#{CODE_DIR}"
+      path GONANO_PATH
+      user 'gonano'
+      stream true
+      on_data {|data| logtap.print data}
+      on_exit { |code| logtap.print code == 0 ? subtask_success : subtask_fail }
+    end
+
   end
 end
 
@@ -43,17 +56,28 @@ end
 
 
 # after
-logtap.print(bullet("Running after hook..."), 'debug')
+logtap.print (bullet("Running after hook..."), 'debug')
 
 if boxfile[:after]
-  logtap.print(bullet("'After' detected, running now..."), 'debug')
+  logtap.print (bullet("'After' detected, running now..."), 'debug')
 
-  execute "after code" do
-    command boxfile[:after]
-    cwd "#{CODE_DIR}"
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logtap.print data}
+  if boxfile[:after].is_a?(String)
+    boxfile[:after]=[boxfile[:after]]
+  end
+
+  boxfile[:after].each_with_index do |after_hook, i|
+    logtap.print subtask_start "After hook #{i}"
+    logtap.print bullet_info "$ #{after_hook}"
+
+    execute "after code" do
+      command after_hook
+      cwd "#{CODE_DIR}"
+      path GONANO_PATH
+      user 'gonano'
+      stream true
+      on_data {|data| logtap.print data}
+      on_exit { |code| logtap.print code == 0 ? subtask_success : subtask_fail }
+    end
+
   end
 end
