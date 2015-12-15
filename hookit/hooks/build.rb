@@ -5,7 +5,7 @@ include NanoBox::Output
 # before
 logtap.print(bullet("Running before hook..."), 'debug')
 
-if not boxfile[:before]
+if boxfile[:before]
   logtap.print(bullet("'Before' detected, running now..."), 'debug')
 
   execute "before code" do
