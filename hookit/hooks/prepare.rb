@@ -19,10 +19,10 @@ if boxfile[:packages]
 end
 
 # user prepare
-logtap.print (bullet("Running user prepare hook..."), 'debug')
+logtap.print(bullet("Running user prepare hook..."), 'debug')
 
 if boxfile[:prepare]
-  logtap.print (bullet("'Prepare' detected, running now..."), 'debug')
+  logtap.print(bullet("'Prepare' detected, running now..."), 'debug')
 
   if boxfile[:prepare].is_a?(String)
     boxfile[:prepare]=[boxfile[:prepare]]
