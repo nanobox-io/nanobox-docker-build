@@ -3,10 +3,10 @@ include NanoBox::Engine
 include NanoBox::Output
 
 # before
-logtap.print (bullet("Running before hook..."), 'debug')
+logtap.print(bullet("Running before hook..."), 'debug')
 
 if boxfile[:before]
-  logtap.print (bullet("'Before' detected, running now..."), 'debug')
+  logtap.print(bullet("'Before' detected, running now..."), 'debug')
 
   if boxfile[:before].is_a?(String)
     boxfile[:before]=[boxfile[:before]]
@@ -54,10 +54,10 @@ end
 
 
 # after
-logtap.print (bullet("Running after hook..."), 'debug')
+logtap.print(bullet("Running after hook..."), 'debug')
 
 if boxfile[:after]
-  logtap.print (bullet("'After' detected, running now..."), 'debug')
+  logtap.print(bullet("'After' detected, running now..."), 'debug')
 
   if boxfile[:after].is_a?(String)
     boxfile[:after]=[boxfile[:after]]
