@@ -1,5 +1,5 @@
 module NanoBox
-  class Prepare
+  module Prepare
     # Extracts the contents of 'config_files' from the Boxfile
     # and will return the list of files that actually exist.
     def config_files
@@ -13,7 +13,7 @@ module NanoBox
         end
 
         # reject the files that don't exist
-        files.reject do |file|
+        files.keep_if do |file|
           ::File.exist? "/mnt/build/#{file}"
         end
       end
