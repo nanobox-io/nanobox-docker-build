@@ -7,7 +7,7 @@ if boxfile[:packages]
   logtap.print(bullet("Packages declared, installing now..."), 'debug')
 
   logtap.print subtask_start "Installing custom packages"
-  logtap.print bullet_info "$ pkgin -y in #{[boxfile[:packages]].join(' ')}"
+  logtap.print subtask_info  "$ pkgin -y in #{[boxfile[:packages]].join(' ')}"
 
   execute "install packages" do
     command "pkgin -y in #{[boxfile[:packages]].join(' ')}"
@@ -32,7 +32,7 @@ if boxfile[:prepare]
   boxfile[:prepare].each_with_index do |prepare_hook, i|
 
     logtap.print subtask_start "Running prepare hook #{i}"
-    logtap.print bullet_info "$ #{prepare_hook}"
+    logtap.print subtask_info  "$ #{prepare_hook}"
 
     execute "prepare code" do
       command prepare_hook
