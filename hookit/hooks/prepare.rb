@@ -12,6 +12,7 @@ if boxfile[:packages]
   execute "install packages" do
     command "pkgin -y in #{[boxfile[:packages]].join(' ')}"
     path GONANO_PATH
+    user 'gonano'
     stream true
     on_data { |data| logtap.print(data, 'debug') }
     on_exit { |code| logtap.print code == 0 ? subtask_success : subtask_fail }
