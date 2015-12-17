@@ -86,7 +86,7 @@ module NanoBox
       res << ">"
 
       # end with a newline and the first column
-      res << "\n"
+      res << "\n   "
 
       res
     end
@@ -133,7 +133,7 @@ module NanoBox
       res << ">"
 
       # end with a newline and the column for the first output
-      res << "\n"
+      res << "\n   "
 
       res
     end
