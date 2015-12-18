@@ -1,7 +1,7 @@
 # import some logic/helpers from lib/*.rb
 include NanoBox::Engine
 include NanoBox::Output
-include NanoBox::Prepare
+include NanoBox::File
 
 logtap.print(bullet("Running dev-prepare hook..."), 'debug')
 

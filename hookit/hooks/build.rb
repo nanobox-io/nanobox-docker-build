@@ -1,6 +1,27 @@
 # import some logic/helpers from lib/*.rb
 include NanoBox::Engine
 include NanoBox::Output
+include NanoBox::File
+
+# interpolate files
+logtap.print(bullet("Interpolate_files detected, running now..."), 'debug')
+
+# ensure boxfile[:interpolate_files] is not empty AND at least
+# one of the files listed exists in the build
+if interpolate_files.any?
+  # inform user
+  logtap.print interpolate_message
+
+  # copy each of the values in the 'interpolate_files' node into the raw source
+  interpolate_files.each do |file|
+    payload[:env].each do |key, value|
+      execute "interpolate #{file}" do
+        command %Q(sed -i "s/#{key}/#{value}/g" #{CODE_STAGE_DIR}/#{file})
+      end
+    end
+  end
+end
+
 
 # before
 logtap.print(bullet("Running before hook..."), 'debug')
