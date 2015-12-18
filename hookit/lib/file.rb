@@ -1,5 +1,5 @@
 module NanoBox
-  module Prepare
+  module File
     # Extracts the contents of 'config_files' from the Boxfile
     # and will return the list of files that actually exist.
     def config_files
@@ -14,7 +14,26 @@ module NanoBox
 
         # reject the files that don't exist
         files.keep_if do |file|
-          ::File.exist? "/mnt/build/#{file}"
+          ::File.exist? "#{BUILD_DIR}/#{file}"
+        end
+      end
+    end
+
+    # Extracts the contents of 'interpolate_files' from the Boxfile
+    # and will return the list of files that actually exist.
+    def interpolate_files
+      $interpolate_files ||= begin
+        files = boxfile[:interpolate_files] || []
+
+        # if a string was provided, just create a
+        # single item array
+        if files.is_a?(String)
+          files=[files]
+        end
+
+        # reject the files that don't exist
+        files.keep_if do |file|
+          ::File.exist? "#{CODE_STAGE_DIR}/#{file}"
         end
       end
     end
@@ -41,6 +60,20 @@ module NanoBox
 
     def config_files_list
       config_files.inject("") do |msg, file|
+        msg << "     - #{file}\n"; msg
+      end
+    end
+
+    def interpolate_message
+      <<-END
++> The following files were parsed for your convenience and variables will be 
+   interpolated:
+#{interpolated_files_list}
+      END
+    end
+
+    def interpolated_files_list
+      interpolate_files.inject("") do |msg, file|
         msg << "     - #{file}\n"; msg
       end
     end
