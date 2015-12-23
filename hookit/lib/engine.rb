@@ -48,7 +48,8 @@ module NanoBox
         dns: payload[:dns],
         port: payload[:port],
         boxfile: payload[:boxfile] || original_boxfile,
-        platform: 'local'
+        platform: 'local',
+        run: payload[:run]
       }
 
       ::MultiJson.dump(data)
