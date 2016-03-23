@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+# Publish the packed build, application, and cache
+#
+# local:
+#   1 - rsync/copy into /mnt/*
+#
+# production:
+#   2 - upload to warehouse

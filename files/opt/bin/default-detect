@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/opt/gonano/bin/hookit detect "${1}"

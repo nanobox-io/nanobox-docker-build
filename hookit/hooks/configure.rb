@@ -9,6 +9,10 @@
 # publish   [run]
 # cleanup   [all]
 
+# This hook is responsible for setting up the container for a build process.
+#
+# 1 - If
+
 # import some logic/helpers from lib/*.rb
 include NanoBox::Engine
 include NanoBox::Output

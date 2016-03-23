@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+# Allows an engine or Boxfile to setup an environment before the build process
+#
+# 1 - Run before_setup
+# 2 - Run engine setup script
+# 3 - Run after_setup
+#
+# NEED to find a different name for this

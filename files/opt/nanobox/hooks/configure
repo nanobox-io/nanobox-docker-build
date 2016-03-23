@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+# Prepare the container for an app build
+#
+# 1 - Fetch the engine if specified
+# 2 - Copy the engine if local mount
+# 3 - Ensure all the required directories exist and have proper permissions
+# 4 - Extract the cache (rsync local - fetch production)
+# 5 - Extract the pkgin db from the cache
+# 6 - Update pkgin db
+# 7 - Setup the user environment

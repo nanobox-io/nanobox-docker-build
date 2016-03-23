@@ -4,19 +4,17 @@ require 'yaml'
 
 module NanoBox
   module Engine
-    SHARE_DIR       = '/share'
-    MNT_DIR         = '/mnt'
-    BUILD_DIR       = '/data'
-    LIVE_DIR        = '/live'
-    CODE_DIR        = "#{MNT_DIR}/build"
-    DEPLOY_DIR      = "#{MNT_DIR}/deploy"
-    CACHE_DIR       = "#{MNT_DIR}/cache"
+    BUILD_DIR       = '/data' # binaries, libraries, and configs packed into the build
+    LIVE_DIR        = '/live' # what is this?
+    CODE_DIR        = "/mnt/build"
+    DEPLOY_DIR      = "/mnt/deploy"
+    CACHE_DIR       = "/mnt/cache"
     APP_CACHE_DIR   = "#{CACHE_DIR}/app"
     LIB_CACHE_DIR   = "#{CACHE_DIR}/lib_dirs"
     ENGINE_DIR      = '/opt/engines'
     CODE_STAGE_DIR  = '/code'
-    CODE_LIVE_DIR   = "#{SHARE_DIR}/code"
-    ENGINE_LIVE_DIR = "#{SHARE_DIR}/engines"
+    CODE_LIVE_DIR   = "/share/code" #
+    ENGINE_LIVE_DIR = "/share/engines"
     ETC_DIR         = "#{BUILD_DIR}/etc"
     ENV_DIR         = "#{ETC_DIR}/env.d"
     GONANO_PATH     = [

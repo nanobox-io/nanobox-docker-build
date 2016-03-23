@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+# Build/Compile the application
+#
+# 1 - Run boxfile.yml before_build
+# 2 - Run engine build script
+# 3 - Run boxfile.yml after_build

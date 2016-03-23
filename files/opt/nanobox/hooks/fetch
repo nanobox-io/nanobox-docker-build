@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+# Fetch the codebase and cache
+#
+# local:
+#   1 - rsync the code from /share/code
+#
+# production:
+#   1 - clone/checkout code from git repo
+#
+# all:
+#   2 - setup/copy lib_dirs

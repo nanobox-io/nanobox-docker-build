@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+# Pack the application and build into a release
+#
+# 1 - Run engine pack script

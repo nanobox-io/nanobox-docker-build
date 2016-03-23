@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+
+# Run the engine boxfile script and return the response

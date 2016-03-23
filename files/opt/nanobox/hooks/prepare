@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+# Prepare the environment that the compiled application will run within
+#
+# 1 - Run Boxfile before_prepare
+# 2 - Run engine prepare script
+# 3 - Run Boxfile after_prepare

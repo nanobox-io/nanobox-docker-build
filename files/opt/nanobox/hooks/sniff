@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+# Detect a suitable engine by calling the sniff script on all installed
+# engines until we get a 0 exit code
