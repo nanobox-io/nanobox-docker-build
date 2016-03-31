@@ -1,6 +1,6 @@
 require 'faraday'
 
-module NanoBox
+module Nanobox
   class Logvac
 
     def initialize(opts)

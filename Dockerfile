@@ -1,4 +1,4 @@
-FROM nanobox/base
+FROM nanobox/runit
 
 # install gcc and build tools
 RUN apt-get update -qq && \
@@ -11,10 +11,6 @@ RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
     /opt/gonano/bin/pkgin -y in shon mustache && \
     rm -rf /var/gonano/db/pkgin/cache
 
-# fetch latest nanobox cli
-RUN wget -qO /opt/gonano/bin/nanobox https://s3.amazonaws.com/tools.nanobox.io/cli/linux/amd64/nanobox && \
-    chmod 755 /opt/gonano/bin/nanobox
-
 # add temporary scripts
 ADD scripts/. /var/tmp/
 
@@ -24,15 +20,14 @@ RUN /var/tmp/generate-build-excludes
 
 # update pkgin remote packages
 RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
-    rm -rf /data/var/db/pkgin/cache
-RUN chown -R gonano /data/var/db/pkgin
+    rm -rf /data/var/db/pkgin/cache && \
+    chown -R gonano /data/var/db/pkgin
 
 # Created necessary directories
-RUN mkdir -p /opt/bin
+RUN mkdir -p /opt/nanobox
 
 # Copy files
-ADD hookit/. /opt/gonano/hookit/mod/
-ADD files/opt/bin/. /opt/bin/
+ADD files/opt/nanobox/. /opt/nanobox/
 
 # install nos
 RUN mkdir -p /opt/nos && \
@@ -51,3 +46,6 @@ RUN /var/tmp/install-engines
 
 # Cleanup disk
 RUN rm -rf /tmp/* /var/tmp/*
+
+
+CMD [ "/opt/gonano/bin/nanoinit", "/bin/sleep 365d" ]

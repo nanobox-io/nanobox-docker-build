@@ -9,3 +9,17 @@
 # 5 - Extract the pkgin db from the cache
 # 6 - Update pkgin db
 # 7 - Setup the user environment
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+
+logvac.print(bullet('Running configure hook...'), 'debug')
+
+if payload[:engine]
+
+  if condition
+
+  end
+
+end

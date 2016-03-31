@@ -1,5 +1,3 @@
-require 'json'
-
 # Hook order:
 #   1 - configure
 #   2 - fetch
@@ -11,9 +9,8 @@ require 'json'
 #   8 - pack
 #   9 - publish
 
-module NanoBox
+module Nanobox
   module Engine
-
     # The BUILD_DIR is the pkgsrc build root. This is where pkgsrc is
     # bootstrapped and contains a fully chrooted environment that packages can
     # be installed into and binaries can be linked.
@@ -114,6 +111,12 @@ module NanoBox
       '/bin'
     ].join (':')
 
+    # Extract the 'env' section of the payload, which is only the
+    # 'env' section of the Boxfile provided by the app
+    def env
+      $env ||= payload[:env] || {}
+    end
+
     # This payload will serialized as JSON and passed into each of the
     # engine scripts as the first and only argument.
     def engine_payload
@@ -125,11 +128,37 @@ module NanoBox
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,
         app: payload[:app],
-        env: payload[:env],
+        evars: payload[:evars],
         dns: payload[:dns],
-        config: payload[:config],
+        config: env[:config] || {},
         platform: payload[:platform]
       }.to_json
     end
+
+    # When an engine is provided, determine the type of url which will
+    # inform the hook of how to fetch the engine
+    def engine_url_type(engine)
+      case engine
+      when /.+\.git($|#.+$)/
+        'git'
+      when /^[\w\-]+\/[\w\-]+($|#\w+$)/
+        'github'
+      when /^http.+(\.tar\.gz|\.tgz)/
+        'tarball'
+      when /^[~|\.|\/|\\]/
+        'filepath'
+      end
+    end
+
+    # If a git repo is provided for an engine, extract the commit point
+    def engine_git_commitish(engine)
+      match = engine.match(/^.+#(\w+$)/)
+      if match
+        match[1]
+      else
+        'master'
+      end
+    end
+
   end
 end

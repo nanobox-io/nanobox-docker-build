@@ -1,8 +1,8 @@
-module NanoBox
+module Nanobox
   module Output
 
-    def logtap
-      $logtap ||= ::NanoBox::Logvac.new(host: payload[:logtap_host], deploy_id: payload[:deploy_id])
+    def logvac
+      $logvac ||= ::Nanobox::Logvac.new(host: payload[:logtap_host], deploy_id: payload[:deploy_id])
     end
 
     # header
