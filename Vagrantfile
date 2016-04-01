@@ -61,6 +61,12 @@ Vagrant.configure(2) do |config|
     fi
   SCRIPT
 
+  # fetch hoarder image for simulating warehouse
+  config.vm.provision "shell", inline: <<-SCRIPT
+    echo "Fetching image for warehouse..."
+    docker pull nanobox/hoarder
+  SCRIPT
+
   # build the docker image
   config.vm.provision "shell", inline: <<-SCRIPT
     echo "Building docker image..."
