@@ -2,13 +2,19 @@
 
 # Prepare the container for an app build
 #
-# 1 - Fetch the engine if specified
-# 2 - Copy the engine if local mount
-# 3 - Ensure all the required directories exist and have proper permissions
+# 1 - Setup the user environment
+# 2 - Ensure all the required directories exist and have proper permissions
+# 3 - Fetch or copy the engine if specified
 # 4 - Extract the cache (rsync local - fetch production)
 # 5 - Extract the pkgin db from the cache
 # 6 - Update pkgin db
-# 7 - Setup the user environment
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
 
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
@@ -16,10 +22,118 @@ include Nanobox::Output
 
 logvac.print(bullet('Running configure hook...'), 'debug')
 
-if payload[:engine]
+# 1 - Setup the user environment
+# TODO
 
-  if condition
+# 2 - Ensure required directories exist and have permissions
+logvac.print(bullet('ensuring all directories required for build exist'), 'debug')
 
+[
+  "#{BUILD_DIR}",
+  "#{BUILD_DIR}/sbin",
+  "#{BUILD_DIR}/bin",
+  "#{ETC_DIR}",
+  "#{ENV_DIR}",
+  "#{DEPLOY_DIR}",
+  "#{CODE_DIR}",
+  "#{LIVE_DIR}",
+  "#{CACHE_DIR}",
+  "#{APP_CACHE_DIR}",
+  "#{LIB_CACHE_DIR}",
+  "#{ENGINE_DIR}"
+].each do |dir|
+  directory dir do
+    recursive true
   end
+
+  execute "chown gonano #{dir}"
+end
+
+# 2 - Fetch or copy the engine if specified
+#
+# If the engine is specified, we're gonna fetch it from one of 4 sources.
+# Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
+case engine_url_type(engine)
+when 'git'
+
+  logvac.print(process_start("Cloning engine"))
+
+  repo = engine_git_url(engine)
+
+  execute "cloning #{repo}" do
+    command "git clone #{repo} custom"
+    cwd ENGINE_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logvac.print subtask_info(data) }
+    # on_exit { |code| }
+  end
+
+  logvac.print(process_end)
+
+  commit = engine_git_commitish(engine)
+
+  if commit != 'master'
+    logvac.print(process_start("Checkout #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "git checkout #{commit}"
+      cwd "#{ENGINE_DIR}/custom"
+      user 'gonano'
+      stream true
+      on_data { |data| logvac.print subtask_info(data) }
+    end
+
+    logvac.print(process_end)
+  end
+
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
+
+when 'github'
+
+  logvac.print(process_start("Cloning engine from github"))
+
+  repo = engine_git_url(engine)
+  url = "https://github.com/#{repo}.git"
+
+  execute "cloning #{repo}" do
+    command "git clone #{url} custom"
+    cwd ENGINE_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logvac.print subtask_info(data) }
+    # on_exit { |code| }
+  end
+
+  logvac.print(process_end)
+
+  commit = engine_git_commitish(engine)
+
+  if commit != 'master'
+    logvac.print(process_start("Checkout #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "git checkout #{commit}"
+      cwd "#{ENGINE_DIR}/custom"
+      user 'gonano'
+      stream true
+      on_data { |data| logvac.print subtask_info(data) }
+    end
+
+    logvac.print(process_end)
+  end
+
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
+
+when 'tarball'
+
+  
+
+when 'filepath'
+
+else
+  # no engine was specified
 
 end

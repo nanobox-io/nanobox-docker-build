@@ -117,6 +117,11 @@ module Nanobox
       $env ||= payload[:env] || {}
     end
 
+    # extract engine from the env payload
+    def engine
+      $engine ||= env[:engine]
+    end
+
     # This payload will serialized as JSON and passed into each of the
     # engine scripts as the first and only argument.
     def engine_payload
@@ -129,7 +134,6 @@ module Nanobox
         env_dir: ENV_DIR,
         app: payload[:app],
         evars: payload[:evars],
-        dns: payload[:dns],
         config: env[:config] || {},
         platform: payload[:platform]
       }.to_json
@@ -141,7 +145,7 @@ module Nanobox
       case engine
       when /.+\.git($|#.+$)/
         'git'
-      when /^[\w\-]+\/[\w\-]+($|#\w+$)/
+      when /^[\w\-]+\/[\w\-]+($|#[\w|\/|-]+$)/
         'github'
       when /^http.+(\.tar\.gz|\.tgz)/
         'tarball'
@@ -152,11 +156,22 @@ module Nanobox
 
     # If a git repo is provided for an engine, extract the commit point
     def engine_git_commitish(engine)
-      match = engine.match(/^.+#(\w+$)/)
+      match = engine.match(/^.+#([\w|\/|-]+$)/)
       if match
         match[1]
       else
         'master'
+      end
+    end
+
+    # If a commit point is provided for a repo, strip it off to return just
+    # the repo location
+    def engine_git_url(engine)
+      match = engine.match(/^(.+)#[\w|\/|-]+$/)
+      if match
+        match[1]
+      else
+        engine
       end
     end
 

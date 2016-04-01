@@ -4,20 +4,21 @@ module Nanobox
   class Logvac
 
     def initialize(opts)
-      @host = opts[:host]
-      @deploy_id = opts[:deploy_id]
+      @logvac = opts[:logvac]
+      @build  = opts[:build]
     end
 
     def post(message, level='info')
-      if ! @host.nil?
-        connection.post("/deploy") do |req|
-          req.headers['X-Log-Level'] = level
-          if @deploy_id
-            req.headers['X-Deploy-ID'] = @deploy_id
-          end
-          req.body = message
-        end
-      end
+      $stdout.print message
+      # if ! @host.nil?
+      #   connection.post("/deploy") do |req|
+      #     req.headers['X-Log-Level'] = level
+      #     if @deploy_id
+      #       req.headers['X-Deploy-ID'] = @deploy_id
+      #     end
+      #     req.body = message
+      #   end
+      # end
     end
     alias :print :post
 

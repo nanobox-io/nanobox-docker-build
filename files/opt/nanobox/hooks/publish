@@ -7,3 +7,11 @@
 #
 # production:
 #   2 - upload to warehouse
+
+# curl -k http://192.168.0.100:7410/ping
+#
+# curl -H "x-auth-token: 123" http://192.168.0.100:7410/blobs/test -d "data"
+#
+# curl -H "x-auth-token: 123" http://192.168.0.100:7410/blobs/test
+#
+# curl -H "x-auth-token: 123" http://192.168.0.100:7410/blobs

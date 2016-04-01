@@ -1,6 +1,6 @@
 
 util_dir="$(dirname $(readlink -f $BASH_SOURCE))"
-hookit_dir="$(readlink -f ${util_dir}/../../src)"
+hookit_dir="$(readlink -f ${util_dir}/../../files/opt/nanobox/hooks)"
 payloads_dir=$(readlink -f ${util_dir}/../payloads)
 
 payload() {
