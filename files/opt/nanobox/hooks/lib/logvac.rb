@@ -6,30 +6,30 @@ module Nanobox
     def initialize(opts)
       @logvac = opts[:logvac]
       @build  = opts[:build]
+      @token  = opts[:token]
     end
 
     def post(message, level='info')
-      $stdout.print message
-      # if ! @host.nil?
-      #   connection.post("/deploy") do |req|
-      #     req.headers['X-Log-Level'] = level
-      #     if @deploy_id
-      #       req.headers['X-Deploy-ID'] = @deploy_id
-      #     end
-      #     req.body = message
-      #   end
-      # end
+      connection.post("/") do |req|
+        req.headers['X-AUTH-TOKEN'] = @token
+        body = {}
+        body[:message] = message
+        body[:type] = "build"
+        body[:level] = level
+        body[:id] = @build
+        req.body = body.to_json
+      end
     end
     alias :print :post
 
     def puts(message='', level='info')
-      post("#{message}\n")
+      post("#{message}\n", level)
     end
 
     protected
 
     def connection
-      @connection ||= Faraday.new(url: "http://#{@host}:5140") do |faraday|
+      @connection ||= Faraday.new(url: "http://#{@logvac}:6361") do |faraday|
         faraday.adapter :excon
       end
     end

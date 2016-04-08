@@ -20,13 +20,59 @@ require 'hookit/setup'
 include Nanobox::Engine
 include Nanobox::Output
 
-logvac.print(bullet('Running configure hook...'), 'debug')
+logger.print(bullet('Running configure hook...'), 'debug')
 
 # 1 - Setup the user environment
 # TODO
 
+if payload[:platform] == 'production'
+  # Setup root keys for data migrations
+  directory '/root/.ssh' do
+    recursive true
+  end
+
+  file '/root/.ssh/id_rsa' do
+    content payload[:ssh][:admin_key][:private_key]
+    mode 0600
+  end
+
+  file '/root/.ssh/id_rsa.pub' do
+    content payload[:ssh][:admin_key][:public_key]
+  end
+
+  file '/root/.ssh/authorized_keys' do
+    content payload[:ssh][:admin_key][:public_key]
+  end
+
+  # Setup gonano keys for repo cloning
+  directory '/home/gonano/.ssh' do
+    recursive true
+    owner gonano
+    group gonano
+  end
+
+  file '/home/gonano/.ssh/id_rsa' do
+    content payload[:ssh][:admin_key][:private_key]
+    mode 0600
+    owner gonano
+    group gonano
+  end
+
+  file '/home/gonano/.ssh/id_rsa.pub' do
+    content payload[:ssh][:admin_key][:public_key]
+    owner gonano
+    group gonano
+  end
+
+  file '/home/gonano/.ssh/authorized_keys' do
+    content payload[:ssh][:admin_key][:public_key]
+    owner gonano
+    group gonano
+  end
+end
+
 # 2 - Ensure required directories exist and have permissions
-logvac.print(bullet('ensuring all directories required for build exist'), 'debug')
+logger.print(bullet('ensuring all directories required for build exist'), 'debug')
 
 [
   "#{BUILD_DIR}",
@@ -45,18 +91,18 @@ logvac.print(bullet('ensuring all directories required for build exist'), 'debug
   directory dir do
     recursive true
   end
-
+  # Some of the directories might already exist. Chown everything.
   execute "chown gonano #{dir}"
 end
 
-# 2 - Fetch or copy the engine if specified
+# 3 - Fetch or copy the engine if specified
 #
 # If the engine is specified, we're gonna fetch it from one of 4 sources.
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
 case engine_url_type(engine)
 when 'git'
 
-  logvac.print(process_start("Cloning engine"))
+  logger.print(process_start("Cloning engine"))
 
   repo = engine_git_url(engine)
 
@@ -65,26 +111,26 @@ when 'git'
     cwd ENGINE_DIR
     user 'gonano'
     stream true
-    on_data { |data| logvac.print subtask_info(data) }
+    on_data { |data| logger.print subtask_info(data) }
     # on_exit { |code| }
   end
 
-  logvac.print(process_end)
+  logger.print(process_end)
 
   commit = engine_git_commitish(engine)
 
   if commit != 'master'
-    logvac.print(process_start("Checkout #{commit}"))
+    logger.print(process_start("Checkout #{commit}"))
 
     execute "Checkout commitish point" do
       command "git checkout #{commit}"
       cwd "#{ENGINE_DIR}/custom"
       user 'gonano'
       stream true
-      on_data { |data| logvac.print subtask_info(data) }
+      on_data { |data| logger.print subtask_info(data) }
     end
 
-    logvac.print(process_end)
+    logger.print(process_end)
   end
 
   # set the engine as custom in the registry
@@ -92,7 +138,7 @@ when 'git'
 
 when 'github'
 
-  logvac.print(process_start("Cloning engine from github"))
+  logger.print(process_start("Cloning engine from github"))
 
   repo = engine_git_url(engine)
   url = "https://github.com/#{repo}.git"
@@ -102,38 +148,143 @@ when 'github'
     cwd ENGINE_DIR
     user 'gonano'
     stream true
-    on_data { |data| logvac.print subtask_info(data) }
+    on_data { |data| logger.print subtask_info(data) }
     # on_exit { |code| }
   end
 
-  logvac.print(process_end)
+  logger.print(process_end)
 
   commit = engine_git_commitish(engine)
 
   if commit != 'master'
-    logvac.print(process_start("Checkout #{commit}"))
+    logger.print(process_start("Checkout #{commit}"))
 
     execute "Checkout commitish point" do
       command "git checkout #{commit}"
       cwd "#{ENGINE_DIR}/custom"
       user 'gonano'
       stream true
-      on_data { |data| logvac.print subtask_info(data) }
+      on_data { |data| logger.print subtask_info(data) }
     end
 
-    logvac.print(process_end)
+    logger.print(process_end)
   end
 
   # set the engine as custom in the registry
   registry('engine', 'custom')
 
 when 'tarball'
+  directory "#{ENGINE_DIR}/custom"
 
+  execute "Extract engine" do
+    command "curl -k #{engine} | tar -C #{ENGINE_DIR}/custom -xzf - --strip-components=1"
+    user 'gonano'
+  end
   
-
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
 when 'filepath'
+  if payload[:platform] != 'local'
+    logger.print(fatal("Invalid Engine", "A file path can only be used with Nanobox locally."),'fatal')
+  end
 
+  directory "#{ENGINE_DIR}/custom"
+
+  execute "copy engine" do
+    command "cp -r #{LOCAL_ENGINE_SRC_DIR}/* #{ENGINE_DIR}/custom"
+    user 'gonano'
+  end
+
+  registry('engine', 'custom')
 else
   # no engine was specified
 
 end
+
+# 4 - Extract the cache (rsync local - fetch production)
+if payload[:platform] == 'local'
+  logger.print(process_start('Extract cache...'), 'debug')
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract cache for quick access" do
+    command <<-EOF
+      rsync \
+        -v \
+        -a \
+        #{LOCAL_CACHE_DEST_DIR}/ \
+        #{CACHE_DIR}
+    EOF
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data), 'debug' }
+  end
+
+  logger.print process_end, 'debug'
+end
+
+if payload[:platform] == 'production'
+  logger.print(process_start('Extract cache...'), 'debug')
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract cache for quick access" do
+    command <<-EOF
+      curl \
+        -k \
+        -H "x-auth-token: #{payload[:warehouse_token]}" \
+        https://#{payload[:warehouse]}:7410/blobs/cache | \
+      tar \
+        -x \
+        -z \
+        -f - \
+        -C #{CACHE_DIR}
+    EOF
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data), 'debug' }
+  end
+
+  logger.print process_end, 'debug'
+end
+
+# 5 - Extract the pkgin db from the cache
+if ::File.exist? "#{CACHE_DIR}/pkgin"
+
+  directory "#{BUILD_DIR}/var/db/pkgin/cache" do
+    owner 'gonano'
+    group 'gonano'
+    recursive true
+  end
+
+  logger.print(process_start('Extract pkgin cache...'), 'debug')
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract pkgin packages from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -v \
+        -a \
+        #{CACHE_DIR}/pkgin/ \
+        #{BUILD_DIR}/var/db/pkgin/cache
+    EOF
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data), 'debug' }
+  end
+
+  logger.print process_end, 'debug'
+end
+
+# 6 - Update pkgin db
+logger.print(process_start('Updating pkgin database...'), 'debug')
+
+execute "update pkgin packages" do
+  command <<-EOF
+    rm -f #{BUILD_DIR}/var/db/pkgin/pkgin.db && \
+    #{BUILD_DIR}/bin/pkgin -y up
+  EOF
+  user 'gonano'
+  stream true
+  on_data { |data| logger.print subtask_info(data), 'debug' }
+end
+
+logger.print process_end, 'debug'

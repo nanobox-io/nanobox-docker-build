@@ -1,9 +1,14 @@
 module Nanobox
   module Output
 
-    def logvac
-      $logvac ||= ::Nanobox::Logvac.new(logvac: payload[:logvac], build: payload[:build])
+    def logger
+      if ! payload[:logvac].nil?
+        $logger ||= ::Nanobox::Logvac.new(logvac: payload[:logvac], build: payload[:build], token: payload[:logvac_token])
+      else
+        $logger ||= ::Nanobox::Stderr.new(log_level: payload[:log_level])
+      end
     end
+
 
     # header
     #

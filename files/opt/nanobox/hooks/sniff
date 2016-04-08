@@ -2,3 +2,70 @@
 
 # Detect a suitable engine by calling the sniff script on all installed
 # engines until we get a 0 exit code
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+
+logger.print(bullet("Running detect hook..."), 'debug')
+
+# By this point, engine should be set in the registry
+# if an engine is specified in the Boxfile
+engine = registry('engine')
+
+# If an engine is not already specified, we need to iterate through the
+# installed engines calling the "sniff" script until one of them exits with 0
+if not engine
+  logger.print(bullet('Detecting app language & engine'))
+
+  ::Dir.glob("#{ENGINE_DIR}/*").select { |f| ::File.directory?(f) }.sort.each do |e|
+
+    # once engine is set, we can stop looping
+    break if engine
+
+    # make sure we have a sniff script
+    next if not ::File.exist? "#{e}/bin/sniff"
+
+    # for convenience, we only want the engine name
+    basename = ::File.basename(e)
+
+    # execute 'sniff' to see if we qualify
+    execute 'sniff' do
+      command %Q(#{e}/bin/sniff "#{CODE_DIR}")
+      cwd "#{e}/bin"
+      path GONANO_PATH
+      user 'gonano'
+      on_exit { |code| engine = basename if code == 0 }
+    end
+  end
+
+  if engine
+    # set the engine in the registry for later use
+    registry('engine', engine)
+  else
+    logger.print(no_engine)
+    exit Hookit::Exit::ABORT
+  end
+end
+
+# Can't use engine_id because that is added by nanobox
+# and won't exist in their local dev engine
+if not enginefile[:name]
+  logger.print no_enginefile
+end
+
+info = engine_info(
+  engine_id, 
+  enginefile[:name], 
+  enginefile[:language], 
+  enginefile[:generic]
+)
+
+logger.print info

@@ -15,3 +15,14 @@
 # curl -H "x-auth-token: 123" http://192.168.0.100:7410/blobs/test
 #
 # curl -H "x-auth-token: 123" http://192.168.0.100:7410/blobs
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output

@@ -5,3 +5,14 @@
 # 1 - Run Boxfile before_prepare
 # 2 - Run engine prepare script
 # 3 - Run Boxfile after_prepare
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output

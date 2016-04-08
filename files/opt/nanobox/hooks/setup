@@ -7,3 +7,38 @@
 # 3 - Run after_setup
 #
 # NEED to find a different name for this
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+
+# By this point, engine should be set in the registry
+engine = registry('engine')
+
+# 1 - Run before_setup
+
+# 2 - Run engine setup script
+logger.print(bullet("Running setup hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/setup"
+
+  logger.print(bullet("Setup script detected, running now..."), 'debug')
+
+  execute "setup environment" do
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/setup '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
+
+# 3 - Run after_setup
