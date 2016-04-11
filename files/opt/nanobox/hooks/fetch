@@ -10,6 +10,8 @@
 #
 # all:
 #   2 - setup/copy lib_dirs
+#
+#   3 - Fetch or copy the engine if specified
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -74,4 +76,114 @@ lib_dirs.each do |dir|
 
     logger.print(process_end, 'debug')
   end
+end
+
+# 3 - Fetch or copy the engine if specified
+#
+# If the engine is specified, we're gonna fetch it from one of 4 sources.
+# Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
+use_engine = nil
+if ! converged_boxfile[:env].nil? && ! converged_boxfile[:env][:engine]
+  use_engine = converged_boxfile[:env][:engine]
+end
+case engine_url_type(boxfile_engine)
+when 'git'
+
+  logger.print(process_start("Cloning engine"))
+
+  repo = engine_git_url(boxfile_engine)
+
+  execute "cloning #{repo}" do
+    command "git clone #{repo} custom"
+    cwd ENGINE_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data) }
+    # on_exit { |code| }
+  end
+
+  logger.print(process_end)
+
+  commit = engine_git_commitish(boxfile_engine)
+
+  if commit != 'master'
+    logger.print(process_start("Checkout #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "git checkout #{commit}"
+      cwd "#{ENGINE_DIR}/custom"
+      user 'gonano'
+      stream true
+      on_data { |data| logger.print subtask_info(data) }
+    end
+
+    logger.print(process_end)
+  end
+
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
+
+when 'github'
+
+  logger.print(process_start("Cloning engine from github"))
+
+  repo = engine_git_url(boxfile_engine)
+  url = "https://github.com/#{repo}.git"
+
+  execute "cloning #{repo}" do
+    command "git clone #{url} custom"
+    cwd ENGINE_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data) }
+    # on_exit { |code| }
+  end
+
+  logger.print(process_end)
+
+  commit = engine_git_commitish(boxfile_engine)
+
+  if commit != 'master'
+    logger.print(process_start("Checkout #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "git checkout #{commit}"
+      cwd "#{ENGINE_DIR}/custom"
+      user 'gonano'
+      stream true
+      on_data { |data| logger.print subtask_info(data) }
+    end
+
+    logger.print(process_end)
+  end
+
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
+
+when 'tarball'
+  directory "#{ENGINE_DIR}/custom"
+
+  execute "Extract engine" do
+    command "curl -k #{engine} | tar -C #{ENGINE_DIR}/custom -xzf - --strip-components=1"
+    user 'gonano'
+  end
+  
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
+when 'filepath'
+  if payload[:platform] != 'local'
+    logger.print(fatal("Invalid Engine", "A file path can only be used with Nanobox locally."),'fatal')
+  end
+
+  directory "#{ENGINE_DIR}/custom"
+
+  execute "copy engine" do
+    command "cp -r #{LOCAL_ENGINE_SRC_DIR}/* #{ENGINE_DIR}/custom"
+    user 'gonano'
+  end
+
+  registry('engine', 'custom')
+else
+  # no engine was specified
+
 end

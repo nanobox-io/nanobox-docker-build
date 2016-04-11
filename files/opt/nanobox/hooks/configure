@@ -4,10 +4,9 @@
 #
 # 1 - Setup the user environment
 # 2 - Ensure all the required directories exist and have proper permissions
-# 3 - Fetch or copy the engine if specified
-# 4 - Extract the cache (rsync local - fetch production)
-# 5 - Extract the pkgin db from the cache
-# 6 - Update pkgin db
+# 3 - Extract the cache (rsync local - fetch production)
+# 4 - Extract the pkgin db from the cache
+# 5 - Update pkgin db
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -95,113 +94,7 @@ logger.print(bullet('ensuring all directories required for build exist'), 'debug
   execute "chown gonano #{dir}"
 end
 
-# 3 - Fetch or copy the engine if specified
-#
-# If the engine is specified, we're gonna fetch it from one of 4 sources.
-# Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
-case engine_url_type(engine)
-when 'git'
-
-  logger.print(process_start("Cloning engine"))
-
-  repo = engine_git_url(engine)
-
-  execute "cloning #{repo}" do
-    command "git clone #{repo} custom"
-    cwd ENGINE_DIR
-    user 'gonano'
-    stream true
-    on_data { |data| logger.print subtask_info(data) }
-    # on_exit { |code| }
-  end
-
-  logger.print(process_end)
-
-  commit = engine_git_commitish(engine)
-
-  if commit != 'master'
-    logger.print(process_start("Checkout #{commit}"))
-
-    execute "Checkout commitish point" do
-      command "git checkout #{commit}"
-      cwd "#{ENGINE_DIR}/custom"
-      user 'gonano'
-      stream true
-      on_data { |data| logger.print subtask_info(data) }
-    end
-
-    logger.print(process_end)
-  end
-
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
-
-when 'github'
-
-  logger.print(process_start("Cloning engine from github"))
-
-  repo = engine_git_url(engine)
-  url = "https://github.com/#{repo}.git"
-
-  execute "cloning #{repo}" do
-    command "git clone #{url} custom"
-    cwd ENGINE_DIR
-    user 'gonano'
-    stream true
-    on_data { |data| logger.print subtask_info(data) }
-    # on_exit { |code| }
-  end
-
-  logger.print(process_end)
-
-  commit = engine_git_commitish(engine)
-
-  if commit != 'master'
-    logger.print(process_start("Checkout #{commit}"))
-
-    execute "Checkout commitish point" do
-      command "git checkout #{commit}"
-      cwd "#{ENGINE_DIR}/custom"
-      user 'gonano'
-      stream true
-      on_data { |data| logger.print subtask_info(data) }
-    end
-
-    logger.print(process_end)
-  end
-
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
-
-when 'tarball'
-  directory "#{ENGINE_DIR}/custom"
-
-  execute "Extract engine" do
-    command "curl -k #{engine} | tar -C #{ENGINE_DIR}/custom -xzf - --strip-components=1"
-    user 'gonano'
-  end
-  
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
-when 'filepath'
-  if payload[:platform] != 'local'
-    logger.print(fatal("Invalid Engine", "A file path can only be used with Nanobox locally."),'fatal')
-  end
-
-  directory "#{ENGINE_DIR}/custom"
-
-  execute "copy engine" do
-    command "cp -r #{LOCAL_ENGINE_SRC_DIR}/* #{ENGINE_DIR}/custom"
-    user 'gonano'
-  end
-
-  registry('engine', 'custom')
-else
-  # no engine was specified
-
-end
-
-# 4 - Extract the cache (rsync local - fetch production)
+# 3 - Extract the cache (rsync local - fetch production)
 if payload[:platform] == 'local'
   logger.print(process_start('Extract cache...'), 'debug')
 
@@ -246,7 +139,7 @@ if payload[:platform] == 'production'
   logger.print process_end, 'debug'
 end
 
-# 5 - Extract the pkgin db from the cache
+# 4 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
   directory "#{BUILD_DIR}/var/db/pkgin/cache" do
@@ -274,7 +167,7 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
   logger.print process_end, 'debug'
 end
 
-# 6 - Update pkgin db
+# 5 - Update pkgin db
 logger.print(process_start('Updating pkgin database...'), 'debug')
 
 execute "update pkgin packages" do

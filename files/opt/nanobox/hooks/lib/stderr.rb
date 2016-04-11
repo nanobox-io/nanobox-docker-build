@@ -1,5 +1,3 @@
-require 'faraday'
-
 module Nanobox
   class Stderr
 
