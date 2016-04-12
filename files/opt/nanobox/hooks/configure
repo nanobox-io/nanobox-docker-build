@@ -46,27 +46,35 @@ if payload[:platform] == 'production'
   # Setup gonano keys for repo cloning
   directory '/home/gonano/.ssh' do
     recursive true
-    owner gonano
-    group gonano
+    owner 'gonano'
+    group 'gonano'
   end
 
   file '/home/gonano/.ssh/id_rsa' do
     content payload[:ssh][:admin_key][:private_key]
     mode 0600
-    owner gonano
-    group gonano
+    owner 'gonano'
+    group 'gonano'
   end
 
   file '/home/gonano/.ssh/id_rsa.pub' do
     content payload[:ssh][:admin_key][:public_key]
-    owner gonano
-    group gonano
+    owner 'gonano'
+    group 'gonano'
   end
 
   file '/home/gonano/.ssh/authorized_keys' do
     content payload[:ssh][:admin_key][:public_key]
-    owner gonano
-    group gonano
+    owner 'gonano'
+    group 'gonano'
+  end
+
+  # set custom ssh configuration
+  file "/home/gonano/.ssh/config" do
+    source 'ssh/config'
+    mode 0600
+    owner 'gonano'
+    group 'gonano'
   end
 end
 

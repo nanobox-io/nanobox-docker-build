@@ -18,49 +18,62 @@ module Nanobox
   module Boxfile
 
     BOXFILE_DATA_DEFAULTS = {
-      config:        {type: :hash, default: {}},
-      image:         {type: :string, default: nil}
+      config:         {type: :hash, default: {}},
+      image:          {type: :string, default: nil}
     }
 
     BOXFILE_ENV_DEFAULTS = {
-      config:        {type: :hash, default: {}},
-      engine:        {type: :string, default: nil},
-      image:         {type: :string, default: nil},
+      config:         {type: :hash, default: {}},
+      engine:         {type: :string, default: nil},
+      image:          {type: :string, default: nil},
+      lib_dirs:       {type: :array, of: :folders, default: []},
 
-      before_build:  {type: :array, of: :string, default: []},
-      after_build:   {type: :array, of: :string, default: []}
+      before_setup:   {type: :array, of: :string, default: []},
+      after_setup:    {type: :array, of: :string, default: []},
+      before_prepare: {type: :array, of: :string, default: []},
+      after_prepare:  {type: :array, of: :string, default: []},
+      before_build:   {type: :array, of: :string, default: []},
+      after_build:    {type: :array, of: :string, default: []}
     }
 
     BOXFILE_WEB_DEFAULTS = {
-      image:         {type: :string, default: nil},
-      start:         {type: :array, of: :string, default: []},
-      routes:        {type: :array, of: :string, default: []},
-      ports:         {type: :array, of: :string, default: []},
+      image:          {type: :string, default: nil},
+      start:          {type: :array, of: :string, default: []},
+      routes:         {type: :array, of: :string, default: []},
+      ports:          {type: :array, of: :string, default: []},
 
-      before_deploy: {type: :array, of: :string, default: []},
-      after_deploy:  {type: :array, of: :string, default: []}
+      before_deploy:  {type: :array, of: :string, default: []},
+      after_deploy:   {type: :array, of: :string, default: []}
     }
 
     BOXFILE_WORKER_DEFAULTS = {
-      image:         {type: :string, default: nil},
-      start:         {type: :array, of: :string, default: []},
+      image:          {type: :string, default: nil},
+      start:          {type: :array, of: :string, default: []},
 
-      before_deploy: {type: :array, of: :string, default: []},
-      after_deploy:  {type: :array, of: :string, default: []}
+      before_deploy:  {type: :array, of: :string, default: []},
+      after_deploy:   {type: :array, of: :string, default: []}
     }
 
     def converged_boxfile
-      $converged_boxfile ||= begin
+      $converged_boxfile ||= converge_boxfile(unconverged_boxfile)
+    end
+
+    def unconverged_boxfile
+      $unconverged_boxfile ||= begin
         boxfile = {}
         if ::File.exist?("#{CODE_DIR}/Boxfile")
-          boxfile = converge_boxfile(YAML::load(File.open("#{CODE_DIR}/Boxfile")))
+          boxfile = YAML::load(File.open("#{CODE_DIR}/Boxfile"))
         end
         boxfile
       end
     end
 
-    def converge_engine_boxfile
-      $converge_engine_boxfile ||= begin
+    def converged_engine_boxfile
+      $converged_engine_boxfile ||= converge_boxfile(unconverged_engine_boxfile)
+    end
+
+    def unconverged_engine_boxfile
+      $unconverged_engine_boxfile ||= begin
         output = ''
         execute "generating boxfile" do
           command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/boxfile 'payload')
@@ -76,7 +89,7 @@ module Nanobox
     end
 
     def merged_boxfile
-      $merged_boxfile ||= merge_boxfile(converge_engine_boxfile, converged_boxfile)
+      $merged_boxfile ||= converge_boxfile(merge_boxfile(unconverge_engine_boxfile, unconverged_boxfile))
     end
 
     def converge_boxfile(original)

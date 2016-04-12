@@ -9,9 +9,7 @@
 #   1 - clone/checkout code from git repo
 #
 # all:
-#   2 - setup/copy lib_dirs
-#
-#   3 - Fetch or copy the engine if specified
+#   2 - Fetch or copy the engine if specified
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -23,6 +21,7 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+include Nanobox::Boxfile
 
 if payload[:platform] == 'local'
   # 1 - rsync the code from /share/code
@@ -46,45 +45,13 @@ if payload[:platform] == 'production'
   end
 end
 
-# 2 - setup/copy lib_dirs
-# move the lib_dirs into place if this is a subsequent deploy
-lib_dirs.each do |dir|
-  if not ::File.exist? "#{CODE_DIR}/dir" and ::File.exist? "#{LIB_CACHE_DIR}/#{dir}"
-
-    # ensure the directory exists
-    logger.print(bullet("Extracting #{dir} from cache..."), 'debug')
-
-    directory "#{CODE_DIR}/#{dir}" do
-      recursive true
-    end
-
-    # copy (and remove) the lib dir for quick subsequent deploys
-    logger.print(process_start("Extract #{dir}"), 'debug')
-
-    execute "extract #{dir} from cache for quick access" do
-      command <<-EOF
-        rsync \
-          -v \
-          -a \
-          #{LIB_CACHE_DIR}/#{dir}/ \
-          #{CODE_DIR}/#{dir}
-      EOF
-      stream true
-      user 'gonano'
-      on_data { |data| logger.print subtask_info(data), 'debug' }
-    end
-
-    logger.print(process_end, 'debug')
-  end
-end
-
-# 3 - Fetch or copy the engine if specified
+# 2 - Fetch or copy the engine if specified
 #
 # If the engine is specified, we're gonna fetch it from one of 4 sources.
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
-use_engine = nil
+boxfile_engine = nil
 if ! converged_boxfile[:env].nil? && ! converged_boxfile[:env][:engine]
-  use_engine = converged_boxfile[:env][:engine]
+  boxfile_engine = converged_boxfile[:env][:engine]
 end
 case engine_url_type(boxfile_engine)
 when 'git'

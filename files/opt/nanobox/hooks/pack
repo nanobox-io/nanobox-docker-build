@@ -14,3 +14,20 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+
+# 1 - Run engine pack script
+logger.print(bullet("Running pack hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/pack"
+
+  logger.print(bullet("Build script detected, running now..."), 'debug')
+
+  execute "pack environment" do
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/pack '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end

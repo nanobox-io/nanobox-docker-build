@@ -16,3 +16,9 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+include Nanobox::Boxfile
+
+require 'yaml'
+
+# 1, 2 & 3
+merged_boxfile.to_yaml

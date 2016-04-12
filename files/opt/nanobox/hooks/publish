@@ -6,7 +6,7 @@
 #   1 - rsync/copy into /mnt/*
 #
 # production:
-#   2 - upload to warehouse
+#   1 - upload to warehouse
 
 # curl -k http://192.168.0.100:7410/ping
 #
@@ -26,3 +26,66 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+
+excludes = (lib_dirs + %w(.git)).inject("") do |result, exclude|
+  result << "--exclude='#{exclude}' "
+end
+
+if payload[:platform] == 'local'
+  execute "rsync build" do
+    command <<-EOF
+      rsync \
+        -v \
+        --delete \
+        -a \
+        #{excludes} \
+        #{DEPLOY_DIR}/ \
+        #{LOCAL_LIVE_DEST_DIR}
+    EOF
+    user 'gonano'
+  end
+
+  execute "rsync application" do
+    command <<-EOF
+      rsync \
+        -v \
+        --delete \
+        -a \
+        #{LIVE_DIR}/ \
+        #{LOCAL_DEPLOY_DEST_DIR}
+    EOF
+    user 'gonano'
+  end
+
+  execute "rsync cache" do
+    command <<-EOF
+      rsync \
+        -v \
+        --delete \
+        -a \
+        #{CACHE_DIR}/ \
+        #{LOCAL_CACHE_DEST_DIR}
+    EOF
+    user 'gonano'
+  end
+end
+
+if payload[:platform] == 'production'
+  execute "publish build" do
+    command <<-EOF
+      tar -czf - -C #{LOCAL_LIVE_DEST_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}/blobs/#{payload[:build]}
+    EOF
+  end
+
+  execute "publish application" do
+    command <<-EOF
+      tar -czf - -C #{LOCAL_DEPLOY_DEST_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}/blobs/#{payload[:build]}
+    EOF
+  end
+
+  execute "publish cache" do
+    command <<-EOF
+      tar -czf - -C #{LOCAL_CACHE_DEST_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}/blobs/#{payload[:build]}
+    EOF
+  end
+end

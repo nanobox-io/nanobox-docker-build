@@ -18,11 +18,21 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
-
-# By this point, engine should be set in the registry
-engine = registry('engine')
+include Nanobox::Boxfile
 
 # 1 - Run before_setup
+merged_boxfile[:env][:before_setup].each do |cmd|
+  logger.print(bullet("Before setup running: #{cmd}"), 'debug')
+
+  execute "Before setup: #{cmd}" do
+    command cmd
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
 
 # 2 - Run engine setup script
 logger.print(bullet("Running setup hook..."), 'debug')
@@ -42,3 +52,15 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/setup"
 end
 
 # 3 - Run after_setup
+merged_boxfile[:env][:after_setup].each do |cmd|
+  logger.print(bullet("After setup running: #{cmd}"), 'debug')
+
+  execute "After setup: #{cmd}" do
+    command cmd
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end

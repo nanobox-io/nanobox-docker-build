@@ -16,3 +16,48 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+
+# 1 - Run before_build
+payload[:env][:before_build].each do |cmd|
+  logger.print(bullet("Before bulid running: #{cmd}"), 'debug')
+
+  execute "Before bulid: #{cmd}" do
+    command cmd
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
+
+# 2 - Run engine bulid script
+logger.print(bullet("Running bulid hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/bulid"
+
+  logger.print(bullet("Build script detected, running now..."), 'debug')
+
+  execute "bulid environment" do
+    command %Q(#{ENGINE_DIR}/#{engine}/bin/bulid '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
+
+# 3 - Run after_build
+payload[:env][:after_build].each do |cmd|
+  logger.print(bullet("After bulid running: #{cmd}"), 'debug')
+
+  execute "After bulid: #{cmd}" do
+    command cmd
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
