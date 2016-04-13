@@ -114,7 +114,7 @@ module Nanobox
     # Extract the 'env' section of the payload, which is only the
     # 'env' section of the Boxfile provided by the app
     def env
-      $env ||= payload[:env] || {}
+      $env ||= merged_boxfile[:env] || {}
     end
 
     # extract engine from the env payload

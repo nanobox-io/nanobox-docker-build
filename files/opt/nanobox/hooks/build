@@ -16,9 +16,10 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+include Nanobox::Boxfile
 
 # 1 - Run before_build
-payload[:env][:before_build].each do |cmd|
+env[:before_build].each do |cmd|
   logger.print(bullet("Before bulid running: #{cmd}"), 'debug')
 
   execute "Before bulid: #{cmd}" do
@@ -49,7 +50,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/bulid"
 end
 
 # 3 - Run after_build
-payload[:env][:after_build].each do |cmd|
+env[:after_build].each do |cmd|
   logger.print(bullet("After bulid running: #{cmd}"), 'debug')
 
   execute "After bulid: #{cmd}" do

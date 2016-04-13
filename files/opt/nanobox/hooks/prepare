@@ -20,7 +20,7 @@ include Nanobox::Output
 
 # 1 - setup/copy lib_dirs
 # move the lib_dirs into place if this is a subsequent deploy
-payload[:env][:lib_dirs].each do |dir|
+env[:lib_dirs].each do |dir|
   if not ::File.exist? "#{CODE_DIR}/dir" and ::File.exist? "#{LIB_CACHE_DIR}/#{dir}"
 
     # ensure the directory exists
@@ -51,7 +51,7 @@ payload[:env][:lib_dirs].each do |dir|
 end
 
 # 2 - Run before_prepare
-payload[:env][:before_prepare].each do |cmd|
+env[:before_prepare].each do |cmd|
   logger.print(bullet("Before prepare running: #{cmd}"), 'debug')
 
   execute "Before prepare: #{cmd}" do
@@ -82,7 +82,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/prepare"
 end
 
 # 4 - Run after_prepare
-payload[:env][:after_prepare].each do |cmd|
+env[:after_prepare].each do |cmd|
   logger.print(bullet("After prepare running: #{cmd}"), 'debug')
 
   execute "After prepare: #{cmd}" do
