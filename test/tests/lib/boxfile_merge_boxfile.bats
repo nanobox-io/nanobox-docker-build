@@ -42,12 +42,12 @@ END
 }
 
 @test "Deep merge child nodes" {
-  payload1='{"env":{"engine":"engine"}}'
-  payload2='{"env":{"before_build":["echo hello"]}}'
+  payload1='{"code.build":{"engine":"engine"}}'
+  payload2='{"code.build":{"before_build":["echo hello"]}}'
   run docker exec test-merge_boxfile bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   echo_lines
   [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "env:" ]
+  [ "${lines[1]}" = "code.build:" ]
   [ "${lines[2]}" = "  engine: engine" ]
   [ "${lines[3]}" = "  before_build:" ]
   [ "${lines[4]}" = "  - echo hello" ]
@@ -55,12 +55,12 @@ END
 }
 
 @test "Merged boxfile includes nodes from both boxfiles" {
-  payload1='{"env":{},"web":{}}'
+  payload1='{"code.build":{},"web":{}}'
   payload2='{"worker":{},"data":{"image":"nanobox/mysql"}}'
   run docker exec test-merge_boxfile bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   echo_lines
   [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "env: {}" ]
+  [ "${lines[1]}" = "code.build: {}" ]
   [ "${lines[2]}" = "web: {}" ]
   [ "${lines[3]}" = "worker: {}" ]
   [ "${lines[4]}" = "data:" ]
@@ -69,12 +69,12 @@ END
 }
 
 @test "Second boxfile values replace first one" {
-  payload1='{"env":{"engine":"test"}}'
-  payload2='{"env":{"engine":"replaced"}}'
+  payload1='{"code.build":{"engine":"test"}}'
+  payload2='{"code.build":{"engine":"replaced"}}'
   run docker exec test-merge_boxfile bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   echo_lines
   [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "env:" ]
+  [ "${lines[1]}" = "code.build:" ]
   [ "${lines[2]}" = "  engine: replaced" ]
 
 }

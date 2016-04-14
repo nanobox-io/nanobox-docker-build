@@ -111,15 +111,15 @@ module Nanobox
       '/bin'
     ].join (':')
 
-    # Extract the 'env' section of the payload, which is only the
-    # 'env' section of the Boxfile provided by the app
-    def env
-      $env ||= merged_boxfile[:env] || {}
+    # Extract the 'code.build' section of the payload, which is only the
+    # 'code.build' section of the Boxfile provided by the app
+    def build
+      merged_boxfile[:"code.build"]
     end
 
     # extract engine from the env payload
     def engine
-      $engine ||= env[:engine]
+      $engine ||= build[:engine]
     end
 
     # This payload will serialized as JSON and passed into each of the
@@ -133,8 +133,7 @@ module Nanobox
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,
         app: payload[:app],
-        evars: payload[:evars],
-        config: env[:config] || {},
+        config: build[:config] || {},
         platform: payload[:platform]
       }.to_json
     end

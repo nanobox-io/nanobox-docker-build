@@ -21,7 +21,7 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - Run before_setup
-env[:before_setup].each do |cmd|
+build[:before_setup].each do |cmd|
   logger.print(bullet("Before setup running: #{cmd}"), 'debug')
 
   execute "Before setup: #{cmd}" do
@@ -52,7 +52,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/setup"
 end
 
 # 3 - Run after_setup
-env[:after_setup].each do |cmd|
+build[:after_setup].each do |cmd|
   logger.print(bullet("After setup running: #{cmd}"), 'debug')
 
   execute "After setup: #{cmd}" do

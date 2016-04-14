@@ -9,7 +9,9 @@
 #   1 - clone/checkout code from git repo
 #
 # all:
-#   2 - Fetch or copy the engine if specified
+#   2 - Read the boxfile.yml and set it in the registry
+#   3 - Fetch or copy the engine if specified
+
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -45,20 +47,20 @@ if payload[:platform] == 'production'
   end
 end
 
-# 2 - Fetch or copy the engine if specified
+# 2 - Read the boxfile.yml and set it in the registry
+registry('boxfile', converged_app_boxfile)
+
+# 3 - Fetch or copy the engine if specified
 #
 # If the engine is specified, we're gonna fetch it from one of 4 sources.
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
-boxfile_engine = nil
-if ! converged_boxfile[:env].nil? && ! converged_boxfile[:env][:engine]
-  boxfile_engine = converged_boxfile[:env][:engine]
-end
-case engine_url_type(boxfile_engine)
+
+case engine_url_type(build[:engine])
 when 'git'
 
   logger.print(process_start("Cloning engine"))
 
-  repo = engine_git_url(boxfile_engine)
+  repo = engine_git_url(build[:engine])
 
   execute "cloning #{repo}" do
     command "git clone #{repo} custom"
@@ -71,7 +73,7 @@ when 'git'
 
   logger.print(process_end)
 
-  commit = engine_git_commitish(boxfile_engine)
+  commit = engine_git_commitish(build[:engine])
 
   if commit != 'master'
     logger.print(process_start("Checkout #{commit}"))
@@ -94,7 +96,7 @@ when 'github'
 
   logger.print(process_start("Cloning engine from github"))
 
-  repo = engine_git_url(boxfile_engine)
+  repo = engine_git_url(build[:engine])
   url = "https://github.com/#{repo}.git"
 
   execute "cloning #{repo}" do
@@ -108,7 +110,7 @@ when 'github'
 
   logger.print(process_end)
 
-  commit = engine_git_commitish(boxfile_engine)
+  commit = engine_git_commitish(build[:engine])
 
   if commit != 'master'
     logger.print(process_start("Checkout #{commit}"))

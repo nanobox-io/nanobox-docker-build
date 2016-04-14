@@ -51,7 +51,7 @@ module Nanobox
       image:          {type: :string, default: nil}
     }
 
-    BOXFILE_ENV_DEFAULTS = {
+    BOXFILE_BUILD_DEFAULTS = {
       config:         {type: :hash, default: {}},
       engine:         {type: :string, default: nil},
       image:          {type: :string, default: "nanobox/build"},
@@ -63,6 +63,14 @@ module Nanobox
       after_prepare:  {type: :array, of: :string, default: []},
       before_build:   {type: :array, of: :string, default: []},
       after_build:    {type: :array, of: :string, default: []}
+    }
+
+    BOXFILE_DEPLOY_DEFAULTS = {
+      transform: {type: :array, of: :string, default: []}
+    }
+
+    BOXFILE_DEV_DEFAULTS = {
+      # TODO: something should be in here
     }
 
     BOXFILE_WEB_DEFAULTS = {
@@ -83,15 +91,19 @@ module Nanobox
       after_deploy:   {type: :array, of: :string, default: []}
     }
 
-    def converged_boxfile
-      $converged_boxfile ||= converge_boxfile(unconverged_boxfile)
+    def boxfile
+      registry('boxfile') || {}
     end
 
-    def unconverged_boxfile
-      $unconverged_boxfile ||= begin
+    def converged_app_boxfile
+      $converged_app_boxfile ||= converge_boxfile(unconverged_app_boxfile)
+    end
+
+    def unconverged_app_boxfile
+      $unconverged_app_boxfile ||= begin
         boxfile = {}
-        if ::File.exist?("#{CODE_DIR}/Boxfile")
-          boxfile = YAML::load(File.open("#{CODE_DIR}/Boxfile")).deep_symbolize_keys
+        if ::File.exist?("#{CODE_DIR}/boxfile.yml")
+          boxfile = YAML::load(File.open("#{CODE_DIR}/boxfile.yml")).deep_symbolize_keys
         end
         boxfile
       end
@@ -118,7 +130,7 @@ module Nanobox
     end
 
     def merged_boxfile
-      $merged_boxfile ||= converge_boxfile(merge_boxfile(unconverge_engine_boxfile, unconverged_boxfile))
+      $merged_boxfile ||= converge_boxfile(merge_boxfile(unconverged_engine_boxfile, unconverged_app_boxfile))
     end
 
     def converge_boxfile(original)
@@ -127,8 +139,12 @@ module Nanobox
         case key
         when /^data/
           boxfile[key] = converge( BOXFILE_DATA_DEFAULTS, original[key] )
-        when /^env/
-          boxfile[key] = converge( BOXFILE_ENV_DEFAULTS, original[key] )
+        when /^code.build/
+          boxfile[key] = converge( BOXFILE_BUILD_DEFAULTS, original[key] )
+        when /^code.deploy/
+          boxfile[key] = converge( BOXFILE_DEPLOY_DEFAULTS, original[key] )
+        when /^dev/
+          boxfile[key] = converge( BOXFILE_DEV_DEFAULTS, original[key] )
         when /^web/
           boxfile[key] = converge( BOXFILE_WEB_DEFAULTS, original[key] )
         when /^worker/

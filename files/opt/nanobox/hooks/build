@@ -19,7 +19,7 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - Run before_build
-env[:before_build].each do |cmd|
+build[:before_build].each do |cmd|
   logger.print(bullet("Before bulid running: #{cmd}"), 'debug')
 
   execute "Before bulid: #{cmd}" do
@@ -50,7 +50,7 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/bulid"
 end
 
 # 3 - Run after_build
-env[:after_build].each do |cmd|
+build[:after_build].each do |cmd|
   logger.print(bullet("After bulid running: #{cmd}"), 'debug')
 
   execute "After bulid: #{cmd}" do

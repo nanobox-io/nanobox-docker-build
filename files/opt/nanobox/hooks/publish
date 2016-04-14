@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 
 # Publish the packed build, application, and cache
+# 1 - Prepare for publishing by putting things back into the cache, and moving things into place
 #
 # local:
-#   1 - rsync/copy into /mnt/*
+#   2 - rsync/copy into /mnt/*
 #
 # production:
-#   1 - upload to warehouse
+#   2 - upload to warehouse
 
 # curl -k http://192.168.0.100:7410/ping
 #
@@ -27,11 +28,67 @@ require 'hookit/setup'
 include Nanobox::Engine
 include Nanobox::Output
 
+# 1 - Prepare for publishing by putting things back into the cache, and moving things into place
+if ::File.exist? "#{BUILD_DIR}/var/db/pkgin/cache"
+  directory "#{CACHE_DIR}/pkgin" do
+    owner 'gonano'
+    group 'gonano'
+    recursive true
+  end
+
+  execute "extract pkgin packages from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -v \
+        -a \
+        --delete \
+        #{BUILD_DIR}/var/db/pkgin/cache/ \
+        #{CACHE_DIR}/pkgin
+    EOF
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data), 'debug' }
+  end
+end
+
+# move the lib_dirs into place if this is a subsequent deploy
+build[:lib_dirs].each do |dir|
+  if ::File.exist? "#{CODE_DIR}/#{dir}"
+
+    # ensure the directory exists
+    logger.print(bullet("Inserting #{dir} into cache..."), 'debug')
+
+    directory "#{LIB_CACHE_DIR}/#{dir}" do
+      recursive true
+    end
+
+    # copy (and remove) the lib dir for quick subsequent deploys
+    logger.print(process_start("Insert #{dir}"), 'debug')
+
+    execute "insert #{dir} into cache for quick access" do
+      command <<-EOF
+        rsync \
+          -v \
+          -a \
+          --delete \
+          #{CODE_DIR}/#{dir}/ \
+          #{LIB_CACHE_DIR}/#{dir}
+      EOF
+      stream true
+      user 'gonano'
+      on_data { |data| logger.print subtask_info(data), 'debug' }
+    end
+
+    logger.print(process_end, 'debug')
+  end
+end
+
 excludes = (lib_dirs + %w(.git)).inject("") do |result, exclude|
   result << "--exclude='#{exclude}' "
 end
 
 if payload[:platform] == 'local'
+  # 2 - rsync/copy into /mnt/*
   execute "rsync build" do
     command <<-EOF
       rsync \
@@ -71,21 +128,22 @@ if payload[:platform] == 'local'
 end
 
 if payload[:platform] == 'production'
+  # 2 - upload to warehouse
   execute "publish build" do
     command <<-EOF
-      tar -czf - -C #{LOCAL_LIVE_DEST_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}/blobs/#{payload[:build]}
+      tar -czf - -C #{DEPLOY_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}:7410/blobs/build-#{payload[:build]}
     EOF
   end
 
   execute "publish application" do
     command <<-EOF
-      tar -czf - -C #{LOCAL_DEPLOY_DEST_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}/blobs/#{payload[:build]}
+      tar -czf - -C #{LIVE_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]}
     EOF
   end
 
   execute "publish cache" do
     command <<-EOF
-      tar -czf - -C #{LOCAL_CACHE_DEST_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}/blobs/#{payload[:build]}
+      tar -czf - -C #{CACHE_DIR} * | curl -k -H "x-auth-token: #{payload[:warehouse_token]}" https://#{payload[:warehouse]}:7410/blobs/cache 
     EOF
   end
 end

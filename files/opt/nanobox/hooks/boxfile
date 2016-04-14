@@ -21,4 +21,6 @@ include Nanobox::Boxfile
 require 'yaml'
 
 # 1, 2 & 3
-merged_boxfile.prune_empty.deep_stringify_keys.to_yaml
+registry('boxfile', merged_boxfile)
+
+registry('boxfile').prune_empty.deep_stringify_keys.to_yaml
