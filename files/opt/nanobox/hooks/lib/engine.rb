@@ -114,7 +114,7 @@ module Nanobox
     # Extract the 'code.build' section of the payload, which is only the
     # 'code.build' section of the Boxfile provided by the app
     def build
-      merged_boxfile[:"code.build"]
+      boxfile[:"code.build"] || {}
     end
 
     # extract engine from the env payload
