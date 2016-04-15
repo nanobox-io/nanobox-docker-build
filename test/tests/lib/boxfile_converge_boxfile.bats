@@ -41,21 +41,6 @@ END
   [ "$status" -eq 0 ]
 }
 
-@test "Converge using basic names for services" {
-  payload='{"code.build":{},"web":{},"worker":{},"data":{"image":"nanobox/mysql"}}'
-  run docker exec test-converge_boxfile bash -c "/tmp/converge_boxfile '$payload'"
-  echo_lines
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "code.build:" ]
-  [ "${lines[2]}" = "  image: nanobox/build" ]
-  [ "${lines[3]}" = "web:" ]
-  [ "${lines[4]}" = "  image: nanobox/code" ]
-  [ "${lines[5]}" = "worker:" ]
-  [ "${lines[6]}" = "  image: nanobox/code" ]
-  [ "${lines[7]}" = "data:" ]
-  [ "${lines[8]}" = "  image: nanobox/mysql" ]
-}
-
 @test "Converge using complex names for services" {
   payload='{"code.build":{},"web.site":{},"worker.jobs":{},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec test-converge_boxfile bash -c "/tmp/converge_boxfile '$payload'"
@@ -69,6 +54,25 @@ END
   [ "${lines[6]}" = "  image: nanobox/code" ]
   [ "${lines[7]}" = "data.db:" ]
   [ "${lines[8]}" = "  image: nanobox/mysql" ]
+}
+
+@test "Converge using complex names for services" {
+  payload='{"code.build":{},"code.deploy":{"before_deploy":{"web.site":["echo hi"]}},"web.site":{},"worker.jobs":{},"data.db":{"image":"nanobox/mysql"}}'
+  run docker exec test-converge_boxfile bash -c "/tmp/converge_boxfile '$payload'"
+  echo_lines
+  [ "${lines[0]}"  = "---" ]
+  [ "${lines[1]}"  = "code.build:" ]
+  [ "${lines[2]}"  = "  image: nanobox/build" ]
+  [ "${lines[3]}"  = "code.deploy:" ]
+  [ "${lines[4]}"  = "  before_deploy:" ]
+  [ "${lines[5]}"  = "    web.site:" ]
+  [ "${lines[6]}"  = "    - echo hi" ]
+  [ "${lines[7]}"  = "web.site:" ]
+  [ "${lines[8]}"  = "  image: nanobox/code" ]
+  [ "${lines[9]}"  = "worker.jobs:" ]
+  [ "${lines[10]}" = "  image: nanobox/code" ]
+  [ "${lines[11]}" = "data.db:" ]
+  [ "${lines[12]}" = "  image: nanobox/mysql" ]
 }
 
 @test "Filter out bad nodes" {

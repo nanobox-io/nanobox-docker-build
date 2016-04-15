@@ -66,7 +66,11 @@ module Nanobox
     }
 
     BOXFILE_DEPLOY_DEFAULTS = {
-      transform: {type: :array, of: :string, default: []}
+      transform:      {type: :array, of: :string, default: []},
+      before_deploy_all: {type: :hash, default: {}},
+      after_deploy_all: {type: :hash, default: {}},
+      before_deploy:  {type: :hash, default: {}},
+      after_deploy:   {type: :hash, default: {}}
     }
 
     BOXFILE_DEV_DEFAULTS = {
@@ -90,6 +94,22 @@ module Nanobox
       before_deploy:  {type: :array, of: :string, default: []},
       after_deploy:   {type: :array, of: :string, default: []}
     }
+
+    def boxfile_deploy_hooks_defaults(boxfile)
+      $boxfile_deploy_hooks_defaults ||= begin
+        template = {}
+        boxfile.keys.each do |key|
+          case key
+          when /^web\./
+            template[key] = {type: :array, of: :string, default: []}
+          when /^worker\./
+            template[key] = {type: :array, of: :string, default: []}
+          end
+
+        end
+        template
+      end
+    end
 
     def boxfile
       registry('boxfile') || {}
@@ -137,20 +157,24 @@ module Nanobox
       boxfile = {}
       original.keys.each do |key|
         case key
-        when /^data/
+        when /^data\./
           boxfile[key] = converge( BOXFILE_DATA_DEFAULTS, original[key] )
-        when /^code.build/
+        when /^code\.build$/
           boxfile[key] = converge( BOXFILE_BUILD_DEFAULTS, original[key] )
-        when /^code.deploy/
+        when /^code\.deploy$/
           boxfile[key] = converge( BOXFILE_DEPLOY_DEFAULTS, original[key] )
-        when /^dev/
+          boxfile[key][:before_deploy]     = converge(boxfile_deploy_hooks_defaults(original), boxfile[key][:before_deploy])
+          boxfile[key][:before_deploy_all] = converge(boxfile_deploy_hooks_defaults(original), boxfile[key][:before_deploy_all])
+          boxfile[key][:after_deploy]      = converge(boxfile_deploy_hooks_defaults(original), boxfile[key][:after_deploy])
+          boxfile[key][:after_deploy_all]  = converge(boxfile_deploy_hooks_defaults(original), boxfile[key][:after_deploy_all])
+        when /^dev$/
           boxfile[key] = converge( BOXFILE_DEV_DEFAULTS, original[key] )
-        when /^web/
+        when /^web\./
           boxfile[key] = converge( BOXFILE_WEB_DEFAULTS, original[key] )
-        when /^worker/
+        when /^worker\./
           boxfile[key] = converge( BOXFILE_WORKER_DEFAULTS, original[key] )
         end
-      end 
+      end
       boxfile
     end
 
