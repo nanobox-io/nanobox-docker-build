@@ -31,3 +31,41 @@ if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/pack"
     on_data {|data| logger.print data}
   end
 end
+
+# 2 - rsync/copy into /mnt/*
+execute "rsync build" do
+command <<-EOF
+  rsync \
+    -v \
+    --delete \
+    -a \
+    #{excludes} \
+    #{DEPLOY_DIR}/ \
+    #{LOCAL_LIVE_DEST_DIR}
+EOF
+user 'gonano'
+end
+
+execute "rsync application" do
+command <<-EOF
+  rsync \
+    -v \
+    --delete \
+    -a \
+    #{LIVE_DIR}/ \
+    #{LOCAL_DEPLOY_DEST_DIR}
+EOF
+user 'gonano'
+end
+
+execute "rsync cache" do
+command <<-EOF
+  rsync \
+    -v \
+    --delete \
+    -a \
+    #{CACHE_DIR}/ \
+    #{LOCAL_CACHE_DEST_DIR}
+EOF
+user 'gonano'
+end

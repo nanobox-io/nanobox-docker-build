@@ -25,30 +25,24 @@ include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
 
-if payload[:platform] == 'local'
-  # 1 - rsync the code from /share/code
-  execute "rsync code" do
-    command <<-EOF
-      rsync \
-        -v \
-        -a \
-        #{LOCAL_CODE_SRC_DIR}/ \
-        #{CODE_DIR}
-    EOF
-    user 'gonano'
-  end
-end
-
-if payload[:platform] == 'production'
-  # 1 - clone/checkout code from git repo
-  execute "clone code" do
-    command "git clone #{payload[:code_repo]} #{CODE_DIR}"
-    user 'gonano'
-  end
+# 1 - rsync the code from /share/code
+execute "rsync code" do
+  command <<-EOF
+    rsync \
+      -v \
+      -a \
+      #{LOCAL_CODE_SRC_DIR}/ \
+      #{CODE_DIR}
+  EOF
+  user 'gonano'
 end
 
 # 2 - Read the boxfile.yml and set it in the registry
 registry('boxfile', converged_app_boxfile)
+
+if build[:engine].nil?
+  exit 1
+end
 
 # 3 - Fetch or copy the engine if specified
 #
@@ -140,9 +134,6 @@ when 'tarball'
   # set the engine as custom in the registry
   registry('engine', 'custom')
 when 'filepath'
-  if payload[:platform] != 'local'
-    logger.print(fatal("Invalid Engine", "A file path can only be used with Nanobox locally."),'fatal')
-  end
 
   directory "#{ENGINE_DIR}/custom"
 

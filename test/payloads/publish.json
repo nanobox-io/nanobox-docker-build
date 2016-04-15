@@ -1,0 +1,5 @@
+{
+  "build": "123abc",
+  "warehouse": "192.168.0.3",
+  "warehouse_token": "123"
+}
