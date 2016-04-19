@@ -2,11 +2,7 @@ module Nanobox
   module Output
 
     def logger
-      if ! payload[:logvac].nil?
-        $logger ||= ::Nanobox::Logvac.new(logvac: payload[:logvac], build: payload[:build], token: payload[:logvac_token])
-      else
-        $logger ||= ::Nanobox::Stderr.new(log_level: payload[:log_level])
-      end
+      $logger ||= ::Nanobox::Stderr.new(log_level: payload[:log_level])
     end
 
 
@@ -315,75 +311,6 @@ module Nanobox
       res << "\n"
 
       res
-    end
-
-    # when no engine is found, this will return a formatted message
-    # explaining why the engine is not found, and what can be done
-    def no_engine
-      <<-END
-+> NO ENGINE DETECTED
-   You're probably using a language we haven't built an engine for
-   yet. Good news though, it's a quick and simple process to create
-   an engine specific to your app or framework. Contact us so we can
-   ask you a few questions about configuring and running your app
-   and let's get this rolling!
-   --------------------------------
-   IRC   : #nanobox (freenode)
-   EMAIL : engines@nanobox.io
-   --------------------------------
-      END
-    end
-
-    # when no enginefile is found, this will return a formatted message
-    # explaining why the enginefile is not found, and what can be done
-    def no_enginefile
-      <<-END
-+> NO ENGINEFILE FOUND
-   We couldn't read the Enginefile for the engine your app is using.
-   If you just added a custom engine to your Boxfile, you will need to
-   `nanobox reload` to mount it into the build container.
-   If this persists, contact us on IRC or submit an issue on github
-   at nanobox-io/nanobox/issues.
-   --------------------------------
-   IRC   : #nanobox (freenode)
-   --------------------------------
-      END
-    end
-
-
-    # when an engine is detected, this will return a formatted message
-    # providing basic details about the engine
-    def engine_info(id, name, language, generic)
-      if generic
-        <<-END
-+> LANGUAGE AND ENGINE DETECTED [√]
-   --------------------------------
-   [√] LANGUAGE : #{language}
-   [√] ENGINE   : #{name} (generic)
-   --------------------------------
-   NOTE : This is a generic #{name} engine. It's likely you will need to
-   configure your nanobox environment to suit your app via the Boxfile[1].
-   If you're willing to answer a few questions about configuring and
-   running this particular app, it's a quick and simple process to create
-   an engine specific to your app or framework. So contact us and let's
-   get this rolling!
-   [1] http://engines.nanobox.io/engines/#{id}
-   --------------------------------
-   IRC   : #nanobox (freenode)
-   EMAIL : engines@nanobox.io
-   --------------------------------
-        END
-      else
-        <<-END
-+> LANGUAGE AND ENGINE DETECTED [√]
-   --------------------------------
-   [√] LANGUAGE : #{language}
-   [√] ENGINE   : #{name}
-   --------------------------------
-   #{name.upcase} ENGINE DOCUMENTATION:
-   http://engines.nanobox.io/engines/#{id}
-        END
-      end
     end
 
   end

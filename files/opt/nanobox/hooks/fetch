@@ -2,16 +2,11 @@
 
 # Fetch the codebase and cache
 #
-# local:
 #   1 - rsync the code from /share/code
-#
-# production:
-#   1 - clone/checkout code from git repo
-#
-# all:
-#   2 - Read the boxfile.yml and set it in the registry
-#   3 - Fetch or copy the engine if specified
-
+#   2 - Validate and enfore boxfile.yml
+#   3 - Read the boxfile.yml and set it in the registry
+#   4 - Validate an engine is specified in the boxfile.yml
+#   5 - Fetch or copy the engine if specified
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -37,14 +32,28 @@ execute "rsync code" do
   user 'gonano'
 end
 
-# 2 - Read the boxfile.yml and set it in the registry
-registry('boxfile', converged_app_boxfile)
+# 2 - ensure boxfile.yml exists
+# TODO
 
+# 3 - Read the boxfile.yml and set it in the registry
+app_boxfile = begin
+  (YAML::load(File.open("#{CODE_DIR}/boxfile.yml")) rescue {})
+    .deep_symbolize_keys
+end
+
+# set the raw app boxfile for later use
+registry('raw_app_boxfile', app_boxfile)
+
+# set the current boxfile to the raw_app_boxfile until the boxfile hook is run
+registry('boxfile', converge_boxfile(app_boxfile))
+
+# 4 - Validate an engine exists
 if build[:engine].nil?
+  # TODO: nice message
   exit 1
 end
 
-# 3 - Fetch or copy the engine if specified
+# 5 - Fetch or copy the engine if specified
 #
 # If the engine is specified, we're gonna fetch it from one of 4 sources.
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
@@ -127,10 +136,13 @@ when 'tarball'
   directory "#{ENGINE_DIR}/custom"
 
   execute "Extract engine" do
-    command "curl -k #{engine} | tar -C #{ENGINE_DIR}/custom -xzf - --strip-components=1"
+    command <<-EOF
+      curl -k #{engine} \
+        | tar -C #{ENGINE_DIR}/custom -xzf - --strip-components=1
+    EOF
     user 'gonano'
   end
-  
+
   # set the engine as custom in the registry
   registry('engine', 'custom')
 when 'filepath'

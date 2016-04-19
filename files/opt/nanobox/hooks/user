@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+# Setup the user ssh keys for the container
+#
+# 1 - Create .ssh directory
+# 2 - Set the ssh client config
+# 3 - Create the ssh keys given in the payload
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+
+logger.print(bullet('Running user hook...'), 'debug')
+
+# ensure the gonano .ssh directory exists
+directory "/home/gonano/.ssh" do
+  recursive true
+  mode 0700
+  owner 'gonano'
+  group 'gonano'
+end
+
+# set custom ssh configuration
+hook_file "/home/gonano/.ssh/config" do
+  source 'ssh/config'
+  mode 0600
+  owner 'gonano'
+  group 'gonano'
+end
+
+# create file for each file passed in
+(payload[:ssh_files] || {}).each do |name, body|
+
+  file "/home/gonano/.ssh/#{name}" do
+    content body
+    mode 0600
+    owner 'gonano'
+    group 'gonano'
+  end
+
+end

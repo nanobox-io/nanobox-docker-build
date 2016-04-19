@@ -2,11 +2,10 @@
 
 # Prepare the container for an app build
 #
-# 1 - Setup the user environment
-# 2 - Ensure all the required directories exist and have proper permissions
-# 3 - Extract the cache (rsync local - fetch production)
-# 4 - Extract the pkgin db from the cache
-# 5 - Update pkgin db
+# 1 - Ensure all the required directories exist and have proper permissions
+# 2 - Clear the BUILD_DIR, LIVE_DIR, and boxfile
+# 3 - Extract the pkgin db from the cache
+# 4 - Update pkgin db
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -21,19 +20,16 @@ include Nanobox::Output
 
 logger.print(bullet('Running configure hook...'), 'debug')
 
-# 1 - Setup the user environment
-# TODO
-
-# 2 - Ensure required directories exist and have permissions
+# 1 - Ensure required directories exist and have permissions
 logger.print(bullet('ensuring all directories required for build exist'), 'debug')
 
 [
-  "#{BUILD_DIR}",
-  "#{BUILD_DIR}/sbin",
-  "#{BUILD_DIR}/bin",
+  "#{DEPLOY_DIR}",
+  "#{DEPLOY_DIR}/sbin",
+  "#{DEPLOY_DIR}/bin",
   "#{ETC_DIR}",
   "#{ENV_DIR}",
-  "#{DEPLOY_DIR}",
+  "#{BUILD_DIR}",
   "#{CODE_DIR}",
   "#{LIVE_DIR}",
   "#{CACHE_DIR}",
@@ -48,29 +44,23 @@ logger.print(bullet('ensuring all directories required for build exist'), 'debug
   execute "chown gonano #{dir}"
 end
 
-# 3 - Extract the cache (rsync local - fetch production)
-logger.print(process_start('Extract cache...'), 'debug')
+# 2 - Clear the BUILD_DIR, LIVE_DIR, and boxfile
+logger.print(process_start('Purge previous build'), 'debug')
 
-# fetch the pkgin cache & db from cache for a quick deploy
-execute "extract cache for quick access" do
-  command <<-EOF
-    rsync \
-      -v \
-      -a \
-      #{LOCAL_CACHE_DEST_DIR}/ \
-      #{CACHE_DIR}
-  EOF
-  user 'gonano'
-  stream true
-  on_data { |data| logger.print subtask_info(data), 'debug' }
+[
+  "#{BUILD_DIR}/*",
+  "#{LIVE_DIR}/*",
+  "#{CACHE_DIR}/boxfile.yml"
+].each do |old|
+  execute "Purge #{old}" do
+    command "rm -rf #{old}"
+  end
 end
 
-logger.print process_end, 'debug'
-
-# 4 - Extract the pkgin db from the cache
+# 3 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
-  directory "#{BUILD_DIR}/var/db/pkgin/cache" do
+  directory "#{DEPLOY_DIR}/var/db/pkgin/cache" do
     owner 'gonano'
     group 'gonano'
     recursive true
@@ -85,7 +75,7 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
         -v \
         -a \
         #{CACHE_DIR}/pkgin/ \
-        #{BUILD_DIR}/var/db/pkgin/cache
+        #{DEPLOY_DIR}/var/db/pkgin/cache
     EOF
     user 'gonano'
     stream true
@@ -95,13 +85,13 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
   logger.print process_end, 'debug'
 end
 
-# 5 - Update pkgin db
+# 4 - Update pkgin db
 logger.print(process_start('Updating pkgin database...'), 'debug')
 
 execute "update pkgin packages" do
   command <<-EOF
-    rm -f #{BUILD_DIR}/var/db/pkgin/pkgin.db && \
-    #{BUILD_DIR}/bin/pkgin -y up
+    rm -f #{DEPLOY_DIR}/var/db/pkgin/pkgin.db && \
+    #{DEPLOY_DIR}/bin/pkgin -y up
   EOF
   user 'gonano'
   stream true

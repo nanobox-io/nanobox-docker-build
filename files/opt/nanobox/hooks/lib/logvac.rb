@@ -1,5 +1,6 @@
 require 'faraday'
 
+# todo: move this into code hooks
 module Nanobox
   class Logvac
 
