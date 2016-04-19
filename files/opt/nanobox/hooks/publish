@@ -27,6 +27,7 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+include Nanobox::Boxfile
 
 # 1 - Prepare for publishing by putting things back into the cache, and moving things into place
 if ::File.exist? "#{BUILD_DIR}/var/db/pkgin/cache"
@@ -36,7 +37,7 @@ if ::File.exist? "#{BUILD_DIR}/var/db/pkgin/cache"
     recursive true
   end
 
-  execute "extract pkgin packages from cache for quick access" do
+  execute "Insert pkgin packages from cache for quick access" do
     command <<-EOF
       rsync \
         -v \
@@ -60,12 +61,13 @@ build[:lib_dirs].each do |dir|
 
     directory "#{LIB_CACHE_DIR}/#{dir}" do
       recursive true
+      owner 'gonano'
     end
 
     # copy (and remove) the lib dir for quick subsequent deploys
     logger.print(process_start("Insert #{dir}"), 'debug')
 
-    execute "insert #{dir} into cache for quick access" do
+    execute "Insert #{dir} into cache for quick access" do
       command <<-EOF
         rsync \
           -v \
@@ -83,7 +85,7 @@ build[:lib_dirs].each do |dir|
   end
 end
 
-excludes = (lib_dirs + %w(.git)).inject("") do |result, exclude|
+excludes = (build[:lib_dirs] + %w(.git)).inject("") do |result, exclude|
   result << "--exclude='#{exclude}' "
 end
 

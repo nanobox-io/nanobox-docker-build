@@ -1,5 +1,6 @@
 # source docker helpers
 . util/helpers.sh
+. util/warehouse.sh
 
 @test "Start Container" {
   start_container
@@ -63,6 +64,69 @@
   [ "$status" -eq 0 ]
 }
 
+@test "Run setup hook" {
+  run run_hook "setup" "$(payload setup)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify? - this engine doesn't have a setup so, it has no verification
+}
+
+@test "Run boxfile hook" {
+  run run_hook "boxfile" "$(payload boxfile)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the output
+  [ "${lines[0]}" = "---" ]
+  [ "${lines[1]}" = "code.build:" ]
+  [ "${lines[2]}" = "  engine: nanobox-io/nanobox-engine-nodejs#refactor/v1" ]
+  [ "${lines[3]}" = "  image: nanobox/build" ]
+  [ "${lines[4]}" = "  lib_dirs:" ]
+  [ "${lines[5]}" = "  - node_modules" ]
+}
+
+@test "Run prepare hook" {
+  run run_hook "prepare" "$(payload prepare)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify prepare hook ran?
+  run docker exec build bash -c "[ -f /data/bin/node ]"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run build hook" {
+  run run_hook "build" "$(payload build)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify build hook?
+}
+
+@test "Run pack hook" {
+  run run_hook "pack" "$(payload pack)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # Verify
+  run docker exec build bash -c "[ -f /mnt/build/server.js ]"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Start warehouse" {
+  start_warehouse
+}
+
+@test "Run publish hook" {
+  run run_hook "publish" "$(payload publish)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
 @test "Stop Container" {
   stop_container
+  stop_warehouse
 }

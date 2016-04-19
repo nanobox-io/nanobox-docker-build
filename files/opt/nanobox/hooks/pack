@@ -15,6 +15,7 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+include Nanobox::Boxfile
 
 # 1 - Run engine pack script
 logger.print(bullet("Running pack hook..."), 'debug')
@@ -40,7 +41,6 @@ execute "rsync build" do
       -v \
       --delete \
       -a \
-      #{excludes} \
       #{DEPLOY_DIR}/ \
       #{BUILD_DIR}
   EOF

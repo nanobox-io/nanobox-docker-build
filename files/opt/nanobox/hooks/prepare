@@ -17,6 +17,7 @@ require 'hookit/setup'
 # import some logic/helpers from lib/*.rb
 include Nanobox::Engine
 include Nanobox::Output
+include Nanobox::Boxfile
 
 # 1 - setup/copy lib_dirs
 # move the lib_dirs into place if this is a subsequent deploy
