@@ -25,11 +25,12 @@ require 'hookit/setup'
 require 'json'
 require 'yaml'
 require '/opt/nanobox/hooks/lib/boxfile.rb'
+require '/opt/nanobox/hooks/lib/hash.rb'
 
 include Nanobox::Boxfile
 
 # Just echo the url type
-puts merge_boxfile(JSON.parse(ARGV[0]).deep_symbolize_keys, JSON.parse(ARGV[1]).deep_symbolize_keys).deep_stringify_keys.to_yaml
+puts JSON.parse(ARGV[0]).deep_symbolize_keys.deep_merge(JSON.parse(ARGV[1]).deep_symbolize_keys).deep_stringify_keys.to_yaml
 
 END
 )"

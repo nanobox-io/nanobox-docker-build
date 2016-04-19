@@ -25,6 +25,7 @@ require 'hookit/setup'
 require 'json'
 require 'yaml'
 require '/opt/nanobox/hooks/lib/boxfile.rb'
+require '/opt/nanobox/hooks/lib/hash.rb'
 
 include Nanobox::Boxfile
 

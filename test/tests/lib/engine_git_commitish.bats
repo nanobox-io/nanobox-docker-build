@@ -35,7 +35,7 @@ END
 @test "Returns master when not provided" {
   url=git@github.com:nanobox-io/nanobox-hooks-hoarder.git
   run docker exec test-git_commitish bash -c "/tmp/git_commitish $url"
-  [ "$output" = "master" ]
+  [ "$output" = "" ]
 }
 
 @test "Stop Container" {
