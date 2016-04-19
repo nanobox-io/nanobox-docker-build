@@ -116,17 +116,17 @@
   [ "$status" -eq 0 ]
 }
 
-# @test "Start warehouse" {
-#   start_warehouse
-# }
-#
-# @test "Run publish hook" {
-#   run run_hook "publish" "$(payload publish)"
-#   print_output
-#   [ "$status" -eq 0 ]
-# }
+@test "Start warehouse" {
+  start_warehouse
+}
+
+@test "Run publish hook" {
+  run run_hook "publish" "$(payload publish)"
+  print_output
+  [ "$status" -eq 0 ]
+}
 
 @test "Stop Container" {
   stop_container
-  # stop_warehouse
+  stop_warehouse
 }
