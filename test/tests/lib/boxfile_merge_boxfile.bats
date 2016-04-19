@@ -1,7 +1,7 @@
 # source docker helpers
-. util/docker.sh
+. util/helpers.sh
 
-echo_lines() {
+print_output() {
   for (( i=0; i < ${#lines[*]}; i++ ))
   do
     echo ${lines[$i]}
@@ -9,7 +9,7 @@ echo_lines() {
 }
 
 @test "Start Container" {
-  start_container "test-merge_boxfile" "192.168.0.2"
+  start_container
 }
 
 @test "Create commitish test script" {
@@ -35,9 +35,9 @@ puts JSON.parse(ARGV[0]).deep_symbolize_keys.deep_merge(JSON.parse(ARGV[1]).deep
 END
 )"
 
-  run docker exec test-merge_boxfile bash -c "echo \"${script}\" > /tmp/merge_boxfile"
-  run docker exec test-merge_boxfile bash -c "chmod +x /tmp/merge_boxfile"
-  run docker exec test-merge_boxfile bash -c " [ -f /tmp/merge_boxfile ] "
+  run docker exec build bash -c "echo \"${script}\" > /tmp/merge_boxfile"
+  run docker exec build bash -c "chmod +x /tmp/merge_boxfile"
+  run docker exec build bash -c " [ -f /tmp/merge_boxfile ] "
 
   [ "$status" -eq 0 ]
 }
@@ -45,8 +45,8 @@ END
 @test "Deep merge child nodes" {
   payload1='{"code.build":{"engine":"engine"}}'
   payload2='{"code.build":{"before_build":["echo hello"]}}'
-  run docker exec test-merge_boxfile bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
-  echo_lines
+  run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
+  print_output
   [ "${lines[0]}" = "---" ]
   [ "${lines[1]}" = "code.build:" ]
   [ "${lines[2]}" = "  engine: engine" ]
@@ -58,8 +58,8 @@ END
 @test "Merged boxfile includes nodes from both boxfiles" {
   payload1='{"code.build":{},"web":{}}'
   payload2='{"worker":{},"data":{"image":"nanobox/mysql"}}'
-  run docker exec test-merge_boxfile bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
-  echo_lines
+  run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
+  print_output
   [ "${lines[0]}" = "---" ]
   [ "${lines[1]}" = "code.build: {}" ]
   [ "${lines[2]}" = "web: {}" ]
@@ -72,8 +72,8 @@ END
 @test "Second boxfile values replace first one" {
   payload1='{"code.build":{"engine":"test"}}'
   payload2='{"code.build":{"engine":"replaced"}}'
-  run docker exec test-merge_boxfile bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
-  echo_lines
+  run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
+  print_output
   [ "${lines[0]}" = "---" ]
   [ "${lines[1]}" = "code.build:" ]
   [ "${lines[2]}" = "  engine: replaced" ]
@@ -81,5 +81,5 @@ END
 }
 
 @test "Stop Container" {
-  stop_container "test-merge_boxfile"
+  stop_container
 }

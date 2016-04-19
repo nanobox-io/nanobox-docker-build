@@ -1,15 +1,8 @@
 # source docker helpers
-. util/docker.sh
-
-echo_lines() {
-  for (( i=0; i < ${#lines[*]}; i++ ))
-  do
-    echo ${lines[$i]}
-  done
-}
+. util/helpers.sh
 
 @test "Start Container" {
-  start_container "test-converge_boxfile" "192.168.0.2"
+  start_container
 }
 
 @test "Create commitish test script" {
@@ -35,17 +28,17 @@ puts converge_boxfile(JSON.parse(ARGV.first).deep_symbolize_keys).prune_empty.de
 END
 )"
 
-  run docker exec test-converge_boxfile bash -c "echo \"${script}\" > /tmp/converge_boxfile"
-  run docker exec test-converge_boxfile bash -c "chmod +x /tmp/converge_boxfile"
-  run docker exec test-converge_boxfile bash -c " [ -f /tmp/converge_boxfile ] "
+  run docker exec build bash -c "echo \"${script}\" > /tmp/converge_boxfile"
+  run docker exec build bash -c "chmod +x /tmp/converge_boxfile"
+  run docker exec build bash -c " [ -f /tmp/converge_boxfile ] "
 
   [ "$status" -eq 0 ]
 }
 
 @test "Converge using complex names for services" {
   payload='{"code.build":{},"web.site":{},"worker.jobs":{},"data.db":{"image":"nanobox/mysql"}}'
-  run docker exec test-converge_boxfile bash -c "/tmp/converge_boxfile '$payload'"
-  echo_lines
+  run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
+  print_output
   [ "${lines[0]}" = "---" ]
   [ "${lines[1]}" = "code.build:" ]
   [ "${lines[2]}" = "  image: nanobox/build" ]
@@ -59,8 +52,8 @@ END
 
 @test "Converge using complex names for services" {
   payload='{"code.build":{},"code.deploy":{"before_deploy":{"web.site":["echo hi"]}},"web.site":{},"worker.jobs":{},"data.db":{"image":"nanobox/mysql"}}'
-  run docker exec test-converge_boxfile bash -c "/tmp/converge_boxfile '$payload'"
-  echo_lines
+  run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
+  print_output
   [ "${lines[0]}"  = "---" ]
   [ "${lines[1]}"  = "code.build:" ]
   [ "${lines[2]}"  = "  image: nanobox/build" ]
@@ -78,11 +71,11 @@ END
 
 @test "Filter out bad nodes" {
   payload='{"games":{},"people":{},"books":{},"junk":{}}'
-  run docker exec test-converge_boxfile bash -c "/tmp/converge_boxfile '$payload'"
-  echo_lines
+  run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
+  print_output
   [ "$output" = "--- {}" ]
 }
 
 @test "Stop Container" {
-  stop_container "test-converge_boxfile"
+  stop_container
 }

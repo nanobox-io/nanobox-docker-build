@@ -1,40 +1,50 @@
-
 util_dir="$(dirname $(readlink -f $BASH_SOURCE))"
 hookit_dir="$(readlink -f ${util_dir}/../../files/opt/nanobox/hooks)"
 payloads_dir=$(readlink -f ${util_dir}/../payloads)
+apps_dir=$(readlink -f ${util_dir}/../apps)
+
+print_output() {
+  for (( i=0; i < ${#lines[*]}; i++ ))
+  do
+    echo ${lines[$i]}
+  done
+}
 
 payload() {
   cat ${payloads_dir}/${1}.json
 }
 
 run_hook() {
-  container=$1
-  hook=$2
-  payload=$3
+  hook=$1
+  payload=$2
 
   docker exec \
-    $container \
+    build \
     /opt/nanobox/hooks/$hook "$payload"
 }
 
 start_container() {
-  name=$1
-  ip=$2
+  app=$1
+
+  if [[ -z $app ]]; then
+    app="simple-nodejs"
+  fi
 
   docker run \
-    --name=$name \
+    --name=build \
     -d \
     -e "PATH=$(path)" \
     --privileged \
     --net=nanobox \
-    --ip=$ip \
+    --ip=192.168.0.2 \
     --volume=${hookit_dir}/:/opt/nanobox/hooks \
+    --volume=${apps_dir}/${app}/:/share/code \
     nanobox/build
 }
 
 stop_container() {
-  docker stop $1
-  docker rm $1
+  docker stop build
+  docker rm build
 }
 
 path() {

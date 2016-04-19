@@ -4,6 +4,7 @@
 
 test_dir="$(dirname $(readlink -f $BASH_SOURCE))"
 payload_dir="$(readlink -f ${test_dir}/payloads)"
+apps_dir=$(readlink -f ${test_dir}/apps)
 util_dir="$(readlink -f ${test_dir}/util)"
 hookit_dir="$(readlink -f ${test_dir}/../files/opt/nanobox/hooks)"
 
@@ -24,6 +25,7 @@ docker run \
   --ip=192.168.0.55 \
   --volume=${hookit_dir}/:/opt/nanobox/hooks \
   --volume=${payload_dir}/:/payloads \
+  --volume=${apps_dir}/simple-nodejs:/share/code \
   nanobox/build
 
 # hop into the sandbox

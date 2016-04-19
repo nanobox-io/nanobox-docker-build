@@ -159,3 +159,5 @@ else
   # no engine was specified
 
 end
+
+exit 0
