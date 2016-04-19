@@ -18,7 +18,7 @@ module Nanobox
     end
 
     def post(message, level='info')
-      if level_to_int(level) >= log_level
+      if level_to_int(level) >= @log_level
         $stderr.print message
       end
     end
