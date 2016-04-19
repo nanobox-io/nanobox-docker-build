@@ -78,7 +78,7 @@ when 'git'
 
   commit = engine_git_commitish(build[:engine])
 
-  if commit != 'master'
+  if commit
     logger.print(process_start("Checkout #{commit}"))
 
     execute "Checkout commitish point" do
@@ -115,7 +115,7 @@ when 'github'
 
   commit = engine_git_commitish(build[:engine])
 
-  if commit != 'master'
+  if commit
     logger.print(process_start("Checkout #{commit}"))
 
     execute "Checkout commitish point" do
