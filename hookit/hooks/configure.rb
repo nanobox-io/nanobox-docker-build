@@ -78,12 +78,12 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
   engine = engine_name(boxfile[:engine])
 
   # remove any official engine that may be in the way
-  directory "#{ENGINE_DIR}/#{engine}" do
+  directory "#{ENGINE_DIR}/#{registry('engine')}" do
     action :delete
   end
 
   # ensure a directory for this engine exists
-  directory "#{ENGINE_DIR}/#{engine}" do
+  directory "#{ENGINE_DIR}/#{registry('engine')}" do
     recursive true
   end
 
@@ -95,7 +95,7 @@ if boxfile[:engine] and not is_filepath?(boxfile[:engine])
         #{boxfile[:engine]} \
           | tar \
             -xzf - \
-            -C #{ENGINE_DIR}/#{engine}
+            -C #{ENGINE_DIR}/#{registry('engine')}
     EOF
     stream true
     on_stderr { |data| logtap.print subtask_info(data) }

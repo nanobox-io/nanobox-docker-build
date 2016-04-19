@@ -113,7 +113,7 @@ module NanoBox
         end
 
         # use the Enginefile from the selected Engine
-        enginefile = "#{ENGINE_DIR}/#{engine}/Enginefile"
+        enginefile = "#{ENGINE_DIR}/#{registry('engine')}/Enginefile"
 
         # if the Enginefile doesn't exist, then there's nothing to do
         if not ::File.exists? enginefile
@@ -138,7 +138,7 @@ module NanoBox
         return {}
       end
 
-      boxfile_script = "#{ENGINE_DIR}/#{engine}/bin/boxfile"
+      boxfile_script = "#{ENGINE_DIR}/#{registry('engine')}/bin/boxfile"
 
       # if the boxfile binscript doesn't exist, then there's nothing to do
       if not ::File.exist? boxfile_script
@@ -146,7 +146,7 @@ module NanoBox
       end
 
       yaml = execute %Q(#{boxfile_script} '#{engine_payload}') do
-        cwd "#{ENGINE_DIR}/#{engine}/bin"
+        cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
         path GONANO_PATH
         user 'gonano'
         on_exit { |code| return {} if not code == 0 }
@@ -170,7 +170,7 @@ module NanoBox
         return {}
       end
 
-      metafile = "#{ENGINE_DIR}/#{engine}/meta.json"
+      metafile = "#{ENGINE_DIR}/#{registry('engine')}/meta.json"
 
       # if the metafile doesn't exist, then there's nothing to do
       if not ::File.exist? metafile

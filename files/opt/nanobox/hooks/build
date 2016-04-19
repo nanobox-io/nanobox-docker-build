@@ -33,15 +33,15 @@ build[:before_build].each do |cmd|
 end
 
 # 2 - Run engine bulid script
-logger.print(bullet("Running bulid hook..."), 'debug')
+logger.print(bullet("Running build hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/bulid"
+if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/bulid"
 
   logger.print(bullet("Build script detected, running now..."), 'debug')
 
   execute "bulid environment" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/bulid '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/bulid '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

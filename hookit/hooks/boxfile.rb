@@ -11,13 +11,13 @@ engine = registry('engine')
 
 boxfile = ''
 
-if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/boxfile"
+if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/boxfile"
 
   logtap.print bullet('Boxfile script detected, running now'), 'debug'
 
   execute "generating boxfile" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/boxfile '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/boxfile '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

@@ -7,13 +7,13 @@ logtap.print(bullet("Running cleanup hook..."), 'debug')
 # By this point, engine should be set in the registry
 engine = registry('engine')
 
-if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/cleanup"
+if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/cleanup"
 
   logtap.print(bullet("Cleanup script detected, running now..."), 'debug')
 
   execute "cleanup environment" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/cleanup '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/cleanup '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

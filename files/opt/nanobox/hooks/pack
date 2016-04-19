@@ -3,6 +3,7 @@
 # Pack the application and build into a release
 #
 # 1 - Run engine pack script
+# 2 - Sync
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -18,54 +19,30 @@ include Nanobox::Output
 # 1 - Run engine pack script
 logger.print(bullet("Running pack hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/#{engine}/bin/pack"
+if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/pack"
 
-  logger.print(bullet("Build script detected, running now..."), 'debug')
+  logger.print(bullet("Pack script detected, running now..."), 'debug')
 
   execute "pack environment" do
-    command %Q(#{ENGINE_DIR}/#{engine}/bin/pack '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{engine}/bin"
+    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/pack '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true
-    on_data {|data| logger.print data}
+    on_data { |data| logger.print data }
   end
 end
 
 # 2 - rsync/copy into /mnt/*
 execute "rsync build" do
-command <<-EOF
-  rsync \
-    -v \
-    --delete \
-    -a \
-    #{excludes} \
-    #{DEPLOY_DIR}/ \
-    #{LOCAL_LIVE_DEST_DIR}
-EOF
-user 'gonano'
-end
-
-execute "rsync application" do
-command <<-EOF
-  rsync \
-    -v \
-    --delete \
-    -a \
-    #{LIVE_DIR}/ \
-    #{LOCAL_DEPLOY_DEST_DIR}
-EOF
-user 'gonano'
-end
-
-execute "rsync cache" do
-command <<-EOF
-  rsync \
-    -v \
-    --delete \
-    -a \
-    #{CACHE_DIR}/ \
-    #{LOCAL_CACHE_DEST_DIR}
-EOF
-user 'gonano'
+  command <<-EOF
+    rsync \
+      -v \
+      --delete \
+      -a \
+      #{excludes} \
+      #{DEPLOY_DIR}/ \
+      #{BUILD_DIR}
+  EOF
+  user 'gonano'
 end
