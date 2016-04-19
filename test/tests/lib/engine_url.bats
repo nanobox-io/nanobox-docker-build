@@ -38,6 +38,12 @@ END
   [ "$output" = "git" ]
 }
 
+@test "Nanobox url" {
+  url=ruby
+  run docker exec build bash -c "/tmp/url_type $url"
+  [ "$output" = "nanobox" ]
+}
+
 @test "Github url" {
   url=nanobox-io/nanobox-hooks-hoarder
   run docker exec build bash -c "/tmp/url_type $url"

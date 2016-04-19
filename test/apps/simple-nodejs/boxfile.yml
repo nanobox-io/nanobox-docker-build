@@ -1,4 +1,3 @@
 code.build:
   # engine: nodejs -> nanobox-io/nanobox-engine-nodejs
-  engine: nanobox-io/nanobox-engine-nodejs#refactor/v1
-  lib_dirs: [ node_modules ]
+  engine: nodejs#refactor/v1

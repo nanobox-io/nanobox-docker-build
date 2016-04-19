@@ -122,6 +122,8 @@ module Nanobox
     # inform the hook of how to fetch the engine
     def engine_url_type(engine)
       case engine
+      when /^(\w+)($|#[\w|\/|-]+$)/
+        'nanobox'
       when /.+\.git($|#.+$)/
         'git'
       when /^[\w\-]+\/[\w\-]+($|#[\w|\/|-]+$)/
@@ -149,6 +151,14 @@ module Nanobox
         match[1]
       else
         engine
+      end
+    end
+
+    # generate a full github clone url from a nanobox engine ie: 'python'
+    def engine_nanobox_url(engine)
+      match = engine.match(/^(\w+)($|#[\w|\/|-]+$)/)
+      if match
+        "https://github.com/nanobox-io/nanobox-engine-#{match[1]}.git"
       end
     end
 

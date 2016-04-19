@@ -132,6 +132,42 @@ when 'github'
   # set the engine as custom in the registry
   registry('engine', 'custom')
 
+when 'nanobox'
+
+  logger.print(process_start("Cloning engine"))
+
+  repo = engine_nanobox_url(build[:engine])
+
+  execute "cloning #{repo}" do
+    command "git clone #{repo} custom"
+    cwd ENGINE_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print subtask_info(data) }
+    # on_exit { |code| }
+  end
+
+  logger.print(process_end)
+
+  commit = engine_git_commitish(build[:engine])
+
+  if commit
+    logger.print(process_start("Checkout #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "git checkout #{commit}"
+      cwd "#{ENGINE_DIR}/custom"
+      user 'gonano'
+      stream true
+      on_data { |data| logger.print subtask_info(data) }
+    end
+
+    logger.print(process_end)
+  end
+
+  # set the engine as custom in the registry
+  registry('engine', 'custom')
+
 when 'tarball'
   directory "#{ENGINE_DIR}/custom"
 
