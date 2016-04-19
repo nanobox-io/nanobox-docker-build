@@ -80,7 +80,7 @@
   # verify the output
   [ "${lines[0]}" = "---" ]
   [ "${lines[1]}" = "code.build:" ]
-  [ "${lines[2]}" = "  engine: nanobox-io/nanobox-engine-nodejs#refactor/v1" ]
+  [ "${lines[2]}" = "  engine: nodejs#refactor/v1" ]
   [ "${lines[3]}" = "  image: nanobox/build" ]
   [ "${lines[4]}" = "  lib_dirs:" ]
   [ "${lines[5]}" = "  - node_modules" ]
@@ -111,7 +111,7 @@
   [ "$status" -eq 0 ]
 
   # Verify
-  run docker exec build bash -c "[ -f /mnt/build/server.js ]"
+  run docker exec build bash -c "[ -f /mnt/live/server.js ]"
   print_output
   [ "$status" -eq 0 ]
 }
@@ -128,5 +128,5 @@
 
 @test "Stop Container" {
   stop_container
-  stop_warehouse
+  # stop_warehouse
 }
