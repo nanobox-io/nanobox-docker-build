@@ -2,7 +2,8 @@ module Nanobox
   class Stderr
 
     def initialize(opts)
-      @log_level = level_to_int(opts[:log_level])
+      level = opts[:log_level] || 'info'
+      @log_level = level_to_int(level)
     end
 
     def level_to_int(level)
