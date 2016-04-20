@@ -37,10 +37,10 @@ if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/pack"
 end
 
 # 2 - rsync/copy into /mnt/*
-logtap.print(process_start('Copy deploy env into place'), 'debug')
+logger.print(process_start('Copy deploy env into place'), 'debug')
 # NOTE: I wonder if we should move the exclude-from into publish when we rsync
 # to slurp. That way, the 'dev' container will have everything. It might not
-# be necessary though. 
+# be necessary though.
 
 execute "rsync build" do
   command <<-EOF
@@ -54,7 +54,7 @@ execute "rsync build" do
   EOF
   user 'gonano'
   stream true
-  on_data { |data| logtap.print subtask_info(data), 'debug' }
+  on_data { |data| logger.print subtask_info(data), 'debug' }
 end
 
 # 3 - Sync lib_dirs with cache
