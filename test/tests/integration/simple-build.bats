@@ -32,17 +32,19 @@
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/build ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /code ]"
+  run docker exec build bash -c "[ -d /mnt/deploy ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /mnt/live ]"
+  run docker exec build bash -c "[ -d /mnt/app ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache ]"
+  [ "$status" -eq 0 ]
+  run docker exec build bash -c "[ -d /code ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/app ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/lib_dirs ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /opt/nanobox/engines ]"
+  run docker exec build bash -c "[ -d /opt/nanobox/engine ]"
   [ "$status" -eq 0 ]
 
   # todo: what about pkgin?
@@ -59,7 +61,7 @@
   [ "$status" -eq 0 ]
 
   # verify the nodejs engine is installed
-  run docker exec build bash -c "[ -f /opt/nanobox/engines/custom/lib/nodejs.sh ]"
+  run docker exec build bash -c "[ -f /opt/nanobox/engine/lib/nodejs.sh ]"
   print_output
   [ "$status" -eq 0 ]
 }
@@ -97,21 +99,54 @@
   [ "$status" -eq 0 ]
 }
 
-@test "Run build hook" {
-  run run_hook "build" "$(payload build)"
+@test "Run compile hook" {
+  run run_hook "compile" "$(payload build)"
   print_output
   [ "$status" -eq 0 ]
 
   # verify build hook?
 }
 
-@test "Run pack hook" {
-  run run_hook "pack" "$(payload pack)"
+@test "Run pack-app hook" {
+  run run_hook "pack-app" "$(payload pack-app)"
   print_output
   [ "$status" -eq 0 ]
 
   # Verify
-  run docker exec build bash -c "[ -f /mnt/live/server.js ]"
+  run docker exec build bash -c "[ -f /mnt/app/server.js ]"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run pack-build hook" {
+  run run_hook "pack-build" "$(payload pack-build)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # Verify
+  run docker exec build bash -c "[ -f /mnt/build/data/bin/node ]"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run clean hook" {
+  run run_hook "clean" "$(payload clean)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # Verify
+  run docker exec build bash -c "[ ! -f /data/bin/python ]"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run pack-deploy hook" {
+  run run_hook "pack-deploy" "$(payload pack-deploy)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # Verify
+  run docker exec build bash -c "[ -f /mnt/deploy/data/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
 }

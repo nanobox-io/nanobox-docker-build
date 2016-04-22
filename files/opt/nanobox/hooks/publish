@@ -18,7 +18,7 @@ include Nanobox::Boxfile
 # 1 - upload to warehouse
 execute "publish deploy" do
   command <<-EOF
-    tar -czf - -C #{BUILD_DIR} * \
+    tar -czf - -C #{DEPLOY_DIR} * \
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \

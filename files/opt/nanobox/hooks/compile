@@ -35,13 +35,13 @@ end
 # 2 - Run engine compile script
 logger.print(bullet("Running compile hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/compile"
+if ::File.exist? "#{ENGINE_DIR}/bin/compile"
 
   logger.print(bullet("Compile script detected, running now..."), 'debug')
 
   execute "compile app" do
-    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/compile '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
+    command %Q(#{ENGINE_DIR}/bin/compile '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

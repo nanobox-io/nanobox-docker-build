@@ -12,13 +12,13 @@ require 'hookit/setup'
 # 1 - Run engine clean script
 logger.print(bullet("Running clean hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/clean"
+if ::File.exist? "#{ENGINE_DIR}/bin/clean"
 
   logger.print(bullet("Cleanup script detected, running now..."), 'debug')
 
   execute "cleanup build" do
-    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/cleanup '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
+    command %Q(#{ENGINE_DIR}/bin/cleanup '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

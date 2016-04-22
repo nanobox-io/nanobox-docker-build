@@ -36,6 +36,7 @@ logger.print(bullet('ensuring all directories required for build exist'), 'debug
   "#{CACHE_DIR}",
   "#{APP_CACHE_DIR}",
   "#{LIB_CACHE_DIR}",
+  "#{NANOBOX_DIR}",
   "#{ENGINE_DIR}"
 ].each do |dir|
   directory dir do

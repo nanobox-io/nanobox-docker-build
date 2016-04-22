@@ -37,13 +37,13 @@ end
 # 2 - Run engine setup script
 logger.print(bullet("Running setup hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/setup"
+if ::File.exist? "#{ENGINE_DIR}/bin/setup"
 
   logger.print(bullet("Setup script detected, running now..."), 'debug')
 
   execute "setup environment" do
-    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/setup '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
+    command %Q(#{ENGINE_DIR}/bin/setup '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true

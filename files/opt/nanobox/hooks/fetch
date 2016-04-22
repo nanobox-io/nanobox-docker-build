@@ -8,9 +8,6 @@
 #   4 - Validate an engine is specified in the boxfile.yml
 #   5 - Fetch or copy the engine if specified
 
-# NOTE: since we only care about a single engine, let's just drop the engine into
-# 'engine' instead of engine/custom so it's not so confusing to the user in the output
-
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
 require 'bundler/setup'
@@ -69,8 +66,8 @@ when 'git'
   repo = engine_git_url(build[:engine])
 
   execute "cloning #{repo}" do
-    command "git clone #{repo} custom"
-    cwd ENGINE_DIR
+    command "git clone #{repo} engine"
+    cwd NANOBOX_DIR
     user 'gonano'
     stream true
     on_data { |data| logger.print subtask_info(data) }
@@ -86,7 +83,7 @@ when 'git'
 
     execute "Checkout commitish point" do
       command "git checkout #{commit}"
-      cwd "#{ENGINE_DIR}/custom"
+      cwd ENGINE_DIR
       user 'gonano'
       stream true
       on_data { |data| logger.print subtask_info(data) }
@@ -94,9 +91,6 @@ when 'git'
 
     logger.print(process_end)
   end
-
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
 
 when 'github'
 
@@ -106,8 +100,8 @@ when 'github'
   url = "https://github.com/#{repo}.git"
 
   execute "cloning #{repo}" do
-    command "git clone #{url} custom"
-    cwd ENGINE_DIR
+    command "git clone #{url} engine"
+    cwd NANOBOX_DIR
     user 'gonano'
     stream true
     on_data { |data| logger.print subtask_info(data) }
@@ -123,7 +117,7 @@ when 'github'
 
     execute "Checkout commitish point" do
       command "git checkout #{commit}"
-      cwd "#{ENGINE_DIR}/custom"
+      cwd ENGINE_DIR
       user 'gonano'
       stream true
       on_data { |data| logger.print subtask_info(data) }
@@ -131,9 +125,6 @@ when 'github'
 
     logger.print(process_end)
   end
-
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
 
 when 'nanobox'
 
@@ -142,8 +133,8 @@ when 'nanobox'
   repo = engine_nanobox_url(build[:engine])
 
   execute "cloning #{repo}" do
-    command "git clone #{repo} custom"
-    cwd ENGINE_DIR
+    command "git clone #{repo} engine"
+    cwd NANOBOX_DIR
     user 'gonano'
     stream true
     on_data { |data| logger.print subtask_info(data) }
@@ -159,7 +150,7 @@ when 'nanobox'
 
     execute "Checkout commitish point" do
       command "git checkout #{commit}"
-      cwd "#{ENGINE_DIR}/custom"
+      cwd ENGINE_DIR
       user 'gonano'
       stream true
       on_data { |data| logger.print subtask_info(data) }
@@ -168,32 +159,26 @@ when 'nanobox'
     logger.print(process_end)
   end
 
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
-
 when 'tarball'
-  directory "#{ENGINE_DIR}/custom"
+  directory ENGINE_DIR
 
   execute "Extract engine" do
     command <<-EOF
       curl -k #{engine} \
-        | tar -C #{ENGINE_DIR}/custom -xzf - --strip-components=1
+        | tar -C #{ENGINE_DIR} -xzf - --strip-components=1
     EOF
     user 'gonano'
   end
 
-  # set the engine as custom in the registry
-  registry('engine', 'custom')
 when 'filepath'
 
-  directory "#{ENGINE_DIR}/custom"
+  directory ENGINE_DIR
 
   execute "copy engine" do
-    command "cp -r #{LOCAL_ENGINE_SRC_DIR}/* #{ENGINE_DIR}/custom"
+    command "cp -r #{LOCAL_ENGINE_SRC_DIR}/* #{ENGINE_DIR}"
     user 'gonano'
   end
 
-  registry('engine', 'custom')
 else
   # no engine was specified
 

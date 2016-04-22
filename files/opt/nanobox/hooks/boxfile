@@ -27,10 +27,10 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   # 1 - Call the engine boxfile script
   output = ''
 
-  if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/boxfile"
+  if ::File.exist? "#{ENGINE_DIR}/bin/boxfile"
     execute "generating boxfile" do
-      command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/boxfile 'payload')
-      cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
+      command %Q(#{ENGINE_DIR}/bin/boxfile 'payload')
+      cwd "#{ENGINE_DIR}/bin"
       path GONANO_PATH
       user 'gonano'
       stream true

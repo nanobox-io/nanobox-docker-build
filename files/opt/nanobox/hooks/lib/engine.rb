@@ -91,9 +91,12 @@ module Nanobox
     # facilitate the storage/retrieval of lib_dirs like ruby's gems
     LIB_CACHE_DIR = "#{CACHE_DIR}/lib_dirs"
 
-    # The ENGINE_DIR contains all of the installed and soon-to-be
-    # installed engines
-    ENGINE_DIR = '/opt/nanobox/engines'
+    # The NANOBOX_DIR is a parent directory which contains engines, hooks, and
+    # other utilities
+    NANOBOX_DIR = '/opt/nanobox'
+
+    # The ENGINE_DIR contains the installed engine
+    ENGINE_DIR = "#{NANOBOX_DIR}/engine"
 
     # The LOCAL_CODE_SRC_DIR is a directory mounted from the user's workstation
     # machine. This is the live source code and should never be modified,

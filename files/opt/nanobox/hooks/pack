@@ -22,13 +22,13 @@ include Nanobox::Boxfile
 # 1 - Run engine pack script
 logger.print(bullet("Running pack hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/pack"
+if ::File.exist? "#{ENGINE_DIR}/bin/pack"
 
   logger.print(bullet("Pack script detected, running now..."), 'debug')
 
   execute "pack environment" do
-    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/pack '#{engine_payload}')
-    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
+    command %Q(#{ENGINE_DIR}/bin/pack '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     user 'gonano'
     stream true
