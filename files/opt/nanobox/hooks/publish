@@ -16,24 +16,24 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - upload to warehouse
-execute "publish build" do
+execute "publish deploy" do
   command <<-EOF
-    tar -czf - -C #{DEPLOY_DIR} * \
+    tar -czf - -C #{BUILD_DIR} * \
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \
-        https://#{payload[:warehouse]}:7410/blobs/build-#{payload[:build]} \
+        https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]} \
         -d @-
   EOF
 end
 
-execute "publish code" do
+execute "publish app" do
   command <<-EOF
-    tar -czf - -C #{LIVE_DIR} * \
+    tar -czf - -C #{APP_DIR} * \
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \
-        https://#{payload[:warehouse]}:7410/blobs/live-#{payload[:build]} \
+        https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]} \
         -d @-
   EOF
 end

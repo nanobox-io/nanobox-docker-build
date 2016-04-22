@@ -1,46 +1,71 @@
-# Hook order:
+# 'dev' hook order:
 #   1 - user
 #   2 - configure
 #   3 - fetch
 #   4 - setup
 #   5 - boxfile
 #   6 - prepare
-#   7 - build
-#   8 - pack
-#   9 - publish
+#   7 - pack-build
+
+# 'build' hook order:
+#   1  - user
+#   2  - configure
+#   3  - fetch
+#   4  - setup
+#   5  - boxfile
+#   6  - prepare
+#   7  - compile
+#   8  - pack-app
+#   8  - pack-build
+#   9  - clean
+#   10 - pack-deploy
+
+# 'publish' hook order:
+#   1 - boxfile
+#   2 - publish
 
 module Nanobox
   module Engine
-    # The DEPLOY_DIR is the pkgsrc build root. This is where pkgsrc is
+    # The DATA_DIR is the pkgsrc build root. This is where pkgsrc is
     # bootstrapped and contains a fully chrooted environment that packages can
     # be installed into and binaries can be linked.
-    DEPLOY_DIR = '/data'
+    DATA_DIR = '/data'
 
     # The ETC_DIR contains configuration for runtimes such as apache or nginx
     # that are required for the live environment.
-    ETC_DIR = "#{DEPLOY_DIR}/etc"
+    ETC_DIR = "#{DATA_DIR}/etc"
 
     # The ENV_DIR contains environment variables available to the
     # application in the live environment
-    ENV_DIR = "#{DEPLOY_DIR}/etc/env.d"
+    ENV_DIR = "#{DATA_DIR}/etc/env.d"
 
     # The BUILD_DIR contains the environment (binaries, runtimes,
-    # configurations) into which the application is deployed.
-    #
-    # NOTE: In the final web/worker container, the contents of this directory
-    # will actually be extracted into the DEPLOY_DIR. After the build process
-    # is complete, the contents of DEPLOY_DIR will be rsynced into this directory
-    # excluding much of the unecessary fluff.
+    # configurations) that are required to build the application.
     #
     # This directory is not managed or manipulated by the engine. It is used
     # internally for the build process. Ultimately, this directory is tar'ed
     # and shipped to the warehouse.
     BUILD_DIR = '/mnt/build'
 
+    # The DEPLOY_DIR container the environment (binaries, runtimes,
+    # configurations) that are required for the compiled app to run.
+    #
+    # This directory should not contain any binary or runtime that is not
+    # needed to run the app. The engine 'clean' bin script should remove
+    # any package or runtime that won't be needed.
+    #
+    # In the final running web and worker components, this directory will
+    # be mounted at the location of the DATA_DIR.
+    #
+    # This directory will be a neutered pkgsrc bootstrap and will not have
+    # the necessary bits to install new packages, but will include ONLY what
+    # is needed to run the app.
+    DEPLOY_DIR = '/mnt/deploy'
+
     # The location of the raw code that the engine and boxfile.yml
     # does transformations against.
     #
-    # NOTE: In the final web/worker/dev containers, the contents of the live
+    # In the final web/worker/dev containers, the contents of the live
     # directory will actually be here. This is necessary since some languages
     # (like python) generate virtual environments which will contain shebangs
     # with absolute paths to this location. Since this is the absolute location
@@ -54,7 +79,7 @@ module Nanobox
     # run the compiled application into this directory.
     #
     # Ultimately, this directory is tar'ed and shipped to the warehouse.
-    LIVE_DIR = '/mnt/live'
+    APP_DIR = '/mnt/app'
 
     # The contents of the cache directory persist between builds. After each
     # build, this directory is stored for the next build.
@@ -81,8 +106,8 @@ module Nanobox
     LOCAL_ENGINE_SRC_DIR = '/share/engine'
 
     GONANO_PATH = [
-      "#{DEPLOY_DIR}/sbin",
-      "#{DEPLOY_DIR}/bin",
+      "#{DATA_DIR}/sbin",
+      "#{DATA_DIR}/bin",
       '/opt/gonano/sbin',
       '/opt/gonano/bin',
       '/usr/local/sbin',
@@ -109,8 +134,8 @@ module Nanobox
     def engine_payload
       {
         code_dir: CODE_DIR,
-        deploy_dir: DEPLOY_DIR,
-        live_dir: LIVE_DIR,
+        data_dir: DATA_DIR,
+        app_dir: APP_DIR,
         cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,

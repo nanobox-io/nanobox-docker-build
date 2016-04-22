@@ -3,7 +3,7 @@
 # Prepare the container for an app build
 #
 # 1 - Ensure all the required directories exist and have proper permissions
-# 2 - Clear the BUILD_DIR, LIVE_DIR, and boxfile
+# 2 - Clear the BUILD_DIR, APP_DIR, and boxfile
 # 3 - Extract the pkgin db from the cache
 # 4 - Update pkgin db
 
@@ -24,14 +24,15 @@ logger.print(bullet('Running configure hook...'), 'debug')
 logger.print(bullet('ensuring all directories required for build exist'), 'debug')
 
 [
-  "#{DEPLOY_DIR}",
-  "#{DEPLOY_DIR}/sbin",
-  "#{DEPLOY_DIR}/bin",
+  "#{DATA_DIR}",
+  "#{DATA_DIR}/sbin",
+  "#{DATA_DIR}/bin",
   "#{ETC_DIR}",
   "#{ENV_DIR}",
   "#{BUILD_DIR}",
+  "#{DEPLOY_DIR}",
   "#{CODE_DIR}",
-  "#{LIVE_DIR}",
+  "#{APP_DIR}",
   "#{CACHE_DIR}",
   "#{APP_CACHE_DIR}",
   "#{LIB_CACHE_DIR}",
@@ -44,12 +45,13 @@ logger.print(bullet('ensuring all directories required for build exist'), 'debug
   execute "chown gonano #{dir}"
 end
 
-# 2 - Clear the BUILD_DIR, LIVE_DIR, and boxfile
+# 2 - Clear the BUILD_DIR, APP_DIR, and boxfile
 logger.print(process_start('Purge previous build'), 'debug')
 
 [
   "#{BUILD_DIR}/*",
-  "#{LIVE_DIR}/*",
+  "#{DEPLOY_DIR}/*",
+  "#{APP_DIR}/*",
   "#{CACHE_DIR}/boxfile.yml"
 ].each do |old|
   execute "Purge #{old}" do
@@ -60,7 +62,7 @@ end
 # 3 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
-  directory "#{DEPLOY_DIR}/var/db/pkgin/cache" do
+  directory "#{DATA_DIR}/var/db/pkgin/cache" do
     owner 'gonano'
     group 'gonano'
     recursive true
@@ -75,7 +77,7 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
         -v \
         -a \
         #{CACHE_DIR}/pkgin/ \
-        #{DEPLOY_DIR}/var/db/pkgin/cache
+        #{DATA_DIR}/var/db/pkgin/cache
     EOF
     user 'gonano'
     stream true
@@ -90,8 +92,8 @@ logger.print(process_start('Updating pkgin database...'), 'debug')
 
 execute "update pkgin packages" do
   command <<-EOF
-    rm -f #{DEPLOY_DIR}/var/db/pkgin/pkgin.db && \
-    #{DEPLOY_DIR}/bin/pkgin -y up
+    rm -f #{DATA_DIR}/var/db/pkgin/pkgin.db && \
+    #{DATA_DIR}/bin/pkgin -y up
   EOF
   user 'gonano'
   stream true

@@ -42,21 +42,6 @@ logger.print(process_start('Copy deploy env into place'), 'debug')
 # to slurp. That way, the 'dev' container will have everything. It might not
 # be necessary though.
 
-execute "rsync build" do
-  command <<-EOF
-    rsync \
-      -v \
-      -a \
-      --delete \
-      --exclude-from=/var/nanobox/build-excludes.txt \
-      #{DEPLOY_DIR}/ \
-      #{BUILD_DIR}
-  EOF
-  user 'gonano'
-  stream true
-  on_data { |data| logger.print subtask_info(data), 'debug' }
-end
-
 # 3 - Sync lib_dirs with cache
 build[:lib_dirs].each do |dir|
   if ::File.exist? "#{CODE_DIR}/#{dir}"

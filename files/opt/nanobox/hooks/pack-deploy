@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+# Pack the contents of the /data pkgsrc bootstrap into the 'deploy' directory
+#
+# The packed 'deploy' directory contains all of the binaries and packages
+# required to run the application. The deploy directory is eventually
+# published to warehouse.
+#
+# 1 - rsync /data to /mnt/deploy
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# 1 - rsync/copy into /mnt/*
+logger.print(process_start('Copy deploy env into place'), 'debug')
+
+execute "rsync deploy" do
+  command <<-EOF
+    rsync \
+      -v \
+      -a \
+      --delete \
+      --exclude-from=/var/nanobox/build-excludes.txt \
+      #{DATA_DIR}/ \
+      #{DEPLOY_DIR}
+  EOF
+  user 'gonano'
+  stream true
+  on_data { |data| logger.print subtask_info(data), 'debug' }
+end

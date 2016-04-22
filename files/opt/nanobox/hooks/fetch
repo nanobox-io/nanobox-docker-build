@@ -8,6 +8,9 @@
 #   4 - Validate an engine is specified in the boxfile.yml
 #   5 - Fetch or copy the engine if specified
 
+# NOTE: since we only care about a single engine, let's just drop the engine into
+# 'engine' instead of engine/custom so it's not so confusing to the user in the output
+
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
 require 'bundler/setup'

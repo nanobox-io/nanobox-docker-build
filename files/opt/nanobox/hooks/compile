@@ -1,0 +1,64 @@
+#!/usr/bin/env ruby
+
+# Compile the application
+#
+# 1 - Run boxfile.yml before_compile
+# 2 - Run engine build script
+# 3 - Run boxfile.yml after_compile
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
+# 1 - Run before_compile
+build[:before_compile].each do |cmd|
+  logger.print(bullet("Before compile running: #{cmd}"), 'debug')
+
+  execute "Before compile: #{cmd}" do
+    command cmd
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
+
+# 2 - Run engine compile script
+logger.print(bullet("Running compile hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/#{registry('engine')}/bin/compile"
+
+  logger.print(bullet("Compile script detected, running now..."), 'debug')
+
+  execute "compile app" do
+    command %Q(#{ENGINE_DIR}/#{registry('engine')}/bin/compile '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/#{registry('engine')}/bin"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
+
+# 3 - Run after_compile
+build[:after_compile].each do |cmd|
+  logger.print(bullet("After compile running: #{cmd}"), 'debug')
+
+  execute "After compile: #{cmd}" do
+    command cmd
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
