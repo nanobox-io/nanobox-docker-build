@@ -124,7 +124,9 @@
   [ "$status" -eq 0 ]
 
   # Verify
-  [ -f /mnt/build/data/bin/node ]
+  run docker exec build bash -c "[ -f /mnt/build/data/bin/node ]"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run clean hook" {
@@ -144,7 +146,9 @@
   [ "$status" -eq 0 ]
 
   # Verify
-  [ -f /mnt/deploy/data/bin/node ]
+  run docker exec build bash -c "[ -f /mnt/deploy/data/bin/node ]"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Start warehouse" {
