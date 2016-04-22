@@ -17,7 +17,7 @@ include Nanobox::Boxfile
 # 1 - Run engine clean script
 logger.print(bullet("Running clean hook..."), 'debug')
 
-if ::File.exist? "#{ENGINE_DIR}/bin/clean"
+if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
 
   logger.print(bullet("Cleanup script detected, running now..."), 'debug')
 
@@ -27,6 +27,18 @@ if ::File.exist? "#{ENGINE_DIR}/bin/clean"
     path GONANO_PATH
     user 'gonano'
     stream true
-    on_data {|data| logger.print data}
+    on_data {|data| logger.print(data)}
   end
+end
+
+# 2 - Remove orphan pkgsrc dependencies
+logger.print(bullet("Removing pkgsrc orphans..."), 'debug')
+
+execute "autoremove pkgin orphans" do
+  command <<-EOF
+    echo "Y\n" | pkgin ar
+  EOF
+  path GONANO_PATH
+  stream true
+  on_data {|data| logger.print(data, 'debug')}
 end

@@ -7,6 +7,7 @@
 # published to warehouse.
 #
 # 1 - rsync /data to /mnt/deploy
+# 2 - strip pkgin bootstrap
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -36,4 +37,9 @@ execute "rsync deploy" do
   user 'gonano'
   stream true
   on_data { |data| logger.print subtask_info(data), 'debug' }
+end
+
+# strip pkgin bootstrap out of the deploy env
+execute "strip pkgin" do
+  command "rm -rf #{DEPLOY_DIR}/var/db/pkgin"
 end

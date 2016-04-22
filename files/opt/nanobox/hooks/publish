@@ -18,22 +18,28 @@ include Nanobox::Boxfile
 # 1 - upload to warehouse
 execute "publish deploy" do
   command <<-EOF
-    tar -czf - -C #{DEPLOY_DIR} * \
+    tar -czf - * \
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \
         https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]} \
-        -d @-
+        --data-binary @-
   EOF
+  cwd DEPLOY_DIR
+  stream true
+  on_data {|data| logger.print(data, 'debug')}
 end
 
 execute "publish app" do
   command <<-EOF
-    tar -czf - -C #{APP_DIR} * \
+    tar -czf - * \
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \
         https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]} \
-        -d @-
+        --data-binary @-
   EOF
+  cwd APP_DIR
+  stream true
+  on_data {|data| logger.print(data, 'debug')}
 end

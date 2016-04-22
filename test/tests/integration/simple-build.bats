@@ -100,7 +100,7 @@
 }
 
 @test "Run compile hook" {
-  run run_hook "compile" "$(payload build)"
+  run run_hook "compile" "$(payload compile)"
   print_output
   [ "$status" -eq 0 ]
 
@@ -124,9 +124,7 @@
   [ "$status" -eq 0 ]
 
   # Verify
-  run docker exec build bash -c "[ -f /mnt/build/data/bin/node ]"
-  print_output
-  [ "$status" -eq 0 ]
+  [ -f /mnt/build/data/bin/node ]
 }
 
 @test "Run clean hook" {
@@ -146,9 +144,7 @@
   [ "$status" -eq 0 ]
 
   # Verify
-  run docker exec build bash -c "[ -f /mnt/deploy/data/bin/node ]"
-  print_output
-  [ "$status" -eq 0 ]
+  [ -f /mnt/deploy/data/bin/node ]
 }
 
 @test "Start warehouse" {
