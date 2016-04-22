@@ -18,8 +18,8 @@ module Nanobox
       after_setup:    {type: :array, of: :string, default: []},
       before_prepare: {type: :array, of: :string, default: []},
       after_prepare:  {type: :array, of: :string, default: []},
-      before_build:   {type: :array, of: :string, default: []},
-      after_build:    {type: :array, of: :string, default: []}
+      before_compile:   {type: :array, of: :string, default: []},
+      after_compile:    {type: :array, of: :string, default: []}
     }
 
     BOXFILE_DEPLOY_DEFAULTS = {

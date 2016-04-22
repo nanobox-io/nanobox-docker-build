@@ -16,6 +16,11 @@ require 'bundler/setup'
 # load hookit/setup to bootstrap hookit and import the dsl
 require 'hookit/setup'
 
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
 # 1 - rsync/copy into /mnt/*
 logger.print(process_start('Copy build env into place'), 'debug')
 

@@ -12,6 +12,11 @@ require 'bundler/setup'
 # load hookit/setup to bootstrap hookit and import the dsl
 require 'hookit/setup'
 
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
 logger.print(bullet("Running release hook..."), 'debug')
 
 if ::File.exist? "#{ENGINE_DIR}/bin/release"
