@@ -123,6 +123,9 @@
   print_output
   [ "$status" -eq 0 ]
 
+  run docker exec build bash -c "ls -lah /mnt/build/data/bin"
+  print_output
+
   # Verify
   run docker exec build bash -c "[ -f /mnt/build/data/bin/node ]"
   print_output
@@ -144,6 +147,9 @@
   run run_hook "pack-deploy" "$(payload pack-deploy)"
   print_output
   [ "$status" -eq 0 ]
+
+  run docker exec build bash -c "ls -lah /mnt/deploy/data/bin"
+  print_output
 
   # Verify
   run docker exec build bash -c "[ -f /mnt/deploy/data/bin/node ]"
