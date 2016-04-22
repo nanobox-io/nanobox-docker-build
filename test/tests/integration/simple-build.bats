@@ -123,11 +123,8 @@
   print_output
   [ "$status" -eq 0 ]
 
-  run docker exec build bash -c "ls -lah /mnt/build/data/bin"
-  print_output
-
   # Verify
-  run docker exec build bash -c "[ -f /mnt/build/data/bin/node ]"
+  run docker exec build bash -c "[ -f /mnt/build/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
 }
@@ -148,11 +145,8 @@
   print_output
   [ "$status" -eq 0 ]
 
-  run docker exec build bash -c "ls -lah /mnt/deploy/data/bin"
-  print_output
-
   # Verify
-  run docker exec build bash -c "[ -f /mnt/deploy/data/bin/node ]"
+  run docker exec build bash -c "[ -f /mnt/deploy/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
 }
