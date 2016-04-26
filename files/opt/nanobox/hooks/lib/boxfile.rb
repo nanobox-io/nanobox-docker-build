@@ -36,14 +36,14 @@ module Nanobox
 
     BOXFILE_WEB_DEFAULTS = {
       image:          {type: :string, default: "nanobox/code"},
-      start:          {type: :array, of: :string, default: []},
+      start:          {type: :hash, of: :string, default: {}},
       routes:         {type: :array, of: :string, default: []},
       ports:          {type: :array, of: :string, default: []},
     }
 
     BOXFILE_WORKER_DEFAULTS = {
       image:          {type: :string, default: "nanobox/code"},
-      start:          {type: :array, of: :string, default: []},
+      start:          {type: :hash, of: :string, default: {}},
     }
 
     # Simple getter to retrieve the boxfile from the registry
