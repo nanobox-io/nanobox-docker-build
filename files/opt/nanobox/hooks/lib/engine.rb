@@ -71,7 +71,7 @@ module Nanobox
     # with absolute paths to this location. Since this is the absolute location
     # during the transformation/compilation process, this needs to be the path
     # used to run the app in production.
-    CODE_DIR = '/code'
+    CODE_DIR = '/app'
 
     # The directory that contains the final application after
     # any transformations or compilation process. The engine is responsible

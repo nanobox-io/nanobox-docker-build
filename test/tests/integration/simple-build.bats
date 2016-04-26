@@ -38,7 +38,7 @@
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /code ]"
+  run docker exec build bash -c "[ -d /app ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/app ]"
   [ "$status" -eq 0 ]
@@ -56,7 +56,7 @@
   [ "$status" -eq 0 ]
 
   # verify the code was copied over
-  run docker exec build bash -c "[ -f /code/package.json ]"
+  run docker exec build bash -c "[ -f /app/package.json ]"
   print_output
   [ "$status" -eq 0 ]
 

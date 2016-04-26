@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
 # Upload build env and live app to warehouse
-# 1 - upload to warehouse
+# 1 - Verify build and app exist
+# 2 - upload to warehouse
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -15,14 +16,16 @@ include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
 
-# 1 - upload to warehouse
+# 1 - verify
+
+# 2 - upload to warehouse
 execute "publish deploy" do
   command <<-EOF
     tar -czf - * \
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \
-        https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]} \
+        https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]}.tgz \
         --data-binary @-
   EOF
   cwd DEPLOY_DIR
@@ -36,7 +39,7 @@ execute "publish app" do
       | curl \
         -k \
         -H "x-auth-token: #{payload[:warehouse_token]}" \
-        https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]} \
+        https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]}.tgz \
         --data-binary @-
   EOF
   cwd APP_DIR
