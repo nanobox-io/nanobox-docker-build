@@ -36,7 +36,7 @@ module Nanobox
 
     BOXFILE_WEB_DEFAULTS = {
       image:          {type: :string, default: nil},
-      start:          {type: :hash, of: :string, default: {}},
+      # start:          {type: :hash, of: :string, default: {}},
       routes:         {type: :array, of: :string, default: []},
       ports:          {type: :array, of: :string, default: []},
     }
