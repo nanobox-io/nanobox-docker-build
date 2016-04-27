@@ -8,7 +8,7 @@ RUN apt-get update -qq && \
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon mustache && \
+    /opt/gonano/bin/pkgin -y in shon mustache siphon && \
     rm -rf /var/gonano/db/pkgin/cache
 
 # add temporary scripts
@@ -30,7 +30,7 @@ RUN mkdir -p /opt/nanobox
 ADD files/opt/nanobox/. /opt/nanobox/
 
 # install nos
-RUN mkdir -p /opt/nos && \
+RUN mkdir -p /opt/pagodabo/nos && \
     curl \
       -k \
       -s \
@@ -39,7 +39,7 @@ RUN mkdir -p /opt/nos && \
         | tar \
             -xzf - \
             --strip-components=1 \
-            -C /opt/nos/
+            -C /opt/pagodabox/nos/
 
 # Install engines
 RUN /var/tmp/install-engines
