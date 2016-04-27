@@ -11,7 +11,7 @@ module Nanobox
     BOXFILE_BUILD_DEFAULTS = {
       config:         {type: :hash, default: {}},
       engine:         {type: :string, default: nil},
-      image:          {type: :string, default: "nanobox/build"},
+      image:          {type: :string, default: nil},
       lib_dirs:       {type: :array, of: :folders, default: []},
 
       before_setup:   {type: :array, of: :string, default: []},
@@ -35,15 +35,16 @@ module Nanobox
     }
 
     BOXFILE_WEB_DEFAULTS = {
-      image:          {type: :string, default: "nanobox/code"},
+      image:          {type: :string, default: nil},
       start:          {type: :hash, of: :string, default: {}},
       routes:         {type: :array, of: :string, default: []},
       ports:          {type: :array, of: :string, default: []},
     }
 
     BOXFILE_WORKER_DEFAULTS = {
-      image:          {type: :string, default: "nanobox/code"},
-      start:          {type: :hash, of: :string, default: {}},
+      image:          {type: :string, default: nil},
+      start:          {type: :string, default: nil}
+      # start:          {type: :string_or_hash, of: :string, default: {}},
     }
 
     # Simple getter to retrieve the boxfile from the registry
