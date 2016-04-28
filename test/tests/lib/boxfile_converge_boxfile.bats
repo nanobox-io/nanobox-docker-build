@@ -23,7 +23,8 @@ require '/opt/nanobox/hooks/lib/hash.rb'
 include Nanobox::Boxfile
 
 # Just echo the url type
-puts converge_boxfile(JSON.parse(ARGV.first).deep_symbolize_keys).prune_empty.deep_stringify_keys.to_yaml
+boxfile = JSON.parse(ARGV.first).deep_symbolize_keys
+puts converge_boxfile(boxfile).prune_empty.deep_stringify_keys.to_yaml
 
 END
 )"
@@ -35,38 +36,59 @@ END
   [ "$status" -eq 0 ]
 }
 
-@test "Converge using complex names for services" {
-  payload='{"code.build":{},"web.site":{},"worker.jobs":{},"data.db":{"image":"nanobox/mysql"}}'
+@test "Test string start commands" {
+  payload='{"code.build":{},"web.site":{"start":"something"},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   print_output
   [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "code.build:" ]
-  [ "${lines[2]}" = "  image: nanobox/build" ]
-  [ "${lines[3]}" = "web.site:" ]
-  [ "${lines[4]}" = "  image: nanobox/code" ]
-  [ "${lines[5]}" = "worker.jobs:" ]
-  [ "${lines[6]}" = "  image: nanobox/code" ]
+  [ "${lines[1]}" = "web.site:" ]
+  [ "${lines[2]}" = "  start: something" ]
+  [ "${lines[3]}" = "worker.jobs:" ]
+  [ "${lines[4]}" = "  start: something" ]
+  [ "${lines[5]}" = "data.db:" ]
+  [ "${lines[6]}" = "  image: nanobox/mysql" ]
+}
+
+@test "Test hash start commands" {
+  payload='{"code.build":{},"web.site":{"start":{"worker":"something"}},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
+  run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
+  print_output
+  [ "${lines[0]}" = "---" ]
+  [ "${lines[1]}" = "web.site:" ]
+  [ "${lines[2]}" = "  start:" ]
+  [ "${lines[3]}" = "    worker: something" ]
+  [ "${lines[4]}" = "worker.jobs:" ]
+  [ "${lines[5]}" = "  start:" ]
+  [ "${lines[6]}" = "    worker: something" ]
   [ "${lines[7]}" = "data.db:" ]
   [ "${lines[8]}" = "  image: nanobox/mysql" ]
 }
 
+@test "Test string and hash start commands" {
+  payload='{"code.build":{},"web.site":{"start":"something"},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
+  run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
+  print_output
+  [ "${lines[0]}" = "---" ]
+  [ "${lines[1]}" = "web.site:" ]
+  [ "${lines[2]}" = "  start: something" ]
+  [ "${lines[3]}" = "worker.jobs:" ]
+  [ "${lines[4]}" = "  start:" ]
+  [ "${lines[5]}" = "    worker: something" ]
+  [ "${lines[6]}" = "data.db:" ]
+  [ "${lines[7]}" = "  image: nanobox/mysql" ]
+}
+
 @test "Converge using complex names for services" {
-  payload='{"code.build":{},"code.deploy":{"before_deploy":{"web.site":["echo hi"]}},"web.site":{},"worker.jobs":{},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"code.deploy":{"before_deploy":{"web.site":["echo hi"]}},"web.site":{},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   print_output
   [ "${lines[0]}"  = "---" ]
-  [ "${lines[1]}"  = "code.build:" ]
-  [ "${lines[2]}"  = "  image: nanobox/build" ]
-  [ "${lines[3]}"  = "code.deploy:" ]
-  [ "${lines[4]}"  = "  before_deploy:" ]
-  [ "${lines[5]}"  = "    web.site:" ]
-  [ "${lines[6]}"  = "    - echo hi" ]
-  [ "${lines[7]}"  = "web.site:" ]
-  [ "${lines[8]}"  = "  image: nanobox/code" ]
-  [ "${lines[9]}"  = "worker.jobs:" ]
-  [ "${lines[10]}" = "  image: nanobox/code" ]
-  [ "${lines[11]}" = "data.db:" ]
-  [ "${lines[12]}" = "  image: nanobox/mysql" ]
+  [ "${lines[1]}"  = "code.deploy:" ]
+  [ "${lines[2]}"  = "  before_deploy:" ]
+  [ "${lines[3]}"  = "    web.site:" ]
+  [ "${lines[4]}"  = "    - echo hi" ]
+  [ "${lines[5]}" = "data.db:" ]
+  [ "${lines[6]}" = "  image: nanobox/mysql" ]
 }
 
 @test "Filter out bad nodes" {
