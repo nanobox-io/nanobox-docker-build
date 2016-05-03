@@ -25,6 +25,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
     command %Q(#{ENGINE_DIR}/bin/cleanup '#{engine_payload}')
     cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
+    environment engine_env
     user 'gonano'
     stream true
     on_data {|data| logger.print(data)}

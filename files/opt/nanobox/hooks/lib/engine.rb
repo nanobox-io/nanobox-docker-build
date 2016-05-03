@@ -146,6 +146,33 @@ module Nanobox
       }.to_json
     end
 
+    # This will generate a hash of key/value pairs that will be exported
+    # as environment variables to engine bin scripts
+    def engine_env
+      env = {
+        "CODE_DIR": CODE_DIR,
+        "DATA_DIR": DATA_DIR,
+        "APP_DIR": APP_DIR,
+        "CACHE_DIR": CACHE_DIR,
+        "ETC_DIR": ETC_DIR,
+        "ENV_DIR": ENV_DIR,
+      }
+
+      # for each of the values in config, we'll generate environment variables
+      # prefixed with CONFIG_ that the engine can use.
+      config = (build[:config] || {}).to_json
+      lines = `echo "#{config.gsub(/"/, "\\\"")}" | shon | sed -e "s/^/CONFIG_/"`
+
+      lines.split.each do |line|
+        parts = line.split /(\w+)\=(.+)/
+        if parts.length == 3
+          env[parts[1]] = parts[2]
+        end
+      end
+
+      env
+    end
+
     # When an engine is provided, determine the type of url which will
     # inform the hook of how to fetch the engine
     def engine_url_type(engine)

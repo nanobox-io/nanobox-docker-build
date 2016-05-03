@@ -30,6 +30,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/pack"
     command %Q(#{ENGINE_DIR}/bin/pack '#{engine_payload}')
     cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
+    environment engine_env
     user 'gonano'
     stream true
     on_data { |data| logger.print data }
