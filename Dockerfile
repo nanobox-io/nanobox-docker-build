@@ -30,16 +30,16 @@ RUN mkdir -p /opt/nanobox
 ADD files/opt/nanobox/. /opt/nanobox/
 
 # install nos
-RUN mkdir -p /opt/pagodabox/nos && \
+RUN mkdir -p /opt/nanobox/nos && \
     curl \
       -k \
       -s \
       -L \
-      https://github.com/pagodabox/nanobox-nos/archive/v0.10.1.tar.gz \
+      https://github.com/nanobox-io/nanobox-nos/archive/v0.10.1.tar.gz \
         | tar \
             -xzf - \
             --strip-components=1 \
-            -C /opt/pagodabox/nos/
+            -C /opt/nanobox/nos/
 
 # Install engines
 RUN /var/tmp/install-engines
