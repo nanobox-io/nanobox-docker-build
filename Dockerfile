@@ -30,7 +30,7 @@ RUN mkdir -p /opt/nanobox
 ADD files/opt/nanobox/. /opt/nanobox/
 
 # install nos
-RUN mkdir -p /opt/pagodabo/nos && \
+RUN mkdir -p /opt/pagodabox/nos && \
     curl \
       -k \
       -s \
