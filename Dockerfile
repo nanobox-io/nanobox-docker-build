@@ -35,7 +35,7 @@ RUN mkdir -p /opt/nanobox/nos && \
       -k \
       -s \
       -L \
-      https://github.com/nanobox-io/nanobox-nos/archive/v0.10.1.tar.gz \
+      https://github.com/nanobox-io/nanobox-nos/archive/v0.11.0.tar.gz \
         | tar \
             -xzf - \
             --strip-components=1 \
