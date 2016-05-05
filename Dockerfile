@@ -1,8 +1,9 @@
 FROM nanobox/runit
 
-# install gcc and build tools
+# install gcc and build tools and other utilities
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential git rsync openssh-client && \
+    apt-get install -y --no-install-recommends \
+      build-essential git rsync openssh-client pv && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
