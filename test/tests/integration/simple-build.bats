@@ -81,9 +81,9 @@
 
   # verify the output
   [ "${lines[0]}" = "--- " ]
-  [ "${lines[1]}" = "code.build:" ]
+  [ "${lines[1]}" = "code.build: " ]
   [ "${lines[2]}" = "  engine: nodejs#refactor/v1" ]
-  [ "${lines[3]}" = "  lib_dirs:" ]
+  [ "${lines[3]}" = "  lib_dirs: " ]
   [ "${lines[4]}" = "    - node_modules" ]
 }
 
