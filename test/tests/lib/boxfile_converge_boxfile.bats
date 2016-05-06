@@ -86,7 +86,7 @@ END
   [ "${lines[1]}"  = "code.deploy:" ]
   [ "${lines[2]}"  = "  before_deploy:" ]
   [ "${lines[3]}"  = "    web.site:" ]
-  [ "${lines[4]}"  = "      - echo hi" ]
+  [ "${lines[4]}"  = "    - echo hi" ]
   [ "${lines[5]}" = "data.db:" ]
   [ "${lines[6]}" = "  image: nanobox/mysql" ]
 }
