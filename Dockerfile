@@ -9,8 +9,9 @@ RUN apt-get update -qq && \
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon mustache siphon && \
-    rm -rf /var/gonano/db/pkgin/cache
+    /opt/gonano/bin/pkgin -y in shon mustache siphon hookit && \
+    rm -rf /var/gonano/db/pkgin/cache && \
+    gem install ya2yaml --no-ri --no-rdoc
 
 # add temporary scripts
 ADD scripts/. /var/tmp/

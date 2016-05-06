@@ -21,7 +21,7 @@ include Nanobox::Output
 logger.print(bullet('Running configure hook...'), 'debug')
 
 # 1 - Ensure required directories exist and have permissions
-logger.print(bullet('ensuring all directories required for build exist'), 'debug')
+logger.print(bullet('Setting up directories and permissions'))
 
 [
   "#{DATA_DIR}",
@@ -47,7 +47,7 @@ logger.print(bullet('ensuring all directories required for build exist'), 'debug
 end
 
 # 2 - Clear the BUILD_DIR, APP_DIR, and boxfile
-logger.print(process_start('Purge previous build'), 'debug')
+logger.print(bullet('Cleaning up any previous builds'))
 
 [
   "#{BUILD_DIR}/*",
@@ -69,36 +69,39 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
     recursive true
   end
 
-  logger.print(process_start('Extract pkgin cache...'), 'debug')
+  logger.print(process_start('Extracting pkg cache'))
 
   # fetch the pkgin cache & db from cache for a quick deploy
   execute "extract pkgin packages from cache for quick access" do
     command <<-EOF
-      rsync \
-        -v \
-        -a \
-        #{CACHE_DIR}/pkgin/ \
-        #{DATA_DIR}/var/db/pkgin/cache
+      siphon --prefix '   sync: ' -- \
+        rsync \
+          -a \
+          --info=progress2 \
+          #{CACHE_DIR}/pkgin/ \
+          #{DATA_DIR}/var/db/pkgin/cache
     EOF
     user 'gonano'
     stream true
-    on_data { |data| logger.print subtask_info(data), 'debug' }
+    on_data { |data| logger.print data }
   end
 
-  logger.print process_end, 'debug'
 end
 
 # 4 - Update pkgin db
-logger.print(process_start('Updating pkgin database...'), 'debug')
+logger.print(process_start('Updating pkg database'))
+
+execute "remove existing database" do
+  command "rm -f #{DATA_DIR}/var/db/pkgin/pkgin.db"
+  user 'gonano'
+end
 
 execute "update pkgin packages" do
   command <<-EOF
-    rm -f #{DATA_DIR}/var/db/pkgin/pkgin.db && \
+    siphon --prefix '   ' -- \
     #{DATA_DIR}/bin/pkgin -y up
   EOF
   user 'gonano'
   stream true
-  on_data { |data| logger.print subtask_info(data), 'debug' }
+  on_data { |data| logger.print data }
 end
-
-logger.print process_end, 'debug'

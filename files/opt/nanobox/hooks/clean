@@ -22,7 +22,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
   logger.print(bullet("Cleanup script detected, running now..."), 'debug')
 
   execute "cleanup build" do
-    command %Q(#{ENGINE_DIR}/bin/cleanup '#{engine_payload}')
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/cleanup '#{engine_payload}')
     cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     environment engine_env
@@ -33,13 +33,14 @@ if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
 end
 
 # 2 - Remove orphan pkgsrc dependencies
-logger.print(bullet("Removing pkgsrc orphans..."), 'debug')
+logger.print(process_start("Removing orphaned packages"))
 
 execute "autoremove pkgin orphans" do
   command <<-EOF
-    echo "Y\n" | pkgin ar
+    siphon --prefix '   ' -- \
+      bash -c "echo \"Y\\n\" | pkgin ar"
   EOF
   path GONANO_PATH
   stream true
-  on_data {|data| logger.print(data, 'debug')}
+  on_data {|data| logger.print data }
 end

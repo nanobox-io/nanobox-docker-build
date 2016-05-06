@@ -4,6 +4,9 @@
 # 1 - Verify build and app exist
 # 2 - upload to warehouse
 
+# how to show progress during an rsync transfer:
+# http://www.cyberciti.biz/faq/show-progress-during-file-transfer/
+
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
 require 'bundler/setup'
@@ -19,30 +22,93 @@ include Nanobox::Boxfile
 # 1 - verify
 
 # 2 - upload to warehouse
-execute "publish deploy" do
-  command <<-EOF
-    tar -czf - * \
-      | curl \
-        -k \
-        -H "x-auth-token: #{payload[:warehouse_token]}" \
-        https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]}.tgz \
-        --data-binary @-
-  EOF
-  cwd DEPLOY_DIR
-  stream true
-  on_data {|data| logger.print(data, 'debug')}
-end
+#
+# 2a - first we have to tar the contents into a tarball
+# 2b - then we upload the tarball
+#
+# While we could pipe the output of tar directly into curl, curl
+# can't provide a progress bar since the data is streaming and the size
+# is unknown. So we'll be slightly less optimal here in trade of visibility
 
-execute "publish app" do
-  command <<-EOF
-    tar -czf - * \
-      | curl \
-        -k \
-        -H "x-auth-token: #{payload[:warehouse_token]}" \
-        https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]}.tgz \
-        --data-binary @-
-  EOF
-  cwd APP_DIR
-  stream true
-  on_data {|data| logger.print(data, 'debug')}
+# Notes for visibility
+#
+# siphon --prefix '+> ' -- bash -c "\
+#   tar -cf - * \
+#     | pv \
+#       -s $(du -sb /data | awk '{print $1}') \
+#         | gzip > /var/tmp/deploy.tgz"
+#
+# siphon --prefix '+> ' -- rsync -a --info=progress2 /data /var/tmp/data
+#
+# curl \
+#   -k \
+#   --progress-bar \
+#   -H "x-auth-token: nWA1qIkB3yHwrGoY0vSieLNPabtTpM75VmZ4gluUDQCXFKxEJz" \
+#   https://198.199.108.59:7410/blobs/app-456.tgz \
+#   --data-binary @test/tarballs/app-123.tgz > /dev/null
+
+if payload[:previous_build]
+
+else
+  logger.print(process_start('Generating compressed tarball of deploy environment'))
+  execute "create deploy tarball" do
+    command <<-EOF
+      siphon --prefix '   ' -- bash -c "\
+        tar -cf - * \
+          | pv \
+            -s $(du -sb #{DEPLOY_DIR} | awk '{print $1}') \
+              | gzip \
+                > /var/tmp/deploy-#{payload[:build]}.tgz"
+    EOF
+    cwd DEPLOY_DIR
+    stream true
+    on_data { |data| logger.print(data) }
+  end
+
+  logger.print(process_start('Generating compressed tarball of compiled app'))
+  execute "create app tarball" do
+    command <<-EOF
+      siphon --prefix '   ' -- bash -c "\
+        tar -cf - * \
+          | pv \
+            -s $(du -sb #{DEPLOY_DIR} | awk '{print $1}') \
+              | gzip \
+                > /var/tmp/app-#{payload[:build]}.tgz"
+    EOF
+    cwd DEPLOY_DIR
+    stream true
+    on_data { |data| logger.print(data) }
+  end
+
+  logger.print(process_start('Uploading deploy tarball to app warehouse'))
+  execute "publish deploy" do
+    command <<-EOF
+      siphon --prefix '   ' -- bash -c "\
+        tar -czf - * \
+          | curl \
+            -k \
+            -H 'x-auth-token: #{payload[:warehouse_token]}' \
+            https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]}.tgz \
+            --data-binary @/var/tmp/deploy-#{payload[:build]}.tgz > /dev/null"
+    EOF
+    cwd DEPLOY_DIR
+    stream true
+    on_data {|data| logger.print(data)}
+  end
+
+  logger.print(process_start('Uploading app tarball to app warehouse'))
+  execute "publish app" do
+    command <<-EOF
+      siphon --prefix '   ' -- bash -c "\
+        tar -czf - * \
+          | curl \
+            -k \
+            -H 'x-auth-token: #{payload[:warehouse_token]}' \
+            https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]}.tgz \
+            --data-binary @/var/tmp/app-#{payload[:build]}.tgz > /dev/null"
+    EOF
+    cwd DEPLOY_DIR
+    stream true
+    on_data {|data| logger.print(data)}
+  end  
 end

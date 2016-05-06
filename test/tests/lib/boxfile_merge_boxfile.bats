@@ -51,7 +51,7 @@ END
   [ "${lines[1]}" = "code.build:" ]
   [ "${lines[2]}" = "  engine: engine" ]
   [ "${lines[3]}" = "  before_build:" ]
-  [ "${lines[4]}" = "  - echo hello" ]
+  [ "${lines[4]}" = "    - echo hello" ]
 
 }
 

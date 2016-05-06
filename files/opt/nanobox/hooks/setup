@@ -5,8 +5,6 @@
 # 1 - Run before_setup
 # 2 - Run engine setup script
 # 3 - Run after_setup
-#
-# NEED to find a different name for this
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -19,13 +17,22 @@ require 'hookit/setup'
 include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
+include Nanobox::Hook
+
+logger.print(bullet("Running setup hook..."), 'debug')
 
 # 1 - Run before_setup
-build[:before_setup].each do |cmd|
-  logger.print(bullet("Before setup running: #{cmd}"), 'debug')
+(build[:before_setup] || []).each_with_index do |cmd, i|
+
+  logger.print(process_start("before setup hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
 
   execute "Before setup: #{cmd}" do
-    command cmd
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '   ' -- \
+          bash -c "#{escape cmd}"
+    EOF
     cwd CODE_DIR
     path GONANO_PATH
     user 'gonano'
@@ -35,11 +42,7 @@ build[:before_setup].each do |cmd|
 end
 
 # 2 - Run engine setup script
-logger.print(bullet("Running setup hook..."), 'debug')
-
 if ::File.exist? "#{ENGINE_DIR}/bin/setup"
-
-  logger.print(bullet("Setup script detected, running now..."), 'debug')
 
   execute "setup environment" do
     command %Q(#{ENGINE_DIR}/bin/setup '#{engine_payload}')
@@ -53,11 +56,17 @@ if ::File.exist? "#{ENGINE_DIR}/bin/setup"
 end
 
 # 3 - Run after_setup
-build[:after_setup].each do |cmd|
-  logger.print(bullet("After setup running: #{cmd}"), 'debug')
+(build[:after_setup] || []).each_with_index do |cmd, i|
+
+  logger.print(process_start("after setup hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
 
   execute "After setup: #{cmd}" do
-    command cmd
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '   ' -- \
+          bash -c "#{escape cmd}"
+    EOF
     cwd CODE_DIR
     path GONANO_PATH
     user 'gonano'

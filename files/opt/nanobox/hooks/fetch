@@ -21,15 +21,19 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - rsync the code from /share/code
+logger.print(process_start('Copying codebase from local project'))
 execute "rsync code" do
   command <<-EOF
-    rsync \
-      -v \
-      -a \
-      #{LOCAL_CODE_SRC_DIR}/ \
-      #{CODE_DIR}
+    siphon --prefix '   sync: ' -- \
+      rsync \
+        --info=progress2 \
+        -a \
+        #{LOCAL_CODE_SRC_DIR}/ \
+        #{CODE_DIR}
   EOF
   user 'gonano'
+  stream true
+  on_data { |data| logger.print data }
 end
 
 # 2 - ensure boxfile.yml exists
@@ -66,30 +70,26 @@ when 'git'
   repo = engine_git_url(build[:engine])
 
   execute "cloning #{repo}" do
-    command "git clone #{repo} engine"
+    command "siphon --prefix '   ' -- git clone #{repo} engine"
     cwd NANOBOX_DIR
     user 'gonano'
     stream true
-    on_data { |data| logger.print subtask_info(data) }
-    # on_exit { |code| }
+    on_data { |data| logger.print data }
   end
-
-  logger.print(process_end)
 
   commit = engine_git_commitish(build[:engine])
 
   if commit
-    logger.print(process_start("Checkout #{commit}"))
+    logger.print(process_start("Checking out: #{commit}"))
 
     execute "Checkout commitish point" do
-      command "git checkout #{commit}"
+      command "siphon --prefix '   ' -- git checkout #{commit}"
       cwd ENGINE_DIR
       user 'gonano'
       stream true
-      on_data { |data| logger.print subtask_info(data) }
+      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
   end
 
 when 'github'
@@ -100,30 +100,26 @@ when 'github'
   url = "https://github.com/#{repo}.git"
 
   execute "cloning #{repo}" do
-    command "git clone #{url} engine"
+    command "siphon --prefix '   ' -- git clone #{url} engine"
     cwd NANOBOX_DIR
     user 'gonano'
     stream true
     on_data { |data| logger.print subtask_info(data) }
-    # on_exit { |code| }
   end
-
-  logger.print(process_end)
 
   commit = engine_git_commitish(build[:engine])
 
   if commit
-    logger.print(process_start("Checkout #{commit}"))
+    logger.print(process_start("Checking out: #{commit}"))
 
     execute "Checkout commitish point" do
-      command "git checkout #{commit}"
+      command "siphon --prefix '   ' -- git checkout #{commit}"
       cwd ENGINE_DIR
       user 'gonano'
       stream true
-      on_data { |data| logger.print subtask_info(data) }
+      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
   end
 
 when 'nanobox'
@@ -133,30 +129,26 @@ when 'nanobox'
   repo = engine_nanobox_url(build[:engine])
 
   execute "cloning #{repo}" do
-    command "git clone #{repo} engine"
+    command "siphon --prefix '   ' -- git clone #{repo} engine"
     cwd NANOBOX_DIR
     user 'gonano'
     stream true
-    on_data { |data| logger.print subtask_info(data) }
-    # on_exit { |code| }
+    on_data { |data| logger.print data }
   end
-
-  logger.print(process_end)
 
   commit = engine_git_commitish(build[:engine])
 
   if commit
-    logger.print(process_start("Checkout #{commit}"))
+    logger.print(process_start("Checking out: #{commit}"))
 
     execute "Checkout commitish point" do
-      command "git checkout #{commit}"
+      command "siphon --prefix '   ' -- git checkout #{commit}"
       cwd ENGINE_DIR
       user 'gonano'
       stream true
-      on_data { |data| logger.print subtask_info(data) }
+      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
   end
 
 when 'tarball'

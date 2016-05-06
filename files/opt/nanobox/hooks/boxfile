@@ -18,6 +18,7 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 require 'yaml'
+require 'ya2yaml'
 
 # This hook will get called during the build process, and also directly
 # before publishing a build. In the event that we're publishing a build,
@@ -29,7 +30,7 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
 
   if ::File.exist? "#{ENGINE_DIR}/bin/boxfile"
     execute "generating boxfile" do
-      command %Q(#{ENGINE_DIR}/bin/boxfile 'payload')
+      command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/boxfile 'payload')
       cwd "#{ENGINE_DIR}/bin"
       path GONANO_PATH
       environment engine_env
@@ -57,7 +58,10 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
 
   # The final boxfile is the merged, converged, and cleaned final boxfile
   final_boxfile = begin
-    converged_boxfile.prune_empty.deep_stringify_keys.to_yaml
+    converged_boxfile
+      .prune_empty
+      .deep_stringify_keys
+      .ya2yaml(:syck_compatible => true)
   end
 
   file "#{CACHE_DIR}/boxfile.yml" do

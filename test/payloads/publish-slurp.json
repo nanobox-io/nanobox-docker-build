@@ -1,6 +1,6 @@
 {
-  "previous": "",
-  "build": "123abc",
+  "previous": "123abc",
+  "build": "456def",
   "warehouse": "192.168.0.100",
   "warehouse_token": "123"
 }

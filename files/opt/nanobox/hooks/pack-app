@@ -24,7 +24,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/release"
   logger.print(bullet("Release script detected, running now..."), 'debug')
 
   execute "release app" do
-    command %Q(#{ENGINE_DIR}/bin/release '#{engine_payload}')
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/release '#{engine_payload}')
     cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     user 'gonano'

@@ -22,20 +22,21 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - rsync/copy into /mnt/*
-logger.print(process_start('Copy build env into place'), 'debug')
+logger.print(process_start('Stashing build environment'))
 
 execute "rsync build" do
   command <<-EOF
-    rsync \
-      -v \
-      -a \
-      --delete \
-      #{DATA_DIR}/ \
-      #{BUILD_DIR}
+    siphon --prefix '   sync: ' -- \
+      rsync \
+        -a \
+        --info=progress2 \
+        --delete \
+        #{DATA_DIR}/ \
+        #{BUILD_DIR}
   EOF
   user 'gonano'
   stream true
-  on_data { |data| logger.print subtask_info(data), 'debug' }
+  on_data { |data| logger.print data }
 end
 
 # 2 - rsync pkgsrc cache into cache
@@ -46,17 +47,20 @@ if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
     recursive true
   end
 
+  logger.print(process_start('Stashing pkg cache'))
+
   execute "Insert pkgin packages from cache for quick access" do
     command <<-EOF
-      rsync \
-        -v \
-        -a \
-        --delete \
-        #{DATA_DIR}/var/db/pkgin/cache/ \
-        #{CACHE_DIR}/pkgin
+      siphon --prefix '   sync: ' -- \
+        rsync \
+          -a \
+          --info=progress2 \
+          --delete \
+          #{DATA_DIR}/var/db/pkgin/cache/ \
+          #{CACHE_DIR}/pkgin
     EOF
     user 'gonano'
     stream true
-    on_data { |data| logger.print subtask_info(data), 'debug' }
+    on_data { |data| logger.print data }
   end
 end

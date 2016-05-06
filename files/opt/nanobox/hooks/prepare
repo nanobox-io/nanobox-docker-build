@@ -18,44 +18,50 @@ require 'hookit/setup'
 include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
+include Nanobox::Hook
+
+logger.print(bullet("Running prepare hook..."), 'debug')
 
 # 1 - setup/copy lib_dirs
 # move the lib_dirs into place if this is a subsequent deploy
 build[:lib_dirs].each do |dir|
-  if not ::File.exist? "#{CODE_DIR}/#{dir}" and ::File.exist? "#{LIB_CACHE_DIR}/#{dir}"
+  if ::File.exist? "#{LIB_CACHE_DIR}/#{dir}"
 
     # ensure the directory exists
-    logger.print(bullet("Extracting #{dir} from cache..."), 'debug')
-
     directory "#{CODE_DIR}/#{dir}" do
       recursive true
     end
 
-    logger.print(process_start("Extract #{dir}"), 'debug')
+    logger.print(process_start("Fetch '#{dir}' from cache"))
 
     execute "extract #{dir} from cache for quick access" do
       command <<-EOF
-        rsync \
-          -v \
-          -a \
-          #{LIB_CACHE_DIR}/#{dir}/ \
-          #{CODE_DIR}/#{dir}
+        siphon --prefix '   sync: ' -- \
+          rsync \
+            -a \
+            --info=progress2 \
+            #{LIB_CACHE_DIR}/#{dir}/ \
+            #{CODE_DIR}/#{dir}
       EOF
       stream true
       user 'gonano'
-      on_data { |data| logger.print subtask_info(data), 'debug' }
+      on_data { |data| logger.print data }
     end
-
-    logger.print(process_end, 'debug')
   end
 end
 
 # 2 - Run before_prepare
-build[:before_prepare].each do |cmd|
-  logger.print(bullet("Before prepare running: #{cmd}"), 'debug')
+build[:before_prepare].each_with_index do |cmd, i|
+
+  logger.print(process_start("before prepare hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
 
   execute "Before prepare: #{cmd}" do
-    command cmd
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '   ' -- \
+          bash -c "#{escape cmd}"
+    EOF
     cwd CODE_DIR
     path GONANO_PATH
     user 'gonano'
@@ -72,7 +78,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/prepare"
   logger.print(bullet("Prepare script detected, running now..."), 'debug')
 
   execute "prepare environment" do
-    command %Q(#{ENGINE_DIR}/bin/prepare '#{engine_payload}')
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/prepare '#{engine_payload}')
     cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     environment engine_env
@@ -83,11 +89,17 @@ if ::File.exist? "#{ENGINE_DIR}/bin/prepare"
 end
 
 # 4 - Run after_prepare
-build[:after_prepare].each do |cmd|
-  logger.print(bullet("After prepare running: #{cmd}"), 'debug')
+build[:after_prepare].each_with_index do |cmd, i|
+
+  logger.print(process_start("after prepare hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
 
   execute "After prepare: #{cmd}" do
-    command cmd
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '   ' -- \
+          bash -c "#{escape cmd}"
+    EOF
     cwd CODE_DIR
     path GONANO_PATH
     user 'gonano'

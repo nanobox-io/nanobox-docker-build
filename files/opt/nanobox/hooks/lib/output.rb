@@ -86,8 +86,8 @@ module Nanobox
       # print the right column
       res << ">"
 
-      # end with a newline and the first column
-      res << "\n   "
+      # end with a newline
+      res << "\n"
 
       res
     end
@@ -99,17 +99,17 @@ module Nanobox
       "\n"
     end
 
-    # subtask_start
+    # process_start
     #
     # Print a header indicating the start of a sub task
     #
     # Example:
     #
-    # subtask_start "after build hook 1"
+    # process_start "after build hook 1"
     #
     # would produce:
     # AFTER BUILD HOOK 1 -------------------->
-    def subtask_start(label)
+    def process_start(label)
       label = label.upcase
       max_len = 40
       left = label.length + 1
@@ -133,8 +133,8 @@ module Nanobox
       # print the right column
       res << ">"
 
-      # end with a newline and the column for the first output
-      res << "\n   "
+      # end with a newline
+      res << "\n"
 
       res
     end
