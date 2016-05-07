@@ -49,66 +49,89 @@ include Nanobox::Boxfile
 
 if payload[:previous_build]
 
+  { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
+
+    previous = "#{part}-#{payload[:previous_build]}.tgz"
+    current  = "#{part}-#{payload[:build]}.tgz"
+
+    # register a stage with slurp
+    logger.print(process_start("extract previous #{part} on warehouse"))
+    execute "create stage for #{part}" do
+      command <<-EOF
+        siphon --prefix '   ' -- bash -c "\
+          curl \
+            -k \
+            https://#{payload[:warehouse]}:1566/stages \
+            -d '{\"old-id\": \"#{previous}\", \"new-id\": \"#{current}\"}'"
+      EOF
+      stream true
+      on_data { |data| logger.print data}
+    end
+
+    # sync
+    logger.print(process_start("sync changes to #{part}"))
+    execute "sync #{part}" do
+      command <<-EOF
+        siphon --prefix '   sync: ' -- bash -c "\
+          rsync \
+            -aR \
+            --delete \
+            --info=progress2 \
+            . \
+            -e 'ssh -p 1567' \
+            #{current}@#{payload[:warehouse]}:#{current}"
+      EOF
+      cwd dir
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    # commit to warehouse
+    logger.print(process_start("commit #{part} to warehouse"))
+    execute "commit #{part} stage" do
+      command <<-EOF
+        siphon --prefix '   ' -- bash -c "\
+          curl \
+            -k \
+            https://#{payload[:warehouse]}:1566/#{current} \
+            -X PUT"
+      EOF
+      stream true
+      on_data { |data| logger.print data }
+    end
+  end
+
 else
-  logger.print(process_start('Generating compressed tarball of deploy environment'))
-  execute "create deploy tarball" do
-    command <<-EOF
-      siphon --prefix '   ' -- bash -c "\
-        tar -cf - * \
-          | pv \
-            -s $(du -sb #{DEPLOY_DIR} | awk '{print $1}') \
-              | gzip \
-                > /var/tmp/deploy-#{payload[:build]}.tgz"
-    EOF
-    cwd DEPLOY_DIR
-    stream true
-    on_data { |data| logger.print(data) }
-  end
 
-  logger.print(process_start('Generating compressed tarball of compiled app'))
-  execute "create app tarball" do
-    command <<-EOF
-      siphon --prefix '   ' -- bash -c "\
-        tar -cf - * \
-          | pv \
-            -s $(du -sb #{DEPLOY_DIR} | awk '{print $1}') \
-              | gzip \
-                > /var/tmp/app-#{payload[:build]}.tgz"
-    EOF
-    cwd DEPLOY_DIR
-    stream true
-    on_data { |data| logger.print(data) }
-  end
+  { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
 
-  logger.print(process_start('Uploading deploy tarball to app warehouse'))
-  execute "publish deploy" do
-    command <<-EOF
-      siphon --prefix '   ' -- bash -c "\
-        tar -czf - * \
-          | curl \
+    logger.print(process_start("Generating compressed tarball of #{part}"))
+    execute "create #{part} tarball" do
+      command <<-EOF
+        siphon --prefix '   ' -- bash -c "\
+          tar -cf - * \
+            | pv \
+              -s $(du -sb #{dir} | awk '{print $1}') \
+                | gzip \
+                  > /var/tmp/#{part}-#{payload[:build]}.tgz"
+      EOF
+      cwd dir
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_start("Uploading #{part} tarball to warehouse"))
+    execute "publish deploy" do
+      command <<-EOF
+        siphon --prefix '   ' -- bash -c "\
+          curl \
             -k \
             -H 'x-auth-token: #{payload[:warehouse_token]}' \
-            https://#{payload[:warehouse]}:7410/blobs/deploy-#{payload[:build]}.tgz \
-            --data-binary @/var/tmp/deploy-#{payload[:build]}.tgz > /dev/null"
-    EOF
-    cwd DEPLOY_DIR
-    stream true
-    on_data {|data| logger.print(data)}
+            https://#{payload[:warehouse]}:7410/blobs/#{part}-#{payload[:build]}.tgz \
+            --data-binary @/var/tmp/#{part}-#{payload[:build]}.tgz > /dev/null"
+      EOF
+      stream true
+      on_data { |data| logger.print data }
+    end
   end
-
-  logger.print(process_start('Uploading app tarball to app warehouse'))
-  execute "publish app" do
-    command <<-EOF
-      siphon --prefix '   ' -- bash -c "\
-        tar -czf - * \
-          | curl \
-            -k \
-            -H 'x-auth-token: #{payload[:warehouse_token]}' \
-            https://#{payload[:warehouse]}:7410/blobs/app-#{payload[:build]}.tgz \
-            --data-binary @/var/tmp/app-#{payload[:build]}.tgz > /dev/null"
-    EOF
-    cwd DEPLOY_DIR
-    stream true
-    on_data {|data| logger.print(data)}
-  end  
 end

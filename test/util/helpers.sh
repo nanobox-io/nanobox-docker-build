@@ -72,3 +72,21 @@ path() {
 
   echo $path
 }
+
+run_hook() {
+  /opt/nanobox/hooks/${1} "$(cat payloads/${1}.json)"
+}
+
+run_build() {
+  /opt/nanobox/hooks/user "$(cat payloads/user.json)"
+  /opt/nanobox/hooks/configure "$(cat payloads/configure.json)"
+  /opt/nanobox/hooks/fetch "$(cat payloads/fetch.json)"
+  /opt/nanobox/hooks/setup "$(cat payloads/setup.json)"
+  /opt/nanobox/hooks/boxfile "$(cat payloads/boxfile.json)"
+  /opt/nanobox/hooks/prepare "$(cat payloads/prepare.json)"
+  /opt/nanobox/hooks/compile "$(cat payloads/compile.json)"
+  /opt/nanobox/hooks/pack-app "$(cat payloads/pack-app.json)"
+  /opt/nanobox/hooks/pack-build "$(cat payloads/pack-build.json)"
+  /opt/nanobox/hooks/clean "$(cat payloads/clean.json)"
+  /opt/nanobox/hooks/pack-deploy "$(cat payloads/pack-deploy.json)"
+}

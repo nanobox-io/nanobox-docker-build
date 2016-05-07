@@ -28,10 +28,6 @@ docker run \
   --volume=${apps_dir}/simple-nodejs:/share/code \
   nanobox/build
 
-# run_hook() {
-#   /opt/nanobox/hooks/${1} "$(cat payloads/${1}.json)"
-# }
-
 # hop into the sandbox
 echo "Consoling into the sandbox..."
 docker exec -it test-console bash
