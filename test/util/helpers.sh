@@ -73,10 +73,6 @@ path() {
   echo $path
 }
 
-run_hook() {
-  /opt/nanobox/hooks/${1} "$(cat payloads/${1}.json)"
-}
-
 run_build() {
   /opt/nanobox/hooks/user "$(cat payloads/user.json)"
   /opt/nanobox/hooks/configure "$(cat payloads/configure.json)"
