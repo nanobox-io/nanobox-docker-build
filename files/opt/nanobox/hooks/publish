@@ -23,30 +23,9 @@ include Nanobox::Boxfile
 
 # 2 - upload to warehouse
 #
-# 2a - first we have to tar the contents into a tarball
-# 2b - then we upload the tarball
+# 2a - if previous build is set, we use slurp
+# 2b - if previous build is not set, we upload to warehouse directly
 #
-# While we could pipe the output of tar directly into curl, curl
-# can't provide a progress bar since the data is streaming and the size
-# is unknown. So we'll be slightly less optimal here in trade of visibility
-
-# Notes for visibility
-#
-# siphon --prefix '+> ' -- bash -c "\
-#   tar -cf - * \
-#     | pv \
-#       -s $(du -sb /data | awk '{print $1}') \
-#         | gzip > /var/tmp/deploy.tgz"
-#
-# siphon --prefix '+> ' -- rsync -a --info=progress2 /data /var/tmp/data
-#
-# curl \
-#   -k \
-#   --progress-bar \
-#   -H "x-auth-token: nWA1qIkB3yHwrGoY0vSieLNPabtTpM75VmZ4gluUDQCXFKxEJz" \
-#   https://198.199.108.59:7410/blobs/app-456.tgz \
-#   --data-binary @test/tarballs/app-123.tgz > /dev/null
-
 if payload[:previous_build]
 
   { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
@@ -61,11 +40,13 @@ if payload[:previous_build]
         siphon --prefix '   ' -- bash -c "\
           curl \
             -k \
+            --progress \
+            -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
             https://#{payload[:warehouse]}:1566/stages \
-            -d '{\"old-id\": \"#{previous}\", \"new-id\": \"#{current}\"}'"
+            -d '{\\\"old-id\\\": \\\"#{previous}\\\", \\\"new-id\\\": \\\"#{current}\\\"}' > /dev/null"
       EOF
       stream true
-      on_data { |data| logger.print data}
+      on_data { |data| logger.print data }
     end
 
     # sync
@@ -74,13 +55,14 @@ if payload[:previous_build]
       command <<-EOF
         siphon --prefix '   sync: ' -- bash -c "\
           rsync \
-            -aR \
+            -a \
             --delete \
             --info=progress2 \
             . \
             -e 'ssh -p 1567' \
             #{current}@#{payload[:warehouse]}:#{current}"
       EOF
+      user 'gonano'
       cwd dir
       stream true
       on_data { |data| logger.print data }
@@ -93,8 +75,10 @@ if payload[:previous_build]
         siphon --prefix '   ' -- bash -c "\
           curl \
             -k \
-            https://#{payload[:warehouse]}:1566/#{current} \
-            -X PUT"
+            --progress \
+            -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
+            https://#{payload[:warehouse]}:1566/stages/#{current} \
+            -X PUT > /dev/null"
       EOF
       stream true
       on_data { |data| logger.print data }
@@ -102,6 +86,10 @@ if payload[:previous_build]
   end
 
 else
+
+  # While we could pipe the output of tar directly into curl, curl
+  # can't provide a progress bar since the data is streaming and the size
+  # is unknown. So we'll be slightly less optimal here in trade of visibility
 
   { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
 

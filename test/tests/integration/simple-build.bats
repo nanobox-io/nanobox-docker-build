@@ -160,6 +160,12 @@
   [ "$status" -eq 0 ]
 }
 
+@test "Run publish hook with previous build" {
+  run run_hook "publish" "$(payload publish-slurp)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
 @test "Stop Container" {
   stop_container
   stop_warehouse
