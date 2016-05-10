@@ -30,7 +30,7 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
 
   if ::File.exist? "#{ENGINE_DIR}/bin/boxfile"
     execute "generating boxfile" do
-      command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/boxfile 'payload')
+      command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/boxfile '#{engine_payload}')
       cwd "#{ENGINE_DIR}/bin"
       path GONANO_PATH
       environment engine_env
