@@ -44,6 +44,7 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
+        cwd:             {type: :folder, default: nil}
         # TODO: something should be in here
       }
     }
