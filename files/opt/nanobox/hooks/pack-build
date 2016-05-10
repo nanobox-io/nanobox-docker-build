@@ -7,7 +7,8 @@
 # mounted into the dev container.
 #
 # 1 - rsync /data to /mnt/build
-# 2 - rsync pkgsrc cache into cache
+# 2 - rsync lib_dirs into cache
+# 3 - rsync pkgsrc cache into cache
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -39,7 +40,38 @@ execute "rsync build" do
   on_data { |data| logger.print data }
 end
 
-# 2 - rsync pkgsrc cache into cache
+# 2 - rsync lib_dirs into cache
+build[:lib_dirs].each do |dir|
+
+  # ensure the lib_dir exists in cache
+  directory "#{LIB_CACHE_DIR}/#{dir}"
+    recursive true
+    owner 'gonano'
+    group 'gonano'
+  end
+
+  if ::File.exist? "#{CODE_DIR}/#{dir}"
+
+    logger.print(process_start("Stashing lib_dir '#{dir}'"))
+
+    execute "rsync #{dir}" do
+      command <<-EOF
+        siphon --prefix '   sync: ' -- \
+          rsync \
+            -a \
+            --delete \
+            --info=progress2 \
+            #{CODE_DIR}/#{dir}/ \
+            #{LIB_CACHE_DIR}/#{dir}
+      EOF
+      stream true
+      user 'gonano'
+      on_data { |data| logger.print data }
+    end
+  end
+end
+
+# 3 - rsync pkgsrc cache into cache
 if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
   directory "#{CACHE_DIR}/pkgin" do
     owner 'gonano'

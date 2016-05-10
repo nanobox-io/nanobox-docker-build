@@ -166,9 +166,20 @@ when 'filepath'
 
   directory ENGINE_DIR
 
-  execute "copy engine" do
-    command "cp -r #{LOCAL_ENGINE_SRC_DIR}/* #{ENGINE_DIR}"
+  logger.print(process_start("Copying engine"))
+
+  execute "rsync engine" do
+    command <<-EOF
+      siphon --prefix '   sync: ' -- \
+        rsync \
+          -a \
+          --info=progress2 \
+          #{LOCAL_ENGINE_SRC_DIR}/ \
+          #{ENGINE_DIR}
+    EOF
     user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
   end
 
 else
