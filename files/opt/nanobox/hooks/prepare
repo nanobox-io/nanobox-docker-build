@@ -30,6 +30,8 @@ build[:lib_dirs].each do |dir|
     # ensure the directory exists
     directory "#{CODE_DIR}/#{dir}" do
       recursive true
+      user 'gonano'
+      group 'gonano'
     end
 
     logger.print(process_start("Fetch '#{dir}' from cache"))
