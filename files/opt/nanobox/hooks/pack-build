@@ -44,7 +44,7 @@ end
 build[:lib_dirs].each do |dir|
 
   # ensure the lib_dir exists in cache
-  directory "#{LIB_CACHE_DIR}/#{dir}"
+  directory "#{LIB_CACHE_DIR}/#{dir}" do
     recursive true
     owner 'gonano'
     group 'gonano'
