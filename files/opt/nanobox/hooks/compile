@@ -24,13 +24,13 @@ logger.print(bullet("Running compile hook..."), 'debug')
 # 1 - Run before_compile
 build[:before_compile].each_with_index do |cmd, i|
 
-  logger.print(process_start("before compile hook #{i + 1}"))
+  logger.print(process_start("Before compile hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
   execute "Before compile: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
-        siphon --prefix '   ' -- \
+        siphon --prefix '  ' -- \
           bash -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
@@ -39,6 +39,8 @@ build[:before_compile].each_with_index do |cmd, i|
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end
 
 # 2 - Run engine compile script
@@ -60,13 +62,13 @@ end
 # 3 - Run after_compile
 build[:after_compile].each_with_index do |cmd, i|
 
-  logger.print(process_start("after compile hook #{i + 1}"))
+  logger.print(process_start("After compile hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
   execute "After compile: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
-        siphon --prefix '   ' -- \
+        siphon --prefix '  ' -- \
           bash -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
@@ -75,4 +77,6 @@ build[:after_compile].each_with_index do |cmd, i|
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end

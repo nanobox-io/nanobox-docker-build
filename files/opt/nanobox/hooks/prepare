@@ -49,19 +49,21 @@ build[:lib_dirs].each do |dir|
       user 'gonano'
       on_data { |data| logger.print data }
     end
+
+    logger.print(process_end)
   end
 end
 
 # 2 - Run before_prepare
 build[:before_prepare].each_with_index do |cmd, i|
 
-  logger.print(process_start("before prepare hook #{i + 1}"))
+  logger.print(process_start("Before prepare hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
   execute "Before prepare: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
-        siphon --prefix '   ' -- \
+        siphon --prefix '  ' -- \
           bash -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
@@ -70,6 +72,8 @@ build[:before_prepare].each_with_index do |cmd, i|
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end
 
 # 3 - Run engine prepare script
@@ -88,18 +92,20 @@ if ::File.exist? "#{ENGINE_DIR}/bin/prepare"
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end
 
 # 4 - Run after_prepare
 build[:after_prepare].each_with_index do |cmd, i|
 
-  logger.print(process_start("after prepare hook #{i + 1}"))
+  logger.print(process_start("After prepare hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
   execute "After prepare: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
-        siphon --prefix '   ' -- \
+        siphon --prefix '  ' -- \
           bash -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
@@ -108,4 +114,6 @@ build[:after_prepare].each_with_index do |cmd, i|
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end

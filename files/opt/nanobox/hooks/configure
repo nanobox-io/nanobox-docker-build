@@ -21,7 +21,7 @@ include Nanobox::Output
 logger.print(bullet('Running configure hook...'), 'debug')
 
 # 1 - Ensure required directories exist and have permissions
-logger.print(bullet('Setting up directories and permissions'))
+logger.print(bullet('Setting up directories and permissions...'))
 
 [
   "#{DATA_DIR}",
@@ -47,7 +47,7 @@ logger.print(bullet('Setting up directories and permissions'))
 end
 
 # 2 - Clear the BUILD_DIR, APP_DIR, and boxfile
-logger.print(bullet('Cleaning up any previous builds'))
+logger.print(bullet('Cleaning up any previous builds...'))
 
 [
   "#{BUILD_DIR}/*",
@@ -86,6 +86,8 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
     on_data { |data| logger.print data }
   end
 
+  logger.print(process_end)
+
 end
 
 # 4 - Update pkgin db
@@ -98,10 +100,12 @@ end
 
 execute "update pkgin packages" do
   command <<-EOF
-    siphon --prefix '   ' -- \
+    siphon --prefix '  ' -- \
     #{DATA_DIR}/bin/pkgin -y up
   EOF
   user 'gonano'
   stream true
   on_data { |data| logger.print data }
 end
+
+logger.print(process_end)

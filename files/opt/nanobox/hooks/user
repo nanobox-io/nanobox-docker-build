@@ -19,7 +19,7 @@ include Nanobox::Output
 
 logger.print(bullet('Running user hook...'), 'debug')
 
-logger.print(bullet('Copying user\'s ssh keys into the build environment'))
+logger.print(bullet('Copying ssh keys into the build environment...'))
 
 # ensure the gonano .ssh directory exists
 directory "/home/gonano/.ssh" do

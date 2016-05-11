@@ -42,6 +42,8 @@ execute "rsync deploy" do
   on_data { |data| logger.print data }
 end
 
+logger.print(process_end)
+
 # strip pkgin bootstrap out of the deploy env
 execute "strip pkgin" do
   command "rm -rf #{DEPLOY_DIR}/var/db/pkgin"

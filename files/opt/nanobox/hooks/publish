@@ -34,10 +34,10 @@ if payload[:previous_build]
     current  = "#{part}-#{payload[:build]}.tgz"
 
     # register a stage with slurp
-    logger.print(process_start("extract previous #{part} on warehouse"))
+    logger.print(process_start("Extract previous #{part} on warehouse"))
     execute "create stage for #{part}" do
       command <<-EOF
-        siphon --prefix '   ' -- bash -c "\
+        siphon --prefix '  ' -- bash -c "\
           curl \
             -k \
             --progress \
@@ -49,8 +49,10 @@ if payload[:previous_build]
       on_data { |data| logger.print data }
     end
 
+    logger.print(process_end)
+
     # sync
-    logger.print(process_start("sync changes to #{part}"))
+    logger.print(process_start("Sync changes to #{part}"))
     execute "sync #{part}" do
       command <<-EOF
         siphon --prefix '   sync: ' -- bash -c "\
@@ -68,11 +70,13 @@ if payload[:previous_build]
       on_data { |data| logger.print data }
     end
 
+    logger.print(process_end)
+
     # commit to warehouse
-    logger.print(process_start("commit #{part} to warehouse"))
+    logger.print(process_start("Commit #{part} to warehouse"))
     execute "commit #{part} stage" do
       command <<-EOF
-        siphon --prefix '   ' -- bash -c "\
+        siphon --prefix '  ' -- bash -c "\
           curl \
             -k \
             --progress \
@@ -83,6 +87,8 @@ if payload[:previous_build]
       stream true
       on_data { |data| logger.print data }
     end
+
+    logger.print(process_end)
   end
 
 else
@@ -96,7 +102,7 @@ else
     logger.print(process_start("Generating compressed tarball of #{part}"))
     execute "create #{part} tarball" do
       command <<-EOF
-        siphon --prefix '   ' -- bash -c "\
+        siphon --prefix '  ' -- bash -c "\
           tar -cf - * \
             | pv \
               -s $(du -sb #{dir} | awk '{print $1}') \
@@ -108,10 +114,12 @@ else
       on_data { |data| logger.print data }
     end
 
+    logger.print(process_end)
+
     logger.print(process_start("Uploading #{part} tarball to warehouse"))
     execute "publish deploy" do
       command <<-EOF
-        siphon --prefix '   ' -- bash -c "\
+        siphon --prefix '  ' -- bash -c "\
           curl \
             -k \
             -H 'x-auth-token: #{payload[:warehouse_token]}' \
@@ -121,5 +129,7 @@ else
       stream true
       on_data { |data| logger.print data }
     end
+
+    logger.print(process_end)
   end
 end

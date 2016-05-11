@@ -5,74 +5,23 @@ module Nanobox
       $logger ||= ::Nanobox::Stderr.new(log_level: payload[:log_level])
     end
 
-
-    # header
-    #
-    # Print a header, formatted to 70 characters, with the label
-    #
-    # Example:
-    #
-    # header "headline here"
-    #
-    # would produce:
-    # ::::::::::::::::::::::::::: HEADLINE HERE :::::::::::::::::::::::::::
-    def header(label)
-      label = label.upcase
-      max_len = 70
-      middle = label.length + 2
-      remainder = max_len - middle
-      left = remainder / 2
-
-      if remainder % 2 == 0
-        right = left
-      else
-        right = left + 1
-      end
-
-      res = ""
-
-      # start with a newline
-      # res << "\n"
-
-      # print the left column
-      left.times { res << ':' }
-
-      # print a space
-      res << " "
-
-      # print the label
-      res << label
-
-      # print the right column
-      right.times { res << ':' }
-
-      # end with a newline
-      res << "\n"
-
-      res
-    end
-
     # process_start
     #
     # Print a header indicating the start of a process.
     #
     # Example:
     #
-    # process_start "installing ruby-2.2"
+    # process_start "Updating pkg database"
     #
     # would produce:
-    # INSTALLING RUBY-2.2 ------------------------------------------------>
+    # + Updating pkg database ----------------------------------------------------- >
     def process_start(label)
-      label = label.upcase
-      max_len = 70
-      left = label.length + 1
-      right = 1
+      max_len = 80
+      left = label.length + 3
+      right = 2
       middle = max_len - (left + right)
 
-      res = ""
-
-      # start with a newline
-      res << "\n"
+      res = "+ "
 
       # print label
       res << label
@@ -84,7 +33,7 @@ module Nanobox
       middle.times { res << '-'}
 
       # print the right column
-      res << ">"
+      res << " >"
 
       # end with a newline
       res << "\n"
@@ -99,88 +48,6 @@ module Nanobox
       "\n"
     end
 
-    # process_start
-    #
-    # Print a header indicating the start of a sub task
-    #
-    # Example:
-    #
-    # process_start "after build hook 1"
-    #
-    # would produce:
-    # AFTER BUILD HOOK 1 -------------------->
-    def process_start(label)
-      label = label.upcase
-      max_len = 40
-      left = label.length + 1
-      right = 1
-      middle = max_len - (left + right)
-
-      res = ""
-
-      # start with a newline
-      res << "\n"
-
-      # print label
-      res << label
-
-      # print a space
-      res << " "
-
-      # print middle column
-      middle.times { res << '-'}
-
-      # print the right column
-      res << ">"
-
-      # end with a newline
-      res << "\n"
-
-      res
-    end
-
-    # subtask_info
-    #
-    # Print subtask info formatted properly
-    #
-    # Example:
-    #
-    # subtask_info "blablablablablabla"
-    #
-    # would produce:
-    #    blablablablablabla
-    def subtask_info(data)
-      data.gsub(/\n\n/, "\n").gsub(/\n/, "\n   ")
-    end
-
-    # subtask_success
-    #
-    # Print a footer indicating a successful sub task
-    #
-    # Example:
-    #
-    # subtask_success
-    #
-    # would produce:
-    #    [√] SUCCESS
-    def subtask_success
-      "   [√] SUCCESS\n\n"
-    end
-
-    # subtask_fail
-    #
-    # Print a footer indicating a failed sub task
-    #
-    # Example:
-    #
-    # subtask_fail
-    #
-    # would produce:
-    #    [!] FAILED
-    def subtask_fail
-      "   [!] FAILED\n\n"
-    end
-
     # bullet
     #
     # Print a line item in the form of a bullet point
@@ -190,9 +57,9 @@ module Nanobox
     # bullet "Language Detected : Ruby"
     #
     # would produce:
-    # +> Language Detected : Ruby
+    # + Language Detected : Ruby
     def bullet(message)
-      "+> #{message}\n"
+      "+ #{message}\n"
     end
 
     # bullet_info
@@ -206,7 +73,7 @@ module Nanobox
     # would produce:
     #  Language Detected : Ruby
     def bullet_info(message)
-      "   #{message}"
+      "  #{message}"
     end
 
     # bullet_sub
@@ -220,12 +87,12 @@ module Nanobox
     # would produce:
     #  - Language Detected : Ruby
     def bullet_sub(message)
-      "   - #{message}"
+      "  - #{message}"
     end
 
     # warning
     #
-    # Print a warning message, formatted to a 70 character block paragraph
+    # Print a warning message, formatted to an 80 character block paragraph
     #
     # Example:
     #
@@ -237,7 +104,7 @@ module Nanobox
     # unexpected behavior. Feel free to review the following guide for
     # more information : bit.ly/2sA9b
     def warning(message)
-      res = "\n-----------------------------  WARNING  -----------------------------\n"
+      res = "\n----------------------------------  WARNING  ----------------------------------\n"
 
       res << format_block(message)
 
@@ -278,7 +145,7 @@ module Nanobox
     # unexpected behavior. Feel free to review the following guide for
     # more information : bit.ly/2sA9b
     def format_block(message)
-      max_line_len = 70
+      max_line_len = 80
       res = ""
       word = ""
       j = 0

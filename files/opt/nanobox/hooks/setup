@@ -24,13 +24,13 @@ logger.print(bullet("Running setup hook..."), 'debug')
 # 1 - Run before_setup
 (build[:before_setup] || []).each_with_index do |cmd, i|
 
-  logger.print(process_start("before setup hook #{i + 1}"))
+  logger.print(process_start("Before setup hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
   execute "Before setup: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
-        siphon --prefix '   ' -- \
+        siphon --prefix '  ' -- \
           bash -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
@@ -39,6 +39,8 @@ logger.print(bullet("Running setup hook..."), 'debug')
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end
 
 # 2 - Run engine setup script
@@ -58,13 +60,13 @@ end
 # 3 - Run after_setup
 (build[:after_setup] || []).each_with_index do |cmd, i|
 
-  logger.print(process_start("after setup hook #{i + 1}"))
+  logger.print(process_start("After setup hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
   execute "After setup: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
-        siphon --prefix '   ' -- \
+        siphon --prefix '  ' -- \
           bash -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
@@ -73,4 +75,6 @@ end
     stream true
     on_data {|data| logger.print data}
   end
+
+  logger.print(process_end)
 end
