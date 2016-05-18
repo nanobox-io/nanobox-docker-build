@@ -36,6 +36,7 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
+        deploy_hook_timeout: {type: :integer, default: nil},
         transform:      {type: :array, of: :string, default: []}
       }
     }

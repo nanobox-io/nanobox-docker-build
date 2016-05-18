@@ -16,6 +16,11 @@
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -f /home/gonano/.ssh/id_rsa.pub ] "
   [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "user" "$(payload user)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run configure hook" {
@@ -48,6 +53,11 @@
   [ "$status" -eq 0 ]
 
   # todo: what about pkgin?
+
+  # second run, don't break
+  run run_hook "configure" "$(payload configure)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run fetch hook" {
@@ -64,6 +74,11 @@
   run docker exec build bash -c "[ -f /opt/nanobox/engine/lib/nodejs.sh ]"
   print_output
   [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "fetch" "$(payload fetch)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run setup hook" {
@@ -72,6 +87,11 @@
   [ "$status" -eq 0 ]
 
   # verify? - this engine doesn't have a setup so, it has no verification
+
+  # second run, don't break
+  run run_hook "setup" "$(payload setup)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run boxfile hook" {
@@ -85,6 +105,11 @@
   # [ "${lines[2]}" = "  engine: nodejs#refactor/v1 " ]
   # [ "${lines[3]}" = "  lib_dirs: " ]
   # [ "${lines[4]}" = "    - node_modules " ]
+
+  # second run, don't break
+  run run_hook "boxfile" "$(payload boxfile)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run prepare hook" {
@@ -96,6 +121,11 @@
   run docker exec build bash -c "[ -f /data/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "prepare" "$(payload prepare)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run compile hook" {
@@ -104,6 +134,11 @@
   [ "$status" -eq 0 ]
 
   # verify build hook?
+
+  # second run, don't break
+  run run_hook "compile" "$(payload compile)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run pack-app hook" {
@@ -113,6 +148,11 @@
 
   # Verify
   run docker exec build bash -c "[ -f /mnt/app/server.js ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "pack-app" "$(payload pack-app)"
   print_output
   [ "$status" -eq 0 ]
 }
@@ -126,6 +166,11 @@
   run docker exec build bash -c "[ -f /mnt/build/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "pack-build" "$(payload pack-build)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run clean hook" {
@@ -135,6 +180,11 @@
 
   # Verify
   run docker exec build bash -c "[ ! -f /data/bin/python ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "clean" "$(payload clean)"
   print_output
   [ "$status" -eq 0 ]
 }
@@ -148,6 +198,11 @@
   run docker exec build bash -c "[ -f /mnt/deploy/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "pack-deploy" "$(payload pack-deploy)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Start warehouse" {
@@ -158,9 +213,19 @@
   run run_hook "publish" "$(payload publish)"
   print_output
   [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "publish" "$(payload publish)"
+  print_output
+  [ "$status" -eq 0 ]
 }
 
 @test "Run publish hook with previous build" {
+  run run_hook "publish" "$(payload publish-slurp)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
   run run_hook "publish" "$(payload publish-slurp)"
   print_output
   [ "$status" -eq 0 ]

@@ -77,6 +77,7 @@ when 'git'
     user 'gonano'
     stream true
     on_data { |data| logger.print data }
+    not_if { Dir.exist? "#{ENGINE_DIR}/.git" }
   end
 
   logger.print(process_end)
@@ -110,6 +111,7 @@ when 'github'
     user 'gonano'
     stream true
     on_data { |data| logger.print subtask_info(data) }
+    not_if { Dir.exist? "#{ENGINE_DIR}/.git" }
   end
 
   logger.print(process_end)
@@ -142,6 +144,7 @@ when 'nanobox'
     user 'gonano'
     stream true
     on_data { |data| logger.print data }
+    not_if { Dir.exist? "#{ENGINE_DIR}/.git" }
   end
 
   logger.print(process_end)
