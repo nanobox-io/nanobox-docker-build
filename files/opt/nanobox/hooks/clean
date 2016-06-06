@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
 # Enable an app to remove unecessary binaries from the deployed environment
+#
+# 1 - Run the clean script
+# 2 - Uninstall dev_packages
+# 3 - Remove orphaned pkgsrc dependencies
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -32,7 +36,28 @@ if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
   end
 end
 
-# 2 - Remove orphan pkgsrc dependencies
+# 2 - Uninstall user-requested dev_packages
+packages = build[:dev_packages] || []
+
+if packages.any?
+  logger.print(process_start("Uninstalling user-requested dev packages"))
+
+  execute "Uninstall packages" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -c "/data/bin/pkgin -y rm #{packages.join(' ')}"
+    EOF
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+# 3 - Remove orphan pkgsrc dependencies
 logger.print(process_start("Removing orphaned packages"))
 
 execute "autoremove pkgin orphans" do

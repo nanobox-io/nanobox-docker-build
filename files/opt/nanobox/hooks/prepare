@@ -4,8 +4,9 @@
 #
 # 1 - setup/copy lib_dirs
 # 2 - Run Boxfile before_prepare
-# 3 - Run engine prepare script
-# 4 - Run Boxfile after_prepare
+# 3 - Install user-requested packages
+# 4 - Run engine prepare script
+# 5 - Run Boxfile after_prepare
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -70,13 +71,37 @@ build[:before_prepare].each_with_index do |cmd, i|
     path GONANO_PATH
     user 'gonano'
     stream true
-    on_data {|data| logger.print data}
+    on_data { |data| logger.print data }
   end
 
   logger.print(process_end)
 end
 
-# 3 - Run engine prepare script
+# 3 - Install user-requested packages and dev_packages
+packages = begin
+  (build[:packages] || []) + (build[:dev_packages] || [])
+end
+
+if packages.any?
+  logger.print(process_start("Installing user-requested packages"))
+
+  execute "Install packages" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -c "/data/bin/pkgin -y in #{packages.join(' ')}"
+    EOF
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+
+# 4 - Run engine prepare script
 logger.print(bullet("Running prepare hook..."), 'debug')
 
 if ::File.exist? "#{ENGINE_DIR}/bin/prepare"
@@ -96,7 +121,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/prepare"
   logger.print(process_end)
 end
 
-# 4 - Run after_prepare
+# 5 - Run after_prepare
 build[:after_prepare].each_with_index do |cmd, i|
 
   logger.print(process_start("After prepare hook #{i + 1}"))
