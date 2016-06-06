@@ -79,7 +79,7 @@ end
 
 # 3 - Install user-requested packages and dev_packages
 packages = begin
-  (build[:packages] || []) + (build[:dev_packages] || [])
+  (build[:extra_packages] || []) + (build[:dev_packages] || [])
 end
 
 if packages.any?

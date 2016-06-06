@@ -22,6 +22,8 @@ module Nanobox
         engine:         {type: :string, default: nil},
         image:          {type: :string, default: nil},
         lib_dirs:       {type: :array, of: :folders, default: []},
+        extra_packages: {type: :array, of: :strings, default: nil},
+        dev_packages:   {type: :array, of: :strings, default: nil},
 
         before_setup:   {type: :array, of: :string, default: []},
         after_setup:    {type: :array, of: :string, default: []},
