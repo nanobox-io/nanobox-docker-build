@@ -18,7 +18,7 @@ include Nanobox::Output
 logger.print(bullet('Running dev hook...'), 'debug')
 
 # 2 - Set all environment variables
-logger.puts("Setting environment variables...")
+logger.print(bullet("Setting environment variables..."))
 (payload[:env] || {}).each do |key, value|
   file "#{ENV_DIR}/#{key}" do
     content value
