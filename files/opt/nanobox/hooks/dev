@@ -20,10 +20,13 @@ logger.print(bullet('Running dev hook...'), 'debug')
 # 2 - Set all environment variables
 logger.print(bullet("Setting environment variables..."))
 (payload[:env] || {}).each do |key, value|
-  file "#{ENV_DIR}/#{key}" do
-    content value
-    owner 'gonano'
-    group 'gonano'
-    mode 0444
+
+  if not key.empty?
+    file "#{ENV_DIR}/#{key}" do
+      content value
+      owner 'gonano'
+      group 'gonano'
+      mode 0444
+    end
   end
 end
