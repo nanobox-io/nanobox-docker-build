@@ -24,25 +24,19 @@ include Nanobox::Boxfile
 # 1 - rsync/copy into /mnt/*
 logger.print(process_start('Copy deploy env into place'), 'debug')
 
-logger.print(process_start('Stashing deploy environment'))
+logger.print(bullet('Stashing deploy environment...'))
 
 execute "rsync deploy" do
   command <<-EOF
-    siphon --prefix '   sync: ' -- \
-      rsync \
-        -a \
-        --info=progress2 \
-        --delete \
-        --exclude-from=/var/nanobox/build-excludes.txt \
-        #{DATA_DIR}/ \
-        #{DEPLOY_DIR}
+    rsync \
+      -a \
+      --delete \
+      --exclude-from=/var/nanobox/build-excludes.txt \
+      #{DATA_DIR}/ \
+      #{DEPLOY_DIR}
   EOF
   user 'gonano'
-  stream true
-  on_data { |data| logger.print data }
 end
-
-logger.print(process_end)
 
 # strip pkgin bootstrap out of the deploy env
 execute "strip pkgin" do

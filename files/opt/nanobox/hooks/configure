@@ -69,29 +69,23 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
     recursive true
   end
 
-  logger.print(process_start('Extracting pkg cache'))
+  logger.print(bullet('Extracting pkg cache...'))
 
   # fetch the pkgin cache & db from cache for a quick deploy
   execute "extract pkgin packages from cache for quick access" do
     command <<-EOF
-      siphon --prefix '   sync: ' -- \
-        rsync \
-          -a \
-          --info=progress2 \
-          #{CACHE_DIR}/pkgin/ \
-          #{DATA_DIR}/var/db/pkgin/cache
+      rsync \
+        -a \
+        #{CACHE_DIR}/pkgin/ \
+        #{DATA_DIR}/var/db/pkgin/cache
     EOF
     user 'gonano'
-    stream true
-    on_data { |data| logger.print data }
   end
-
-  logger.print(process_end)
 
 end
 
 # 4 - Update pkgin db
-logger.print(process_start('Updating pkg database'))
+logger.print(bullet('Updating pkg database...'))
 
 execute "remove existing database" do
   command "rm -f #{DATA_DIR}/var/db/pkgin/pkgin.db"
@@ -100,12 +94,7 @@ end
 
 execute "update pkgin packages" do
   command <<-EOF
-    siphon --prefix '  ' -- \
     #{DATA_DIR}/bin/pkgin -y up
   EOF
   user 'gonano'
-  stream true
-  on_data { |data| logger.print data }
 end
-
-logger.print(process_end)

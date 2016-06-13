@@ -21,22 +21,16 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - rsync the code from /share/code
-logger.print(process_start('Copying codebase from local project'))
+logger.print(bullet('Copying codebase from local project...'))
 execute "rsync code" do
   command <<-EOF
-    siphon --prefix '   sync: ' -- \
-      rsync \
-        --info=progress2 \
-        -a \
-        #{LOCAL_CODE_SRC_DIR}/ \
-        #{CODE_DIR}
+    rsync \
+      -a \
+      #{LOCAL_CODE_SRC_DIR}/ \
+      #{CODE_DIR}
   EOF
   user 'gonano'
-  stream true
-  on_data { |data| logger.print data }
 end
-
-logger.print(process_end)
 
 # 2 - ensure boxfile.yml exists
 # TODO

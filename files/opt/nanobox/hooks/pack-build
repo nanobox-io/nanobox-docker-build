@@ -23,24 +23,18 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - rsync/copy into /mnt/*
-logger.print(process_start('Stashing build environment'))
+logger.print(bullet('Stashing build environment...'))
 
 execute "rsync build" do
   command <<-EOF
-    siphon --prefix '   sync: ' -- \
-      rsync \
-        -a \
-        --info=progress2 \
-        --delete \
-        #{DATA_DIR}/ \
-        #{BUILD_DIR}
+    rsync \
+      -a \
+      --delete \
+      #{DATA_DIR}/ \
+      #{BUILD_DIR}
   EOF
   user 'gonano'
-  stream true
-  on_data { |data| logger.print data }
 end
-
-logger.print(process_end)
 
 # 2 - rsync lib_dirs into cache
 build[:lib_dirs].each do |dir|
@@ -54,24 +48,19 @@ build[:lib_dirs].each do |dir|
 
   if ::File.exist? "#{CODE_DIR}/#{dir}"
 
-    logger.print(process_start("Stashing lib_dir '#{dir}'"))
+    logger.print(bullet("Stashing lib_dir '#{dir}'..."))
 
     execute "rsync #{dir}" do
       command <<-EOF
-        siphon --prefix '   sync: ' -- \
-          rsync \
-            -a \
-            --delete \
-            --info=progress2 \
-            #{CODE_DIR}/#{dir}/ \
-            #{LIB_CACHE_DIR}/#{dir}
+        rsync \
+          -a \
+          --delete \
+          #{CODE_DIR}/#{dir}/ \
+          #{LIB_CACHE_DIR}/#{dir}
       EOF
-      stream true
       user 'gonano'
-      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
   end
 end
 
@@ -83,22 +72,17 @@ if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
     recursive true
   end
 
-  logger.print(process_start('Stashing pkg cache'))
+  logger.print(bullet('Stashing pkg cache...'))
 
   execute "Insert pkgin packages from cache for quick access" do
     command <<-EOF
-      siphon --prefix '   sync: ' -- \
-        rsync \
-          -a \
-          --info=progress2 \
-          --delete \
-          #{DATA_DIR}/var/db/pkgin/cache/ \
-          #{CACHE_DIR}/pkgin
+      rsync \
+        -a \
+        --delete \
+        #{DATA_DIR}/var/db/pkgin/cache/ \
+        #{CACHE_DIR}/pkgin
     EOF
     user 'gonano'
-    stream true
-    on_data { |data| logger.print data }
   end
 
-  logger.print(process_end)
 end
