@@ -29,6 +29,7 @@ logger.print(bullet('Setting up directories and permissions...'))
   "#{DATA_DIR}/bin",
   "#{ETC_DIR}",
   "#{ENV_DIR}",
+  "#{PROFILE_DIR}",
   "#{BUILD_DIR}",
   "#{DEPLOY_DIR}",
   "#{CODE_DIR}",

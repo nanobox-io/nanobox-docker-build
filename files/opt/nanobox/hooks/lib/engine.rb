@@ -39,6 +39,9 @@ module Nanobox
     # application in the live environment
     ENV_DIR = "#{DATA_DIR}/etc/env.d"
 
+    # The PROFILE_DIR contains scripts used to setup the user profile.
+    PROFILE_DIR = "#{DATA_DIR}/etc/profile.d"
+
     # The BUILD_DIR contains the environment (binaries, runtimes,
     # configurations) that are required to build the application.
     #
