@@ -39,56 +39,84 @@ END
 @test "Test string start commands" {
   payload='{"code.build":{},"web.site":{"start":"something"},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
-  print_output
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "web.site:" ]
-  [ "${lines[2]}" = "  start: something" ]
-  [ "${lines[3]}" = "worker.jobs:" ]
-  [ "${lines[4]}" = "  start: something" ]
-  [ "${lines[5]}" = "data.db:" ]
-  [ "${lines[6]}" = "  image: nanobox/mysql" ]
+  
+  expected=$(cat <<-END
+---
+web.site:
+  start: something
+worker.jobs:
+  start: something
+data.db:
+  image: nanobox/mysql
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Test hash start commands" {
   payload='{"code.build":{},"web.site":{"start":{"worker":"something"}},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
-  print_output
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "web.site:" ]
-  [ "${lines[2]}" = "  start:" ]
-  [ "${lines[3]}" = "    worker: something" ]
-  [ "${lines[4]}" = "worker.jobs:" ]
-  [ "${lines[5]}" = "  start:" ]
-  [ "${lines[6]}" = "    worker: something" ]
-  [ "${lines[7]}" = "data.db:" ]
-  [ "${lines[8]}" = "  image: nanobox/mysql" ]
+  
+  expected=$(cat <<-END
+---
+web.site:
+  start:
+    worker: something
+worker.jobs:
+  start:
+    worker: something
+data.db:
+  image: nanobox/mysql
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Test string and hash start commands" {
   payload='{"code.build":{},"web.site":{"start":"something"},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
-  print_output
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "web.site:" ]
-  [ "${lines[2]}" = "  start: something" ]
-  [ "${lines[3]}" = "worker.jobs:" ]
-  [ "${lines[4]}" = "  start:" ]
-  [ "${lines[5]}" = "    worker: something" ]
-  [ "${lines[6]}" = "data.db:" ]
-  [ "${lines[7]}" = "  image: nanobox/mysql" ]
+  
+  expected=$(cat <<-END
+---
+web.site:
+  start: something
+worker.jobs:
+  start:
+    worker: something
+data.db:
+  image: nanobox/mysql
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Converge using complex names for services" {
   payload='{"code.deploy":{"before_deploy":{"web.site":["echo hi"]}},"web.site":{},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
-  print_output
-  [ "${lines[0]}"  = "---" ]
-  [ "${lines[1]}"  = "code.deploy:" ]
-  [ "${lines[2]}"  = "  before_deploy:" ]
-  [ "${lines[3]}"  = "    web.site:" ]
-  [ "${lines[4]}"  = "    - echo hi" ]
-  [ "${lines[5]}" = "data.db:" ]
-  [ "${lines[6]}" = "  image: nanobox/mysql" ]
+  
+  expected=$(cat <<-END
+---
+code.deploy:
+  before_deploy:
+    web.site:
+    - echo hi
+data.db:
+  image: nanobox/mysql
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Filter out bad nodes" {

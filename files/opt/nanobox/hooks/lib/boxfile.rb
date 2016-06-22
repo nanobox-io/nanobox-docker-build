@@ -25,10 +25,10 @@ module Nanobox
         extra_packages: {type: :array, of: :strings, default: nil},
         dev_packages:   {type: :array, of: :strings, default: nil},
 
-        before_setup:   {type: :array, of: :string, default: []},
-        after_setup:    {type: :array, of: :string, default: []},
-        before_prepare: {type: :array, of: :string, default: []},
-        after_prepare:  {type: :array, of: :string, default: []},
+        before_setup:     {type: :array, of: :string, default: []},
+        after_setup:      {type: :array, of: :string, default: []},
+        before_prepare:   {type: :array, of: :string, default: []},
+        after_prepare:    {type: :array, of: :string, default: []},
         before_compile:   {type: :array, of: :string, default: []},
         after_compile:    {type: :array, of: :string, default: []}
       }
@@ -38,8 +38,8 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
-        deploy_hook_timeout: {type: :integer, default: nil},
-        transform:      {type: :array, of: :string, default: []}
+        deploy_hook_timeout:  {type: :integer, default: nil},
+        transform:            {type: :array, of: :string, default: []}
       }
     }
 
@@ -91,10 +91,277 @@ module Nanobox
         start:          {type: :hash, default: {}}
       }
     }
+
+    BOXFILE_DATA_VALIDATOR = {
+      image:  { types: [:string], required: true },
+      config: { types: [:hash] }
+    }
+
+    BOXFILE_BUILD_VALIDATOR = {
+      config:           { types: [:hash] },
+      engine:           { types: [:string], required: true },
+      image:            { types: [:string] },
+      lib_dirs:         { types: [:array_of_strings] },
+      extra_packages:   { types: [:array_of_strings] },
+      dev_packages:     { types: [:array_of_strings] },
+      before_setup:     { types: [:string, :array_of_strings] },
+      after_setup:      { types: [:string, :array_of_strings] },
+      before_prepare:   { types: [:string, :array_of_strings] },
+      after_prepare:    { types: [:string, :array_of_strings] },
+      before_compile:   { types: [:string, :array_of_strings] },
+      after_compile:    { types: [:string, :array_of_strings] }
+    }
+
+    BOXFILE_DEPLOY_VALIDATOR = {
+      deploy_hook_timeout:  { types: [:integer] },
+      transform:            { types: [:string, :array_of_strings] },
+      before_deploy:        { types: [:hash] },
+      before_deploy_all:    { types: [:hash] },
+      after_deploy:         { types: [:hash] },
+      after_deploy_all:     { types: [:hash] }
+    }
+
+    BOXFILE_DEV_VALIDATOR = {
+      cwd:  { types: [:string] }
+    }
+
+    BOXFILE_WEB_VALIDATOR = {
+      image:          { types: [:string] },
+      start:          { types: [:string, :array_of_strings], required: true },
+      routes:         { types: [:array_of_strings] },
+      ports:          { types: [:array_of_integers] },
+      cron:           { types: [:array_of_hashes] },
+      log_watch:      { types: [:hash] },
+      network_dirs:   { types: [:hash] },
+      writable_dirs:  { types: [:array_of_strings] }
+    }
+
+    BOXFILE_WORKER_VALIDATOR = {
+      image:          { types: [:string] },
+      start:          { types: [:string, :array_of_strings], required: true },
+      cron:           { types: [:array_of_hashes] },
+      log_watch:      { types: [:hash] },
+      network_dirs:   { types: [:hash] },
+      writable_dirs:  { types: [:array_of_strings] }
+    }
+
+    BOXFILE_CRON_VALIDATOR = {
+      id:       { types: [:string] },
+      schedule: { types: [:string] },
+      command:  { types: [:string] }
+    }
+
     # Simple getter to retrieve the boxfile from the registry
     # the boxfile is set in the registry as the hooks progress
     def boxfile
       registry('boxfile') || {}
+    end
+
+    # Validate the boxfile and return any validation errors
+    def validate_boxfile(boxfile)
+      errors = {}
+
+      boxfile.each_pair do |key, value|
+        case key
+        when /^dev$/
+          dev_errors = validate_section(value, BOXFILE_DEV_VALIDATOR)
+          if dev_errors != {}
+            errors[key] = dev_errors
+          end
+        when /^code\.build$/
+          build_errors = validate_section(value, BOXFILE_BUILD_VALIDATOR)
+          if build_errors != {}
+            errors[key] = build_errors
+          end
+        when /^code\.deploy$/
+          deploy_errors = validate_section(value, BOXFILE_DEPLOY_VALIDATOR)
+          if deploy_errors != {}
+            errors[key] = deploy_errors
+          end
+        when /^web\./
+          web_errors = validate_section(value, BOXFILE_WEB_VALIDATOR)
+          if not value[:cron].nil? and value[:cron].is_a? Array
+            value[:cron].each do |cron|
+              errors = validate_section(cron, BOXFILE_CRON_VALIDATOR)
+              if errors != {}
+                web_errors[:cron] = "Invalid cron format"
+                break
+              end
+            end
+          end
+          if web_errors != {}
+            errors[key] = web_errors
+          end
+        when /^worker\./
+          worker_errors = validate_section(value, BOXFILE_WORKER_VALIDATOR)
+          if not value[:cron].nil? and value[:cron].is_a? Array
+            value[:cron].each do |cron|
+              errors = validate_section(cron, BOXFILE_CRON_VALIDATOR)
+              if errors != {}
+                web_errors[:cron] = "Invalid cron format"
+                break
+              end
+            end
+          end
+          if worker_errors != {}
+            errors[key] = worker_errors
+          end
+        when /^data\./
+          data_errors = validate_section(value, BOXFILE_DATA_VALIDATOR)
+          if data_errors != {}
+            errors[key] = data_errors
+          end
+        else
+          errors[key] = 'Invalid node'
+        end
+      end
+
+      # now let's check for integrity (ensure net_dirs/hooks are correct etc)
+      boxfile.each_pair do |key, value|
+
+        # verify network_dirs point to actual data components
+        if key =~ /^(web|worker)\./
+          if not value[:network_dirs].nil? and value[:network_dirs].is_a? Hash
+            value[:network_dirs].keys.each do |component|
+              if not component =~ /^data\./ or boxfile[component].nil?
+                if errors[key].nil?
+                  errors[key] = {}
+                end
+                if errors[key][:network_dirs].nil?
+                  errors[key][:network_dirs] = {}
+                end
+                errors[key][:network_dirs][component] \
+                  = "#{component} is not a valid data node"
+              end
+            end
+          end
+        end
+
+        # verify deploy hooks point to actual web or woker components
+        if key =~ /^code.deploy$/
+          value.each_pair do |k2, v2|
+            if k2 =~ /(before|after)_deploy($|_all$)/
+              v2.keys.each do |component|
+                if not component =~ /^(web|worker)\./ or boxfile[component].nil?
+                  if errors[key].nil?
+                    errors[key] = {}
+                  end
+                  if errors[key][k2].nil?
+                    errors[key][k2] = {}
+                  end
+                  errors[key][k2][component] \
+                    = "#{component} is not a valid web or worker node"
+                end
+              end
+            end
+          end
+        end
+      end
+
+      errors
+    end
+
+    # Validate a section with a validator. Returns any errors
+    def validate_section(conf, validator)
+      errors = {}
+
+      # first let's iterate through the provided configuration
+      conf.each_pair do |key, value|
+        # let's make sure the conf is supported
+        if validator[key].nil?
+          errors[key] = 'Invalid node'
+          next
+        end
+
+        # now let's make sure it's the right type
+        case value
+        when String
+          if not validator[key][:types].include? :string
+            errors[key] = supported_types_to_s(validator[key][:types])
+          end
+        when Integer
+          if not validator[key][:types].include? :integer
+            errors[key] = supported_types_to_s(validator[key][:types])
+          end
+        when Hash
+          if not validator[key][:types].include? :hash
+            errors[key] = supported_types_to_s(validator[key][:types])
+          end
+        when Array
+          case value.first
+          when String
+            if not validator[key][:types].include? :array_of_strings
+              errors[key] = supported_types_to_s(validator[key][:types])
+            end
+          when Integer
+            if not validator[key][:types].include? :array_of_integers
+              errors[key] = supported_types_to_s(validator[key][:types])
+            end
+          when Hash
+            if not validator[key][:types].include? :array_of_hashes
+              errors[key] = supported_types_to_s(validator[key][:types])
+            end
+          else
+            errors[key] = supported_types_to_s(validator[key][:types])
+          end
+        else
+          errors[key] = supported_types_to_s(validator[key][:types])
+        end
+
+      end
+
+      # now let's iterate through the validator and check for required values
+      validator.each_pair do |key, value|
+        if value[:required] and value[:required] == true
+          if not conf.include? key
+            errors[key] = 'Cannot be empty'
+          end
+        end
+      end
+
+      errors
+    end
+
+    # Generates a clear message informing the supported types
+    def supported_types_to_s(types)
+      msgs = []
+
+      if types.include? :string
+        msgs << "a string"
+      end
+
+      if types.include? :integer
+        msgs << "an integer"
+      end
+
+      if types.include? :array_of_strings
+        msgs << "an array of strings"
+      end
+
+      if types.include? :array_of_integers
+        msgs << "an array of integers"
+      end
+
+      if types.include? :array_of_hashes
+        msgs << "an array of hashes"
+      end
+
+      if types.include? :hash
+        msgs << "a hash"
+      end
+
+      msg = "Must be "
+
+      if msgs.length == 1
+        msg << msgs.first
+      elsif msgs.length == 2
+        msg << "#{msgs[0]} or #{msgs[1]}"
+      else
+        last = msgs.pop
+        msg << "#{msgs.join(", ")} or #{last}"
+      end
+
+      msg
     end
 
     # This creates a validation template for a boxfile based

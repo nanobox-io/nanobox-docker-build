@@ -45,39 +45,60 @@ END
 @test "Deep merge child nodes" {
   payload1='{"code.build":{"engine":"engine"}}'
   payload2='{"code.build":{"before_build":["echo hello"]}}'
+  
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
-  print_output
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "code.build:" ]
-  [ "${lines[2]}" = "  engine: engine" ]
-  [ "${lines[3]}" = "  before_build:" ]
-  [ "${lines[4]}" = "  - echo hello" ]
+  
+  expected=$(cat <<-END
+---
+code.build:
+  engine: engine
+  before_build:
+  - echo hello
+END
+)
 
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Merged boxfile includes nodes from both boxfiles" {
   payload1='{"code.build":{},"web":{}}'
   payload2='{"worker":{},"data":{"image":"nanobox/mysql"}}'
+  
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
-  print_output
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "code.build: {}" ]
-  [ "${lines[2]}" = "web: {}" ]
-  [ "${lines[3]}" = "worker: {}" ]
-  [ "${lines[4]}" = "data:" ]
-  [ "${lines[5]}" = "  image: nanobox/mysql" ]
+  
+  expected=$(cat <<-END
+---
+code.build: {}
+web: {}
+worker: {}
+data:
+  image: nanobox/mysql
+END
+)
 
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Second boxfile values replace first one" {
   payload1='{"code.build":{"engine":"test"}}'
   payload2='{"code.build":{"engine":"replaced"}}'
+  
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
-  print_output
-  [ "${lines[0]}" = "---" ]
-  [ "${lines[1]}" = "code.build:" ]
-  [ "${lines[2]}" = "  engine: replaced" ]
+  
+  expected=$(cat <<-END
+---
+code.build:
+  engine: replaced
+END
+)
 
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
 }
 
 @test "Stop Container" {
