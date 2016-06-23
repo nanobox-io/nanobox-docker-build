@@ -1,3 +1,6 @@
+require 'yaml'
+require 'ya2yaml'
+
 module Nanobox
   module Output
 
@@ -118,16 +121,38 @@ module Nanobox
     # fatal "deploy stream disconnected", "Oh snap... (abbreviated for clarity)"
     #
     # would produce:
-    # ! DEPLOY STREAM DISCONNECTED !
-    #
-    # Oh snap the deploy stream just disconnected. No worries, you can
-    # visit the dashboard to view the complete output stream.
+    # 
+    # ::::::::::::::::::::::::::::::::::::::::::::::::: DEPLOY STREAM DISCONNECTED !!!
+    # 
+    # Oh snap the deploy stream just disconnected. No worries, you can visit
+    # the dashboard to view the complete output stream.
+    # 
+    # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    # 
     def fatal(title, message=nil)
-      res = "\n! #{title.upcase} !\n"
+      # add a newline add the beginning of the message
+      res = "\n"
+      
+      # add the left padding
+      (75 - message.len).times { res << ':' }
 
-      if message
-        res << format_block(message)
-      end
+      # add the title
+      res << " #{title.upcase} !!!\n"
+      
+      # add an empty line between the header and the message
+      res << "\n"
+      
+      # add the message
+      res << format_block(message)
+      
+      # add an empty line between the message and the footer
+      res << "\n"
+      
+      # add the footer
+      80.times { res << ':' }
+
+      # add a double newline to finish the message
+      res << "\n\n"
 
       res
     end
@@ -180,5 +205,45 @@ module Nanobox
       res
     end
 
+    # When a boxfile.yml is missing this function can be called to inform
+    # of the requirements, and also suggest an engine to start with
+    def missing_boxfile
+      message = <<-END
+Nanobox is looking for a boxfile.yml config file. You might want to 
+check out our getting-started guide on configuring your app:
+
+http://docs.nanobox.io/getting-started/configure-app
+      END
+
+      fatal "missing boxfile.yml", message
+    end
+    
+    # If a boxfile.yml is provided but fails validation, this function can
+    # be called to print the errors and inform the user of next steps
+    def invalid_boxfile(errors)
+      failure = errors
+        .deep_stringify_keys
+        .ya2yaml(:syck_compatible => true)
+      
+      message = <<-END
+Oops, it looks like a few issues need to be resolved in your boxfile.yml
+before we can continue. Please correct the following issues and try again:
+
+#{failure}
+      END
+      
+      fatal "invalid boxfile.yml", message
+    end
+
+    def invalid_engine(engine)
+      message = <<-END
+Uh oh, the engine provided is not something we can retrieve. You might
+want to check out our getting-started guide on specifying an engine:
+
+http://docs/nanobox.io/app-config/boxfile/code-build/
+      END
+      
+      fatal "invalid engine", message
+    end
   end
 end

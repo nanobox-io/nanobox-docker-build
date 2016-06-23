@@ -32,14 +32,28 @@ execute "rsync code" do
   user 'gonano'
 end
 
-# 2 - ensure boxfile.yml exists
-# TODO
+# 2 - Ensure the boxfile actually exists
+if not ::File.exists? "#{CODE_DIR}/boxfile.yml"
+  # print a fatal explaining that boxfile is required.
+  logger.print missing_boxfile
+  exit 1
+end
 
-# 3 - Read the boxfile.yml and set it in the registry
+# 3 - Read the boxfile.yml
 app_boxfile = begin
   (YAML::load(File.open("#{CODE_DIR}/boxfile.yml")) rescue {})
     .deep_symbolize_keys
 end
+
+# 4 - Validate the boxfile
+errors = validate_boxfile(app_boxfile)
+
+if errors != {}
+  logger.print invalid_boxfile(errors)
+  exit 1
+end
+
+# 5 - Persist the boxfile in the registry
 
 # set the raw app boxfile for later use
 registry('raw_app_boxfile', app_boxfile)
@@ -47,13 +61,7 @@ registry('raw_app_boxfile', app_boxfile)
 # set the current boxfile to the raw_app_boxfile until the boxfile hook is run
 registry('boxfile', converge_boxfile(app_boxfile))
 
-# 4 - Validate an engine exists
-if build[:engine].nil?
-  # TODO: nice message
-  exit 1
-end
-
-# 5 - Fetch or copy the engine if specified
+# 6 - Fetch or copy the engine if specified
 #
 # If the engine is specified, we're gonna fetch it from one of 4 sources.
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
@@ -193,8 +201,9 @@ when 'filepath'
   logger.print(process_end)
 
 else
-  # no engine was specified
-
+  # engine provided is an unknown format
+  logger.print invalid_engine(engine)
+  exit 1
 end
 
 exit 0

@@ -1,12 +1,3 @@
-# 'dev' hook order:
-#   1 - user
-#   2 - configure
-#   3 - fetch
-#   4 - setup
-#   5 - boxfile
-#   6 - prepare
-#   7 - pack-build
-
 # 'build' hook order:
 #   1  - user
 #   2  - configure
