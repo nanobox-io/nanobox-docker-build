@@ -235,6 +235,25 @@ before we can continue. Please correct the following issues and try again:
       fatal "invalid boxfile.yml", message
     end
 
+    # If a boxfile fails validation after merging with the engine boxfile
+    # we can print this message to clarify the issue
+    def invalid_merged_boxfile(errors)
+      failure = errors
+        .deep_stringify_keys
+        .ya2yaml(:syck_compatible => true)
+        
+      message = <<-END
+Uh oh... it appears that the engine injected bad configuration into
+your boxfile.yml configuration. This is not your fault, but you should
+probably find a different engine or at least let the author of your
+current engine know what happened.
+
+If you're curious, here are the issues:
+
+#{failure}
+      END
+    end
+
     def invalid_engine(engine)
       message = <<-END
 Uh oh, the engine provided is not something we can retrieve. You might

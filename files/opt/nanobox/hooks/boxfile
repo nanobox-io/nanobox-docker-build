@@ -2,8 +2,9 @@
 
 # 1 - Run the engine boxfile script
 # 2 - Merge the boxfile script output with app's boxfile
-# 3 - Persist the converged boxfile in the cache
-# 4 - Return result
+# 3 - Validate the merged boxfile
+# 4 - Persist the converged boxfile in the cache
+# 5 - Return result
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -48,13 +49,21 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   app_boxfile = registry('raw_app_boxfile')
   merged_boxfile = engine_boxfile.deep_merge(app_boxfile)
 
+  # 3 - Validate the merged boxfile
+  errors = validate_boxfile(merged_boxfile)
+
+  if errors != {}
+    logger.print invalid_merged_boxfile(errors)
+    exit 1
+  end
+
+  # 4 - Persist the boxfile in the cache
+  
   # converge the app_boxfile and the engine_boxfile
   converged_boxfile = converge_boxfile(merged_boxfile)
 
   # set the converged boxfile in the registry for the remainder of the hooks
   registry('boxfile', converged_boxfile)
-
-  # 3 - Persist the boxfile in the cache
 
   # The final boxfile is the merged, converged, and cleaned final boxfile
   final_boxfile = begin
@@ -72,5 +81,5 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   end
 end
 
-# 3 - Remove empty nodes from boxfile and return the result as yaml
+# 5 - Remove empty nodes from boxfile and return the result as yaml
 puts ::File.read "#{CACHE_DIR}/boxfile.yml"
