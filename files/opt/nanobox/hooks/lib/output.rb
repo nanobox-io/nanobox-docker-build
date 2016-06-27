@@ -134,7 +134,7 @@ module Nanobox
       res = "\n"
       
       # add the left padding
-      (75 - message.len).times { res << ':' }
+      (75 - message.length).times { res << ':' }
 
       # add the title
       res << " #{title.upcase} !!!\n"
