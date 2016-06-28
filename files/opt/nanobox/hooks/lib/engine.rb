@@ -171,6 +171,8 @@ module Nanobox
     # inform the hook of how to fetch the engine
     def engine_url_type(engine)
       case engine
+      when /^none/
+        'none'
       when /^(\w+)($|#[\w|\/|-]+$)/
         'nanobox'
       when /.+\.git($|#.+$)/

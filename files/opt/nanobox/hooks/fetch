@@ -67,6 +67,8 @@ registry('boxfile', converge_boxfile(app_boxfile))
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
 
 case engine_url_type(build[:engine])
+when 'none'
+  # do nothing, not having an engine was intentional
 when 'git'
 
   logger.print(process_start("Cloning engine"))
