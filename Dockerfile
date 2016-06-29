@@ -49,5 +49,4 @@ RUN /var/tmp/install-engines
 # Cleanup disk
 RUN rm -rf /tmp/* /var/tmp/*
 
-
-CMD [ "/opt/gonano/bin/nanoinit", "/bin/sleep 365d" ]
+CMD [ "/opt/gonano/bin/nanoinit", "/bin/sleep", "365d" ]
