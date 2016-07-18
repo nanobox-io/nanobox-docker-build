@@ -103,7 +103,7 @@ else
     execute "create #{part} tarball" do
       command <<-EOF
         siphon --prefix '  ' -- bash -c "\
-          tar -cf - * \
+          tar -cf - . \
             | pv \
               -s $(du -sb #{dir} | awk '{print $1}') \
                 | gzip \
