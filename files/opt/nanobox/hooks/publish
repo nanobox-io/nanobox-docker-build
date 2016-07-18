@@ -26,7 +26,7 @@ include Nanobox::Boxfile
 # 2a - if previous build is set, we use slurp
 # 2b - if previous build is not set, we upload to warehouse directly
 #
-if payload[:previous_build]
+if payload[:previous_build] and not payload[:previous_build].empty?
 
   { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
 

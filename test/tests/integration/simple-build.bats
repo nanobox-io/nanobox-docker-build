@@ -231,6 +231,22 @@
   [ "$status" -eq 0 ]
 }
 
+# @test "Extract a build and ensure all files are present" {
+#   
+#   mkdir -p /tmp/app
+#   
+#   curl \
+#     -k \
+#     -H "x-auth-token: 123" \
+#     https://192.168.0.100:7410/blobs/app-123abc.tgz \
+#       | tar \
+#         -xzf \
+#         - \
+#         -C /tmp/app
+#         
+#   [ -f /tmp/app/.hidden/test.txt ]
+# }
+
 @test "Stop Container" {
   stop_container
   stop_warehouse
