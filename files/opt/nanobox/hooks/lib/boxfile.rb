@@ -228,6 +228,11 @@ module Nanobox
         end
       end
 
+      # if we have errors at this point, let's go ahead and exit
+      if errors != {}
+        return errors
+      end
+
       # now let's check for integrity (ensure net_dirs/hooks are correct etc)
       boxfile.each_pair do |key, value|
 
