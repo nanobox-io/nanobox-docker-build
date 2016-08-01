@@ -31,7 +31,7 @@ build[:before_compile].each_with_index do |cmd, i|
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
-          bash -c "#{escape cmd}"
+          bash -i -l -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
     path GONANO_PATH
@@ -69,7 +69,7 @@ build[:after_compile].each_with_index do |cmd, i|
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
-          bash -c "#{escape cmd}"
+          bash -i -l -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
     path GONANO_PATH

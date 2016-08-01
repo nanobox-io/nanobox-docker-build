@@ -31,7 +31,7 @@ logger.print(bullet("Running setup hook..."), 'debug')
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
-          bash -c "#{escape cmd}"
+          bash -i -l -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
     path GONANO_PATH
@@ -67,7 +67,7 @@ end
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
-          bash -c "#{escape cmd}"
+          bash -i -l -c "#{escape cmd}"
     EOF
     cwd CODE_DIR
     path GONANO_PATH
