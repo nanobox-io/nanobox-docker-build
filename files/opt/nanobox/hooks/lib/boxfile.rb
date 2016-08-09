@@ -141,7 +141,7 @@ module Nanobox
       image:          { types: [:string] },
       start:          { types: [:string, :array_of_strings], required: true },
       routes:         { types: [:array_of_strings] },
-      ports:          { types: [:array_of_integers] },
+      ports:          { types: [:array_of_strings] },
       cron:           { types: [:array_of_hashes] },
       log_watch:      { types: [:hash] },
       network_dirs:   { types: [:hash] },
