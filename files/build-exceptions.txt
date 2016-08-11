@@ -19,6 +19,7 @@
 ^/lib/libncurses
 ^/lib/libpanel
 # openssl
+^/etc/openssl
 ^/lib/engines
 ^/lib/libcrypto
 ^/lib/libssl
