@@ -70,6 +70,16 @@
   print_output
   [ "$status" -eq 0 ]
 
+  # verify the .nanoignore was ignored
+  run docker exec build bash -c "[ ! -f /app/.nanoignore ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the contents of .nanoignore was ignored
+  run docker exec build bash -c "[ ! -f /app/badfile ]"
+  print_output
+  [ "$status" -eq 0 ]
+
   # verify the nodejs engine is installed
   run docker exec build bash -c "[ -f /opt/nanobox/engine/lib/nodejs.sh ]"
   print_output
