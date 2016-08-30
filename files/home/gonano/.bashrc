@@ -5,9 +5,9 @@ if [ "$PS1" ]; then
   HISTCONTROL=ignoreboth
   HISTIGNORE="[bf]g:exit:quit"
   RED="\[$(tput setaf 1)\]"
-  GREEN="\[$(tput setaf 2)\]"
+  BLUE="\[$(tput setaf 6)\]"
   RESET="\[$(tput sgr0)\]"
-  PS1="${GREEN}\w ${RESET}${RED}$ ${RESET}"
+  PS1="${BLUE}\w ${RESET}${RED}\\$ ${RESET}"
   PS2="${RED}> ${RESET}"
 fi
 
