@@ -19,6 +19,9 @@ ADD scripts/. /var/tmp/
 # Copy files
 ADD files/. /
 
+# chown the gonano directory
+RUN chown -R gonano:gonano /home/gonano
+
 # generate build exclude list
 RUN /var/tmp/generate-build-excludes
 
