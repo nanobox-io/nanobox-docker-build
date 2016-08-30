@@ -16,20 +16,16 @@ RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
 # add temporary scripts
 ADD scripts/. /var/tmp/
 
+# Copy files
+ADD files/. /
+
 # generate build exclude list
-ADD files/build-exceptions.txt /var/nanobox/build-exceptions.txt
 RUN /var/tmp/generate-build-excludes
 
 # update pkgin remote packages
 RUN rm -rf /data/var/db/pkgin && /data/bin/pkgin -y up && \
     rm -rf /data/var/db/pkgin/cache && \
     chown -R gonano /data/var/db/pkgin
-
-# Created necessary directories
-RUN mkdir -p /opt/nanobox
-
-# Copy files
-ADD files/opt/nanobox/. /opt/nanobox/
 
 # install nos
 RUN mkdir -p /opt/nanobox/nos && \
