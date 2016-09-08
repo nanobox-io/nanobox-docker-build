@@ -40,7 +40,6 @@ if payload[:previous_build] and not payload[:previous_build].empty?
         siphon --prefix '  ' -- bash -c "\
           curl \
             -k \
-            --progress \
             -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
             https://#{payload[:warehouse]}:1566/stages \
             -d '{\\\"old-id\\\": \\\"#{previous}\\\", \\\"new-id\\\": \\\"#{current}\\\"}' > /dev/null"
@@ -59,7 +58,6 @@ if payload[:previous_build] and not payload[:previous_build].empty?
           rsync \
             -a \
             --delete \
-            --info=progress2 \
             . \
             -e 'ssh -p 1567' \
             #{current}@#{payload[:warehouse]}:#{current}"
@@ -79,7 +77,6 @@ if payload[:previous_build] and not payload[:previous_build].empty?
         siphon --prefix '  ' -- bash -c "\
           curl \
             -k \
-            --progress \
             -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
             https://#{payload[:warehouse]}:1566/stages/#{current} \
             -X PUT > /dev/null"

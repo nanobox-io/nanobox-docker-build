@@ -91,7 +91,9 @@ END
  :dev=>
   {:type=>:hash,
    :default=>{},
-   :template=>{:cwd=>{:type=>:folder, :default=>nil}}},
+   :template=>
+    {:cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -180,7 +182,9 @@ END
  :dev=>
   {:type=>:hash,
    :default=>{},
-   :template=>{:cwd=>{:type=>:folder, :default=>nil}}},
+   :template=>
+    {:cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -269,7 +273,9 @@ END
  :dev=>
   {:type=>:hash,
    :default=>{},
-   :template=>{:cwd=>{:type=>:folder, :default=>nil}}},
+   :template=>
+    {:cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -338,7 +344,9 @@ END
  :dev=>
   {:type=>:hash,
    :default=>{},
-   :template=>{:cwd=>{:type=>:folder, :default=>nil}}}}
+   :template=>
+    {:cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}}}
 END
 )
 
@@ -381,7 +389,9 @@ END
  :dev=>
   {:type=>:hash,
    :default=>{},
-   :template=>{:cwd=>{:type=>:folder, :default=>nil}}}}
+   :template=>
+    {:cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}}}
 END
 )
 

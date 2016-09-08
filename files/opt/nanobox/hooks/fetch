@@ -21,7 +21,7 @@ include Nanobox::Output
 include Nanobox::Boxfile
 
 # 1 - rsync the code from /share/code
-logger.print(bullet('Copying codebase from local project...'))
+logger.print(bullet('Copying code...'))
 if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
   execute "rsync code" do
     command <<-EOF

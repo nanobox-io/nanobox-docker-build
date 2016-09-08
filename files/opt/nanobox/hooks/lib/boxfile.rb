@@ -47,8 +47,8 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
-        cwd:             {type: :folder, default: nil}
-        # TODO: something should be in here
+        cwd:      {type: :folder, default: nil},
+        fs_watch: {type: :on_off, default: nil}
       }
     }
 
@@ -134,7 +134,8 @@ module Nanobox
     }
 
     BOXFILE_DEV_VALIDATOR = {
-      cwd:  { types: [:string] }
+      cwd:      { types: [:string] },
+      fs_watch: { types: [:boolean] }
     }
 
     BOXFILE_WEB_VALIDATOR = {
@@ -300,6 +301,10 @@ module Nanobox
           if not validator[key][:types].include? :integer
             errors[key] = supported_types_to_s(validator[key][:types])
           end
+        when TrueClass, FalseClass
+          if not validator[key][:types].include? :boolean
+            errors[key] = supported_types_to_s(validator[key][:types])
+          end
         when Hash
           if not validator[key][:types].include? :hash
             errors[key] = supported_types_to_s(validator[key][:types])
@@ -349,6 +354,10 @@ module Nanobox
 
       if types.include? :integer
         msgs << "an integer"
+      end
+      
+      if types.include? :boolean
+        msgs << "true or false"
       end
 
       if types.include? :array_of_strings
