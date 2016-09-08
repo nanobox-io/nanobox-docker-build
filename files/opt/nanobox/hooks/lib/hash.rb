@@ -46,7 +46,7 @@ class Hash
         return true
       end
       
-      if value.responds_to? :empty and value.empty?
+      if value.respond_to? :empty and value.empty?
         return true
       end
       
