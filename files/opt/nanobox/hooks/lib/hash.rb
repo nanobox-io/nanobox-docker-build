@@ -41,16 +41,12 @@ class Hash
       if value.is_a? Hash
         value.prune_empty 
       end
-      
-      if value.nil?
-        return true
+
+      if value.respond_to? :empty?
+        value.nil? or value.empty?
+      else
+        value.nil?
       end
-      
-      if value.respond_to? :empty and value.empty?
-        return true
-      end
-      
-      false
     end
   end
 end
