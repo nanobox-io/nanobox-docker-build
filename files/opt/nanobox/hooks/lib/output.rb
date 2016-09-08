@@ -17,31 +17,9 @@ module Nanobox
     # process_start "Updating pkg database"
     #
     # would produce:
-    # + Updating pkg database ----------------------------------------------------- >
+    # - Updating pkg database :
     def process_start(label)
-      max_len = 80
-      left = label.length + 3
-      right = 2
-      middle = max_len - (left + right)
-
-      res = "+ "
-
-      # print label
-      res << label
-
-      # print a space
-      res << " "
-
-      # print middle column
-      middle.times { res << '-'}
-
-      # print the right column
-      res << " >"
-
-      # end with a newline
-      res << "\n"
-
-      res
+      "- #{label} :\n"
     end
 
     # process_end
@@ -62,7 +40,7 @@ module Nanobox
     # would produce:
     # + Language Detected : Ruby
     def bullet(message)
-      "+ #{message}\n"
+      "- #{message}\n"
     end
 
     # bullet_info
