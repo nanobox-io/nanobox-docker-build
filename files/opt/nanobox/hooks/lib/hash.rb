@@ -37,6 +37,20 @@ class Hash
   end
 
   def prune_empty
-    delete_if {|key, value| value.prune_empty if value.is_a? Hash; value.nil? or value.empty?}
+    delete_if do |key, value| 
+      if value.is_a? Hash
+        value.prune_empty 
+      end
+      
+      if value.nil?
+        return true
+      end
+      
+      if value.responds_to? :empty and value.empty?
+        return true
+      end
+      
+      false
+    end
   end
 end
