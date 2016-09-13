@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+
+# Enable an app to remove unecessary binaries from the deployed environment
+#
+# 1 - Run the clean script
+# 2 - Uninstall dev_packages
+# 3 - Remove orphaned pkgsrc dependencies
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
+# 1 - Run engine clean script
+logger.print(bullet("Running clean hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
+
+  logger.print(bullet("Cleanup script detected, running now..."), 'debug')
+
+  execute "cleanup build" do
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/cleanup '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
+    path GONANO_PATH
+    environment engine_env
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print(data)}
+  end
+end
+
+# 2 - Uninstall user-requested dev_packages
+packages = build[:dev_packages] || []
+
+if packages.any?
+  logger.print(process_start("Uninstalling user-requested dev packages"))
+
+  execute "Uninstall packages" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -c "/data/bin/pkgin -y rm #{packages.join(' ')}"
+    EOF
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+# 3 - Remove orphan pkgsrc dependencies
+logger.print(bullet("Removing orphaned packages..."))
+
+execute "autoremove pkgin orphans" do
+  command <<-EOF
+    bash -c "echo \"Y\\n\" | pkgin ar"
+  EOF
+  path GONANO_PATH
+end

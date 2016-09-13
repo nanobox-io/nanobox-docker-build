@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+# We defer to the engine to pack the app
+# (move the compiled output into the app dir)
+#
+# 1 - Call the engine release bin script
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
+logger.print(bullet("Running release hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/bin/release"
+
+  logger.print(bullet("Release script detected, running now..."), 'debug')
+
+  execute "release app" do
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/release '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end

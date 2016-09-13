@@ -1,0 +1,101 @@
+#!/usr/bin/env ruby
+
+# Prepare the container for an app build
+#
+# 1 - Ensure all the required directories exist and have proper permissions
+# 2 - Clear the BUILD_DIR, APP_DIR, and boxfile
+# 3 - Extract the pkgin db from the cache
+# 4 - Update pkgin db
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+
+logger.print(bullet('Running configure hook...'), 'debug')
+
+# 1 - Ensure required directories exist and have permissions
+logger.print(bullet('Setting up directories and permissions...'))
+
+[
+  "#{DATA_DIR}",
+  "#{DATA_DIR}/sbin",
+  "#{DATA_DIR}/bin",
+  "#{ETC_DIR}",
+  "#{ENV_DIR}",
+  "#{PROFILE_DIR}",
+  "#{BUILD_DIR}",
+  "#{DEPLOY_DIR}",
+  "#{CODE_DIR}",
+  "#{APP_DIR}",
+  "#{CACHE_DIR}",
+  "#{APP_CACHE_DIR}",
+  "#{LIB_CACHE_DIR}",
+  "#{NANOBOX_DIR}",
+  "#{ENGINE_DIR}"
+].each do |dir|
+  directory dir do
+    recursive true
+  end
+  # Some of the directories might already exist. Chown everything.
+  execute "chown gonano #{dir}"
+end
+
+# 2 - Clear the BUILD_DIR, APP_DIR, and boxfile
+logger.print(bullet('Cleaning up any previous builds...'))
+
+[
+  "#{BUILD_DIR}/*",
+  "#{DEPLOY_DIR}/*",
+  "#{APP_DIR}/*",
+  "#{CACHE_DIR}/boxfile.yml"
+].each do |old|
+  execute "Purge #{old}" do
+    command "rm -rf #{old}"
+  end
+end
+
+# 3 - Extract the pkgin db from the cache
+if ::File.exist? "#{CACHE_DIR}/pkgin"
+
+  directory "#{DATA_DIR}/var/db/pkgin/cache" do
+    owner 'gonano'
+    group 'gonano'
+    recursive true
+  end
+
+  logger.print(bullet('Extracting pkg cache...'))
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract pkgin packages from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -a \
+        #{CACHE_DIR}/pkgin/ \
+        #{DATA_DIR}/var/db/pkgin/cache
+    EOF
+    user 'gonano'
+  end
+
+end
+
+# 4 - Update pkgin db
+logger.print(bullet('Updating pkg database...'))
+
+execute "remove existing database" do
+  command "rm -f #{DATA_DIR}/var/db/pkgin/pkgin.db"
+  user 'gonano'
+end
+
+execute "update pkgin packages" do
+  command <<-EOF
+    #{DATA_DIR}/bin/pkgin -y up
+  EOF
+  user 'gonano'
+end

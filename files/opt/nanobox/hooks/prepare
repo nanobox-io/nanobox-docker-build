@@ -1,0 +1,138 @@
+#!/usr/bin/env ruby
+
+# Prepare the environment that the compiled application will run within
+#
+# 1 - setup/copy lib_dirs
+# 2 - Run Boxfile before_prepare
+# 3 - Install user-requested packages
+# 4 - Run engine prepare script
+# 5 - Run Boxfile after_prepare
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+include Nanobox::Hook
+
+logger.print(bullet("Running prepare hook..."), 'debug')
+
+# 1 - setup/copy lib_dirs
+# move the lib_dirs into place if this is a subsequent deploy
+build[:lib_dirs].each do |dir|
+  if ::File.exist? "#{LIB_CACHE_DIR}/#{dir}"
+
+    # ensure the directory exists
+    directory "#{CODE_DIR}/#{dir}" do
+      recursive true
+      owner 'gonano'
+      group 'gonano'
+    end
+
+    logger.print(bullet("Fetch '#{dir}' from cache..."))
+
+    execute "extract #{dir} from cache for quick access" do
+      command <<-EOF
+        rsync \
+          -a \
+          #{LIB_CACHE_DIR}/#{dir}/ \
+          #{CODE_DIR}/#{dir}
+      EOF
+      user 'gonano'
+    end
+
+  end
+end
+
+# 2 - Run before_prepare
+build[:before_prepare].each_with_index do |cmd, i|
+
+  logger.print(process_start("Before prepare hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
+
+  execute "Before prepare: #{cmd}" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -i -l -c "#{escape cmd}"
+    EOF
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+# 3 - Install user-requested packages and dev_packages
+packages = begin
+  (build[:extra_packages] || []) + (build[:dev_packages] || [])
+end
+
+if packages.any?
+  logger.print(process_start("Installing user-requested packages"))
+
+  execute "Install packages" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -c "/data/bin/pkgin -y in #{packages.join(' ')}"
+    EOF
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+
+# 4 - Run engine prepare script
+logger.print(bullet("Running prepare hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/bin/prepare"
+
+  logger.print(bullet("Prepare script detected, running now..."), 'debug')
+
+  execute "prepare environment" do
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/prepare '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
+    path GONANO_PATH
+    environment engine_env
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+
+end
+
+# 5 - Run after_prepare
+build[:after_prepare].each_with_index do |cmd, i|
+
+  logger.print(process_start("After prepare hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
+
+  execute "After prepare: #{cmd}" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -i -l -c "#{escape cmd}"
+    EOF
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+
+  logger.print(process_end)
+end

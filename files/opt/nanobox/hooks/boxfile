@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+
+# 1 - Run the engine boxfile script
+# 2 - Merge the boxfile script output with app's boxfile
+# 3 - Validate the merged boxfile
+# 4 - Persist the converged boxfile in the cache
+# 5 - Return result
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
+require 'yaml'
+require 'ya2yaml'
+
+# This hook will get called during the build process, and also directly
+# before publishing a build. In the event that we're publishing a build,
+# we don't want to run all of the logic again. So we'll store the output
+# of the logic in a file in the cache for quick access.
+if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
+  # 1 - Call the engine boxfile script
+  output = ''
+
+  if ::File.exist? "#{ENGINE_DIR}/bin/boxfile"
+    execute "generating boxfile" do
+      command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/boxfile '#{engine_payload}')
+      cwd "#{ENGINE_DIR}/bin"
+      path GONANO_PATH
+      environment engine_env
+      user 'gonano'
+      stream true
+      on_stderr {|data| logger.print data}
+      on_stdout {|data| output << data}
+    end
+  end
+
+  # parse the yaml
+  engine_boxfile = (YAML::load(output) || {}).deep_symbolize_keys
+
+  # 2 - Merge the boxfile script output with app's boxfile
+  app_boxfile = registry('raw_app_boxfile')
+  merged_boxfile = engine_boxfile.deep_merge(app_boxfile)
+
+  # 3 - Validate the merged boxfile
+  errors = validate_boxfile(merged_boxfile)
+
+  if errors != {}
+    logger.print invalid_merged_boxfile(errors)
+    exit 1
+  end
+
+  # 4 - Persist the boxfile in the cache
+  
+  # converge the app_boxfile and the engine_boxfile
+  converged_boxfile = converge_boxfile(merged_boxfile)
+
+  # set the converged boxfile in the registry for the remainder of the hooks
+  registry('boxfile', converged_boxfile)
+
+  # The final boxfile is the merged, converged, and cleaned final boxfile
+  final_boxfile = begin
+    converged_boxfile
+      .prune_empty
+      .deep_stringify_keys
+      .ya2yaml(:syck_compatible => true)
+  end
+
+  file "#{CACHE_DIR}/boxfile.yml" do
+    content final_boxfile
+    mode 0644
+    owner 'gonano'
+    group 'gonano'
+  end
+end
+
+# 5 - Remove empty nodes from boxfile and return the result as yaml
+puts ::File.read "#{CACHE_DIR}/boxfile.yml"

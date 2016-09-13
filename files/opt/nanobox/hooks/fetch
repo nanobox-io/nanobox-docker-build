@@ -1,0 +1,225 @@
+#!/usr/bin/env ruby
+
+# Fetch the codebase and cache
+#
+#   1 - rsync the code from /share/code
+#   2 - Validate and enfore boxfile.yml
+#   3 - Read the boxfile.yml and set it in the registry
+#   4 - Validate an engine is specified in the boxfile.yml
+#   5 - Fetch or copy the engine if specified
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
+# 1 - rsync the code from /share/code
+logger.print(bullet('Copying code...'))
+if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
+  execute "rsync code" do
+    command <<-EOF
+      rsync \
+        -a \
+        --exclude-from '#{LOCAL_CODE_SRC_DIR}/.nanoignore' \
+        --exclude '.nanoignore' \
+        #{LOCAL_CODE_SRC_DIR}/ \
+        #{CODE_DIR}
+    EOF
+    user 'gonano'
+  end
+else
+  execute "rsync code" do
+    command <<-EOF
+      rsync \
+        -a \
+        #{LOCAL_CODE_SRC_DIR}/ \
+        #{CODE_DIR}
+    EOF
+    user 'gonano'
+  end
+end
+
+# 2 - Ensure the boxfile actually exists
+if not ::File.exists? "#{CODE_DIR}/boxfile.yml"
+  # print a fatal explaining that boxfile is required.
+  logger.print missing_boxfile
+  exit 1
+end
+
+# 3 - Read the boxfile.yml
+app_boxfile = begin
+  (YAML::load(File.open("#{CODE_DIR}/boxfile.yml")) rescue {})
+    .deep_symbolize_keys
+end
+
+# 4 - Validate the boxfile
+errors = validate_boxfile(app_boxfile)
+
+if errors != {}
+  logger.print invalid_boxfile(errors)
+  exit 1
+end
+
+# 5 - Persist the boxfile in the registry
+
+# set the raw app boxfile for later use
+registry('raw_app_boxfile', app_boxfile)
+
+# set the current boxfile to the raw_app_boxfile until the boxfile hook is run
+registry('boxfile', converge_boxfile(app_boxfile))
+
+# 6 - Fetch or copy the engine if specified
+#
+# If the engine is specified, we're gonna fetch it from one of 4 sources.
+# Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
+
+case engine_url_type(build[:engine])
+when 'none'
+  # do nothing, not having an engine was intentional
+when 'git'
+
+  logger.print(process_start("Cloning engine"))
+
+  repo = engine_git_url(build[:engine])
+
+  execute "cloning #{repo}" do
+    command "siphon --prefix '  ' -- git clone #{repo} engine"
+    cwd NANOBOX_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+    not_if { Dir.exist? "#{ENGINE_DIR}/.git" }
+  end
+
+  logger.print(process_end)
+
+  commit = engine_git_commitish(build[:engine])
+
+  if commit
+    logger.print(process_start("Checking out: #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "siphon --prefix '  ' -- git checkout #{commit}"
+      cwd ENGINE_DIR
+      user 'gonano'
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+  end
+
+when 'github'
+
+  logger.print(process_start("Cloning engine from github"))
+
+  repo = engine_git_url(build[:engine])
+  url = "https://github.com/#{repo}.git"
+
+  execute "cloning #{repo}" do
+    command "siphon --prefix '  ' -- git clone #{url} engine"
+    cwd NANOBOX_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+    not_if { Dir.exist? "#{ENGINE_DIR}/.git" }
+  end
+
+  logger.print(process_end)
+
+  commit = engine_git_commitish(build[:engine])
+
+  if commit
+    logger.print(process_start("Checking out: #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "siphon --prefix '  ' -- git checkout #{commit}"
+      cwd ENGINE_DIR
+      user 'gonano'
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+  end
+
+when 'nanobox'
+
+  logger.print(process_start("Cloning engine"))
+
+  repo = engine_nanobox_url(build[:engine])
+
+  execute "cloning #{repo}" do
+    command "siphon --prefix '  ' -- git clone #{repo} engine"
+    cwd NANOBOX_DIR
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+    not_if { Dir.exist? "#{ENGINE_DIR}/.git" }
+  end
+
+  logger.print(process_end)
+
+  commit = engine_git_commitish(build[:engine])
+
+  if commit
+    logger.print(process_start("Checking out: #{commit}"))
+
+    execute "Checkout commitish point" do
+      command "siphon --prefix '  ' -- git checkout #{commit}"
+      cwd ENGINE_DIR
+      user 'gonano'
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+  end
+
+when 'tarball'
+  directory ENGINE_DIR
+
+  execute "Extract engine" do
+    command <<-EOF
+      curl -k #{engine} \
+        | tar -C #{ENGINE_DIR} -xzf - --strip-components=1
+    EOF
+    user 'gonano'
+  end
+
+when 'filepath'
+
+  directory ENGINE_DIR
+
+  logger.print(process_start("Copying engine"))
+
+  execute "rsync engine" do
+    command <<-EOF
+      siphon --prefix '   sync: ' -- \
+        rsync \
+          -a \
+          --info=progress2 \
+          #{LOCAL_ENGINE_SRC_DIR}/ \
+          #{ENGINE_DIR}
+    EOF
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+
+else
+  # engine provided is an unknown format
+  logger.print invalid_engine(engine)
+  exit 1
+end
+
+exit 0

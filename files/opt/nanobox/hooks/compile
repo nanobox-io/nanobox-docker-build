@@ -1,0 +1,82 @@
+#!/usr/bin/env ruby
+
+# Compile the application
+#
+# 1 - Run boxfile.yml before_compile
+# 2 - Run engine build script
+# 3 - Run boxfile.yml after_compile
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+include Nanobox::Hook
+
+logger.print(bullet("Running compile hook..."), 'debug')
+
+# 1 - Run before_compile
+build[:before_compile].each_with_index do |cmd, i|
+
+  logger.print(process_start("Before compile hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
+
+  execute "Before compile: #{cmd}" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -i -l -c "#{escape cmd}"
+    EOF
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+
+  logger.print(process_end)
+end
+
+# 2 - Run engine compile script
+if ::File.exist? "#{ENGINE_DIR}/bin/compile"
+
+  logger.print(bullet("Compile script detected, running now..."), 'debug')
+
+  execute "compile app" do
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/compile '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
+    path GONANO_PATH
+    environment engine_env
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+end
+
+# 3 - Run after_compile
+build[:after_compile].each_with_index do |cmd, i|
+
+  logger.print(process_start("After compile hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
+
+  execute "After compile: #{cmd}" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -i -l -c "#{escape cmd}"
+    EOF
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+
+  logger.print(process_end)
+end

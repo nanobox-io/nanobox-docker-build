@@ -1,0 +1,132 @@
+#!/usr/bin/env ruby
+
+# Upload build env and live app to warehouse
+# 1 - Verify build and app exist
+# 2 - upload to warehouse
+
+# how to show progress during an rsync transfer:
+# http://www.cyberciti.biz/faq/show-progress-during-file-transfer/
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+
+# 1 - verify
+
+# 2 - upload to warehouse
+#
+# 2a - if previous build is set, we use slurp
+# 2b - if previous build is not set, we upload to warehouse directly
+#
+if payload[:previous_build] and not payload[:previous_build].empty?
+
+  { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
+
+    previous = "#{part}-#{payload[:previous_build]}.tgz"
+    current  = "#{part}-#{payload[:build]}.tgz"
+
+    # register a stage with slurp
+    logger.print(process_start("Extract previous #{part} on warehouse"))
+    execute "create stage for #{part}" do
+      command <<-EOF
+        siphon --prefix '  ' -- bash -c "\
+          curl \
+            -k \
+            -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
+            https://#{payload[:warehouse]}:1566/stages \
+            -d '{\\\"old-id\\\": \\\"#{previous}\\\", \\\"new-id\\\": \\\"#{current}\\\"}' > /dev/null"
+      EOF
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+
+    # sync
+    logger.print(process_start("Sync changes to #{part}"))
+    execute "sync #{part}" do
+      command <<-EOF
+        siphon --prefix '   sync: ' -- bash -c "\
+          rsync \
+            -a \
+            --delete \
+            . \
+            -e 'ssh -p 1567' \
+            #{current}@#{payload[:warehouse]}:#{current}"
+      EOF
+      user 'gonano'
+      cwd dir
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+
+    # commit to warehouse
+    logger.print(process_start("Commit #{part} to warehouse"))
+    execute "commit #{part} stage" do
+      command <<-EOF
+        siphon --prefix '  ' -- bash -c "\
+          curl \
+            -k \
+            -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
+            https://#{payload[:warehouse]}:1566/stages/#{current} \
+            -X PUT > /dev/null"
+      EOF
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+  end
+
+else
+
+  # While we could pipe the output of tar directly into curl, curl
+  # can't provide a progress bar since the data is streaming and the size
+  # is unknown. So we'll be slightly less optimal here in trade of visibility
+
+  { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
+
+    logger.print(process_start("Generating compressed tarball of #{part}"))
+    execute "create #{part} tarball" do
+      command <<-EOF
+        siphon --prefix '  ' -- bash -c "\
+          tar -cf - . \
+            | pv \
+              -s $(du -sb #{dir} | awk '{print $1}') \
+                | gzip \
+                  > /var/tmp/#{part}-#{payload[:build]}.tgz"
+      EOF
+      cwd dir
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+
+    logger.print(process_start("Uploading #{part} tarball to warehouse"))
+    execute "publish deploy" do
+      command <<-EOF
+        siphon --prefix '  ' -- bash -c "\
+          curl \
+            -k \
+            -H 'x-auth-token: #{payload[:warehouse_token]}' \
+            https://#{payload[:warehouse]}:7410/blobs/#{part}-#{payload[:build]}.tgz \
+            --data-binary @/var/tmp/#{part}-#{payload[:build]}.tgz > /dev/null"
+      EOF
+      stream true
+      on_data { |data| logger.print data }
+    end
+
+    logger.print(process_end)
+  end
+end

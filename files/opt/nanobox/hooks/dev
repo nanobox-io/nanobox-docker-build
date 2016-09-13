@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+# Prepare the dev container for a dev session
+#
+# 1 - persist environment variables
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+
+logger.print(bullet('Running dev hook...'), 'debug')
+
+# 2 - Set all environment variables
+logger.print(bullet("Setting environment variables..."))
+(payload[:env] || {}).each do |key, value|
+
+  if not key.empty?
+    file "#{ENV_DIR}/#{key}" do
+      content value
+      owner 'gonano'
+      group 'gonano'
+      mode 0444
+    end
+  end
+end
