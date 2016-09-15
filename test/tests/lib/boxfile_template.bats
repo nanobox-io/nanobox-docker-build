@@ -191,7 +191,7 @@ END
    :default=>{},
    :template=>
     {:image=>{:type=>:string, :default=>nil},
-     :start=>{:type=>:string, :default=>nil},
+     :start=>{:type=>:array, :of=>:string, :default=>nil},
      :routes=>{:type=>:array, :of=>:string, :default=>[]},
      :ports=>{:type=>:array, :of=>:string, :default=>[]},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
