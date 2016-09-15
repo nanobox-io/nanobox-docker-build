@@ -78,6 +78,32 @@ module Nanobox
       }
     }
 
+    BOXFILE_WEB_ARRAY_STRING_DEFAULTS = {
+      type: :hash,
+      default: {},
+      template: {
+        image:          {type: :string, default: nil},
+        start:          {type: :string, default: nil},
+        routes:         {type: :array, of: :string, default: []},
+        ports:          {type: :array, of: :string, default: []},
+        writable_dirs:  {type: :array, of: :string, default: []},
+        network_dirs:   {type: :hash, default: {}},
+        log_watch:       {type: :hash, default: {}}
+      }
+    }
+
+    BOXFILE_WORKER_ARRAY_STRING_DEFAULTS = {
+      type: :hash,
+      default: {},
+      template: {
+        image:          {type: :string, default: nil},
+        start:          {type: :string, default: nil},
+        writable_dirs:  {type: :array, of: :string, default: []},
+        network_dirs:   {type: :hash, default: {}},
+        log_watch:       {type: :hash, default: {}}
+      }
+    }
+
     BOXFILE_WEB_HASH_DEFAULTS = {
       type: :hash,
       default: {},
@@ -140,7 +166,7 @@ module Nanobox
 
     BOXFILE_WEB_VALIDATOR = {
       image:          { types: [:string] },
-      start:          { types: [:string, :array_of_strings], required: true },
+      start:          { types: [:string, :array_of_strings, :hash], required: true },
       routes:         { types: [:array_of_strings] },
       ports:          { types: [:array_of_strings] },
       cron:           { types: [:array_of_hashes] },
@@ -151,7 +177,7 @@ module Nanobox
 
     BOXFILE_WORKER_VALIDATOR = {
       image:          { types: [:string] },
-      start:          { types: [:string, :array_of_strings], required: true },
+      start:          { types: [:string, :array_of_strings, :hash], required: true },
       cron:           { types: [:array_of_hashes] },
       log_watch:      { types: [:hash] },
       network_dirs:   { types: [:hash] },
@@ -419,6 +445,8 @@ module Nanobox
             template[key] = BOXFILE_WEB_HASH_DEFAULTS
           elsif boxfile[key][:start].is_a? String
             template[key] = BOXFILE_WEB_STRING_DEFAULTS
+          elsif boxfile[key][:start].is_a? Array
+            template[key] = BOXFILE_WEB_ARRAY_STRING_DEFAULTS
           else
             # add error?
           end
@@ -429,6 +457,8 @@ module Nanobox
             template[key] = BOXFILE_WORKER_HASH_DEFAULTS
           elsif boxfile[key][:start].is_a? String
             template[key] = BOXFILE_WORKER_STRING_DEFAULTS
+          elsif boxfile[key][:start].is_a? Array
+            template[key] = BOXFILE_WORKER_ARRAY_STRING_DEFAULTS       
           else
             # add error?
           end
