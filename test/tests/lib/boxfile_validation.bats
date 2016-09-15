@@ -79,7 +79,7 @@ code.build:
   engine: 1
   
 web.main:
-  start: {}
+  start: true
   log_watch: ok
 END
 )
@@ -92,7 +92,7 @@ code.build:
   engine: "Must be a string"
 web.main: 
   log_watch: "Must be a hash"
-  start: "Must be a string or an array of strings"
+  start: "Must be a string, an array of strings or a hash"
 END
 )
 
