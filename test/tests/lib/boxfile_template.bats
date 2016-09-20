@@ -128,6 +128,98 @@ END
   [ "$output" = "$expected" ]
 }
 
+@test "test string array start commands" {
+  payload='{"code.build":{"config":{"test":"value"}},"web.site":{"start":["something", "something2"]},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
+  
+  run docker exec build bash -c "/tmp/template_boxfile '$payload'"
+  
+  expected=$(cat <<-END
+{:"code.build"=>
+  {:type=>:hash,
+   :default=>{},
+   :template=>
+    {:config=>{:type=>:hash, :default=>{}},
+     :engine=>{:type=>:string, :default=>nil},
+     :image=>{:type=>:string, :default=>nil},
+     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :extra_packages=>{:type=>:array, :of=>:strings, :default=>nil},
+     :dev_packages=>{:type=>:array, :of=>:strings, :default=>nil},
+     :before_setup=>{:type=>:array, :of=>:string, :default=>[]},
+     :after_setup=>{:type=>:array, :of=>:string, :default=>[]},
+     :before_prepare=>{:type=>:array, :of=>:string, :default=>[]},
+     :after_prepare=>{:type=>:array, :of=>:string, :default=>[]},
+     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
+     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
+ :"code.deploy"=>
+  {:type=>:hash,
+   :default=>{},
+   :template=>
+    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+     :transform=>{:type=>:array, :of=>:string, :default=>[]},
+     :before_deploy=>
+      {:type=>:hash,
+       :default=>{},
+       :template=>
+        {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
+         :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
+     :before_deploy_all=>
+      {:type=>:hash,
+       :default=>{},
+       :template=>
+        {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
+         :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
+     :after_deploy=>
+      {:type=>:hash,
+       :default=>{},
+       :template=>
+        {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
+         :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
+     :after_deploy_all=>
+      {:type=>:hash,
+       :default=>{},
+       :template=>
+        {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
+         :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}}}},
+ :dev=>
+  {:type=>:hash,
+   :default=>{},
+   :template=>
+    {:cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"web.site"=>
+  {:type=>:hash,
+   :default=>{},
+   :template=>
+    {:image=>{:type=>:string, :default=>nil},
+     :start=>{:type=>:array, :of=>:string, :default=>nil},
+     :routes=>{:type=>:array, :of=>:string, :default=>[]},
+     :ports=>{:type=>:array, :of=>:string, :default=>[]},
+     :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :network_dirs=>{:type=>:hash, :default=>{}},
+     :log_watch=>{:type=>:hash, :default=>{}}}},
+ :"worker.jobs"=>
+  {:type=>:hash,
+   :default=>{},
+   :template=>
+    {:image=>{:type=>:string, :default=>nil},
+     :start=>{:type=>:string, :default=>nil},
+     :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :network_dirs=>{:type=>:hash, :default=>{}},
+     :log_watch=>{:type=>:hash, :default=>{}}}},
+ :"data.db"=>
+  {:type=>:hash,
+   :default=>{},
+   :template=>
+    {:config=>{:type=>:hash, :default=>{}},
+     :image=>{:type=>:string, :default=>nil}}}}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
 @test "test hash start commands" {
   payload='{"code.build":{"config":{"test":"value"}},"web.site":{"start":{"test":"value"}},"worker.jobs":{"start":{"test":"value"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
