@@ -19,7 +19,7 @@ include Nanobox::Output
 logger.print(bullet('Running dev hook...'), 'debug')
 
 # 1 - Copy build to data dir
-if ::File.exist? BUILD_DIR do
+if ::File.exist? BUILD_DIR
   logger.print(bullet("Copying build..."))
   execute "Copy build" do
     command <<-EOF
