@@ -40,6 +40,15 @@ end
 
 # 2 - Set all environment variables
 logger.print(bullet("Setting environment variables..."))
+
+# make sure the env dir exists
+directory ENV_DIR do
+  recursive true
+end
+
+# and that it's owned by gonano
+execute "chown gonano #{ENV_DIR}"
+
 (payload[:env] || {}).each do |key, value|
 
   if not key.empty?
