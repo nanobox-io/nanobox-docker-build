@@ -27,12 +27,6 @@ if ::File.exist? BUILD_DIR
     action :delete
   end
   
-  # create a new empty /data dir
-  directory DATA_DIR do
-    owner 'gonano'
-    group 'gonano'
-  end
-  
   # copy the build into data
   execute "Copy build" do
     command "cp -a #{BUILD_DIR} #{DATA_DIR}"
