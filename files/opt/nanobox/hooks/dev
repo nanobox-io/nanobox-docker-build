@@ -30,7 +30,11 @@ if ::File.exist? BUILD_DIR
   # copy the build into data
   execute "Copy build" do
     command "cp -a #{BUILD_DIR} #{DATA_DIR}"
-    user 'gonano'
+  end
+  
+  # change ownership to gonano
+  execute "Change ownership" do
+    command "chown -R gonano #{DATA_DIR}"
   end
 end
 
