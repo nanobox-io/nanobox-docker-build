@@ -21,14 +21,21 @@ logger.print(bullet('Running dev hook...'), 'debug')
 # 1 - Copy build to data dir
 if ::File.exist? BUILD_DIR
   logger.print(bullet("Copying build..."))
+  
+  # remove the existing /data dir
+  directory DATA_DIR do
+    action :delete
+  end
+  
+  # create a new empty /data dir
+  directory DATA_DIR do
+    owner 'gonano'
+    group 'gonano'
+  end
+  
+  # copy the build into data
   execute "Copy build" do
-    command <<-EOF
-      rsync \
-        -a \
-        --delete \
-        #{BUILD_DIR}/ \
-        #{DATA_DIR}
-    EOF
+    command "cp -a #{BUILD_DIR} #{DATA_DIR}"
     user 'gonano'
   end
 end
