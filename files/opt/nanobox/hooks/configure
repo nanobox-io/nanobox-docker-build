@@ -53,7 +53,6 @@ logger.print(bullet('Cleaning up any previous builds...'))
 [
   "#{BUILD_DIR}/*",
   "#{DEPLOY_DIR}/*",
-  "#{APP_DIR}/*",
   "#{CACHE_DIR}/boxfile.yml"
 ].each do |old|
   execute "Purge #{old}" do
