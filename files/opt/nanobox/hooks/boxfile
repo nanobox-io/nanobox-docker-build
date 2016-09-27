@@ -84,7 +84,7 @@ end
 data = ::File.read "#{CACHE_DIR}/boxfile.yml" 
 
 # parse into the final boxfile
-final = (YAML::load(data) || {}).deep_symbolize_keys
+final = converge_boxfile((YAML::load(data) || {}).deep_symbolize_keys)
 
 # set the converged boxfile in the registry for the remainder of the hooks
 registry('boxfile', final)
