@@ -3,13 +3,12 @@
 # Allows an engine or Boxfile to setup an environment before the build process
 #
 # 1 - Clear the BUILD_DIR, APP_DIR, and boxfile
-# 2 - link the app source
-# 3 - Extract the pkgin db from the cache
-# 4 - Update pkgin db
-# 5 - Install user-requested packages and dev_packages
-# 6 - Run before_setup
-# 7 - Run engine setup script
-# 8 - Run after_setup
+# 2 - Extract the pkgin db from the cache
+# 3 - Update pkgin db
+# 4 - Install user-requested packages and dev_packages
+# 5 - Run before_setup
+# 6 - Run engine setup script
+# 7 - Run after_setup
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -28,6 +27,7 @@ logger.print(bullet("Running setup hook..."), 'debug')
 
 # 1 - Clear the BUILD_DIR, DEPLOY_DIR, and boxfile
 logger.print(bullet('Cleaning up any previous builds...'))
+
 [
   "#{BUILD_DIR}/*",
   "#{DEPLOY_DIR}/*",
@@ -38,13 +38,7 @@ logger.print(bullet('Cleaning up any previous builds...'))
   end
 end
 
-# 2 - link the app source
-link CODE_DIR do
-  to LOCAL_CODE_SRC_DIR
-  owner "gonano"
-end
-
-# 3 - Extract the pkgin db from the cache
+# 2 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
   directory "#{DATA_DIR}/var/db/pkgin/cache" do
@@ -68,7 +62,7 @@ if ::File.exist? "#{CACHE_DIR}/pkgin"
 
 end
 
-# 4 - Update pkgin db
+# 3 - Update pkgin db
 logger.print(bullet('Updating pkg database...'))
 
 execute "remove existing database" do
@@ -83,7 +77,7 @@ execute "update pkgin packages" do
   user 'gonano'
 end
 
-# 5 - Install user-requested packages and dev_packages
+# 4 - Install user-requested packages and dev_packages
 packages = begin
   (build[:extra_packages] || []) + (build[:dev_packages] || [])
 end
@@ -106,7 +100,7 @@ if packages.any?
   logger.print(process_end)
 end
 
-# 6 - Run before_setup
+# 5 - Run before_setup
 (build[:before_setup] || []).each_with_index do |cmd, i|
 
   logger.print(process_start("Before setup hook #{i + 1}"))
@@ -128,7 +122,7 @@ end
   logger.print(process_end)
 end
 
-# 7 - Run engine setup script
+# 6 - Run engine setup script
 if ::File.exist? "#{ENGINE_DIR}/bin/setup"
 
   execute "setup environment" do
@@ -142,7 +136,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/setup"
   end
 end
 
-# 8 - Run after_setup
+# 7 - Run after_setup
 (build[:after_setup] || []).each_with_index do |cmd, i|
 
   logger.print(process_start("After setup hook #{i + 1}"))
