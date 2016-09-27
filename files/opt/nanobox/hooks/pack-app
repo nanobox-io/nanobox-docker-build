@@ -3,8 +3,7 @@
 # We defer to the engine to pack the app
 # (move the compiled output into the app dir)
 #
-# 1 - Remove previous app release if any
-# 2 - Call the engine release bin script
+# 1 - Call the engine release bin script
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -20,12 +19,7 @@ include Nanobox::Boxfile
 
 logger.print(bullet("Running release hook..."), 'debug')
 
-# 1 - purge the previous app release
-execute "Purge #{APP_DIR}" do
-  command "rm -rf #{APP_DIR}/*"
-end
-
-# 2 - Call the engine release bin script
+# 1 - Call the engine release bin script
 if ::File.exist? "#{ENGINE_DIR}/bin/release"
 
   logger.print(bullet("Release script detected, running now..."), 'debug')

@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby
 
-# Compile the application
+# Prepare the environment that the compiled application will run within
 #
-# 1 - Remove previous app release if any
-# 2 - Run boxfile.yml before_compile
-# 3 - Run engine compile script
-# 4 - Run boxfile.yml after_compile
+# 1 - Run Boxfile before_build
+# 2 - Run engine build script
+# 3 - Run Boxfile after_build
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
-$:.unshift '/opt/gonano/hookit/vendor/bundle'
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
 require 'bundler/setup'
 
 # load hookit/setup to bootstrap hookit and import the dsl
@@ -20,22 +19,15 @@ include Nanobox::Output
 include Nanobox::Boxfile
 include Nanobox::Hook
 
-logger.print(bullet("Running compile hook..."), 'debug')
+logger.print(bullet("Running build hook..."), 'debug')
 
-# 1 - Clear the APP_DIR
-logger.print(bullet('Cleaning up any previous builds...'))
+# 2 - Run before_build
+build[:before_build].each_with_index do |cmd, i|
 
-execute "Purge #{APP_DIR}" do
-  command "rm -rf #{APP_DIR}/*"
-end
-
-# 2 - Run before_compile
-build[:before_compile].each_with_index do |cmd, i|
-
-  logger.print(process_start("Before compile hook #{i + 1}"))
+  logger.print(process_start("Before build hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
-  execute "Before compile: #{cmd}" do
+  execute "Before build: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
@@ -45,19 +37,21 @@ build[:before_compile].each_with_index do |cmd, i|
     path GONANO_PATH
     user 'gonano'
     stream true
-    on_data {|data| logger.print data}
+    on_data { |data| logger.print data }
   end
 
   logger.print(process_end)
 end
 
-# 3 - Run engine compile script
-if ::File.exist? "#{ENGINE_DIR}/bin/compile"
+# 4 - Run engine build script
+logger.print(bullet("Running build hook..."), 'debug')
 
-  logger.print(bullet("Compile script detected, running now..."), 'debug')
+if ::File.exist? "#{ENGINE_DIR}/bin/build"
 
-  execute "compile app" do
-    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/compile '#{engine_payload}')
+  logger.print(bullet("Prepare script detected, running now..."), 'debug')
+
+  execute "build environment" do
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/build '#{engine_payload}')
     cwd "#{ENGINE_DIR}/bin"
     path GONANO_PATH
     environment engine_env
@@ -65,15 +59,16 @@ if ::File.exist? "#{ENGINE_DIR}/bin/compile"
     stream true
     on_data {|data| logger.print data}
   end
+
 end
 
-# 4 - Run after_compile
-build[:after_compile].each_with_index do |cmd, i|
+# 5 - Run after_build
+build[:after_build].each_with_index do |cmd, i|
 
-  logger.print(process_start("After compile hook #{i + 1}"))
+  logger.print(process_start("After build hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
 
-  execute "After compile: #{cmd}" do
+  execute "After build: #{cmd}" do
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \

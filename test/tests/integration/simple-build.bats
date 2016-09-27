@@ -122,18 +122,18 @@
   [ "$status" -eq 0 ]
 }
 
-@test "Run prepare hook" {
-  run run_hook "prepare" "$(payload prepare)"
+@test "Run build hook" {
+  run run_hook "build" "$(payload build)"
   print_output
   [ "$status" -eq 0 ]
 
-  # verify prepare hook ran?
+  # verify build hook ran?
   run docker exec build bash -c "[ -f /data/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
 
   # second run, don't break
-  run run_hook "prepare" "$(payload prepare)"
+  run run_hook "build" "$(payload build)"
   print_output
   [ "$status" -eq 0 ]
 }
