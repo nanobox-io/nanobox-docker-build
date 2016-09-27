@@ -62,9 +62,6 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   # converge the app_boxfile and the engine_boxfile
   converged_boxfile = converge_boxfile(merged_boxfile)
 
-  # set the converged boxfile in the registry for the remainder of the hooks
-  registry('boxfile', converged_boxfile)
-
   # The final boxfile is the merged, converged, and cleaned final boxfile
   final_boxfile = begin
     converged_boxfile
@@ -81,5 +78,16 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   end
 end
 
-# 5 - Remove empty nodes from boxfile and return the result as yaml
-puts ::File.read "#{CACHE_DIR}/boxfile.yml"
+# 5 - return the result
+
+# load the contents of the cached boxfile
+data = ::File.read "#{CACHE_DIR}/boxfile.yml" 
+
+# parse into the final boxfile
+final = (YAML::load(data) || {}).deep_symbolize_keys
+
+# set the converged boxfile in the registry for the remainder of the hooks
+registry('boxfile', final)
+
+# return the raw yml data
+puts data
