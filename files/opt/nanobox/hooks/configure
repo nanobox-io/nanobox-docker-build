@@ -37,9 +37,14 @@ logger.print(bullet('Setting up directories and permissions...'))
   "#{NANOBOX_DIR}",
   "#{ENGINE_DIR}"
 ].each do |dir|
+  
+  # create the dir if it doesn't exist
   directory dir do
     recursive true
   end
-  # Some of the directories might already exist. Chown everything.
-  execute "chown gonano #{dir}"
+  
+  # Some of the directories might already exist. Chown everything, unless it's a mount
+  execute "chown gonano #{dir}" do
+    only_if { `mount | grep #{dir}`.empty? }
+  end
 end
