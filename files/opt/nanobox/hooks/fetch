@@ -23,7 +23,7 @@ include Nanobox::Boxfile
 # 1 - Link the app dir
 
 # remove /app if it already exists
-directory APP_DIR do
+directory CODE_DIR do
   action :delete
 end
 
