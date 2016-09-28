@@ -177,6 +177,9 @@
   # remove /app from symlink
   run docker exec build bash -c "rm -f /app"
   
+  # create an empty /app dir
+  run docker exec build bash -c "mkdir /app && chown gonano:gonano /app"
+  
   run run_hook "compile" "$(payload compile)"
   print_output
   [ "$status" -eq 0 ]
