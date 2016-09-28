@@ -28,7 +28,7 @@ directory APP_DIR do
 end
 
 link CODE_DIR do
-  from LOCAL_CODE_SRC_DIR
+  to LOCAL_CODE_SRC_DIR
   owner 'gonano'
   group 'gonano'
 end
