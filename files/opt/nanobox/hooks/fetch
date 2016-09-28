@@ -20,32 +20,6 @@ include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
 
-# 1 - rsync the code from /share/code
-logger.print(bullet('Copying code...'))
-if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
-  execute "rsync code" do
-    command <<-EOF
-      rsync \
-        -a \
-        --exclude-from '#{LOCAL_CODE_SRC_DIR}/.nanoignore' \
-        --exclude '.nanoignore' \
-        #{LOCAL_CODE_SRC_DIR}/ \
-        #{CODE_DIR}
-    EOF
-    user 'gonano'
-  end
-else
-  execute "rsync code" do
-    command <<-EOF
-      rsync \
-        -a \
-        #{LOCAL_CODE_SRC_DIR}/ \
-        #{CODE_DIR}
-    EOF
-    user 'gonano'
-  end
-end
-
 # 2 - Ensure the boxfile actually exists
 if not ::File.exists? "#{CODE_DIR}/boxfile.yml"
   # print a fatal explaining that boxfile is required.

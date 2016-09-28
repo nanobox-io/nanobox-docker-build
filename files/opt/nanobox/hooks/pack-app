@@ -19,6 +19,7 @@ include Nanobox::Boxfile
 
 logger.print(bullet("Running release hook..."), 'debug')
 
+# 1 - Call the engine release bin script
 if ::File.exist? "#{ENGINE_DIR}/bin/release"
 
   logger.print(bullet("Release script detected, running now..."), 'debug')

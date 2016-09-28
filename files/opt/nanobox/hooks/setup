@@ -2,9 +2,13 @@
 
 # Allows an engine or Boxfile to setup an environment before the build process
 #
-# 1 - Run before_setup
-# 2 - Run engine setup script
-# 3 - Run after_setup
+# 1 - Clear the BUILD_DIR, APP_DIR, and boxfile
+# 2 - Extract the pkgin db from the cache
+# 3 - Update pkgin db
+# 4 - Install user-requested packages and dev_packages
+# 5 - Run before_setup
+# 6 - Run engine setup script
+# 7 - Run after_setup
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -21,7 +25,82 @@ include Nanobox::Hook
 
 logger.print(bullet("Running setup hook..."), 'debug')
 
-# 1 - Run before_setup
+# 1 - Clear the BUILD_DIR, DEPLOY_DIR, and boxfile
+logger.print(bullet('Cleaning up any previous builds...'))
+
+[
+  "#{BUILD_DIR}/*",
+  "#{DEPLOY_DIR}/*",
+  "#{CACHE_DIR}/boxfile.yml"
+].each do |old|
+  execute "Purge #{old}" do
+    command "rm -rf #{old}"
+  end
+end
+
+# 2 - Extract the pkgin db from the cache
+if ::File.exist? "#{CACHE_DIR}/pkgin"
+
+  directory "#{DATA_DIR}/var/db/pkgin/cache" do
+    owner 'gonano'
+    group 'gonano'
+    recursive true
+  end
+
+  logger.print(bullet('Extracting pkg cache...'))
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract pkgin packages from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -a \
+        #{CACHE_DIR}/pkgin/ \
+        #{DATA_DIR}/var/db/pkgin/cache
+    EOF
+    user 'gonano'
+  end
+
+end
+
+# 3 - Update pkgin db
+logger.print(bullet('Updating pkg database...'))
+
+execute "remove existing database" do
+  command "rm -f #{DATA_DIR}/var/db/pkgin/pkgin.db"
+  user 'gonano'
+end
+
+execute "update pkgin packages" do
+  command <<-EOF
+    #{DATA_DIR}/bin/pkgin -y up
+  EOF
+  user 'gonano'
+end
+
+# 4 - Install user-requested packages and dev_packages
+packages = begin
+  (build[:extra_packages] || []) + (build[:dev_packages] || [])
+end
+
+if packages.any?
+  logger.print(process_start("Installing user-requested packages"))
+
+  execute "Install packages" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -c "/data/bin/pkgin -y in #{packages.join(' ')}"
+    EOF
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+# 5 - Run before_setup
 (build[:before_setup] || []).each_with_index do |cmd, i|
 
   logger.print(process_start("Before setup hook #{i + 1}"))
@@ -43,7 +122,7 @@ logger.print(bullet("Running setup hook..."), 'debug')
   logger.print(process_end)
 end
 
-# 2 - Run engine setup script
+# 6 - Run engine setup script
 if ::File.exist? "#{ENGINE_DIR}/bin/setup"
 
   execute "setup environment" do
@@ -57,7 +136,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/setup"
   end
 end
 
-# 3 - Run after_setup
+# 7 - Run after_setup
 (build[:after_setup] || []).each_with_index do |cmd, i|
 
   logger.print(process_start("After setup hook #{i + 1}"))

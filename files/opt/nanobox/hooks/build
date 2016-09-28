@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+
+# Prepare the environment that the compiled application will run within
+#
+# 1 - Run Boxfile before_build
+# 2 - Run engine build script
+# 3 - Run Boxfile after_build
+
+# hookit is installed as a bundled app, so we need bundler to load it for us
+$:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'bundler/setup'
+
+# load hookit/setup to bootstrap hookit and import the dsl
+require 'hookit/setup'
+
+# import some logic/helpers from lib/*.rb
+include Nanobox::Engine
+include Nanobox::Output
+include Nanobox::Boxfile
+include Nanobox::Hook
+
+logger.print(bullet("Running build hook..."), 'debug')
+
+# 2 - Run before_build
+build[:before_build].each_with_index do |cmd, i|
+
+  logger.print(process_start("Before build hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
+
+  execute "Before build: #{cmd}" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -i -l -c "#{escape cmd}"
+    EOF
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data { |data| logger.print data }
+  end
+
+  logger.print(process_end)
+end
+
+# 4 - Run engine build script
+logger.print(bullet("Running build hook..."), 'debug')
+
+if ::File.exist? "#{ENGINE_DIR}/bin/build"
+
+  logger.print(bullet("Prepare script detected, running now..."), 'debug')
+
+  execute "build environment" do
+    command %Q(stdbuf -o0 #{ENGINE_DIR}/bin/build '#{engine_payload}')
+    cwd "#{ENGINE_DIR}/bin"
+    path GONANO_PATH
+    environment engine_env
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+
+end
+
+# 5 - Run after_build
+build[:after_build].each_with_index do |cmd, i|
+
+  logger.print(process_start("After build hook #{i + 1}"))
+  logger.print("   $ #{cmd}\n")
+
+  execute "After build: #{cmd}" do
+    command <<-EOF
+      stdbuf -o0 \
+        siphon --prefix '  ' -- \
+          bash -i -l -c "#{escape cmd}"
+    EOF
+    cwd CODE_DIR
+    path GONANO_PATH
+    user 'gonano'
+    stream true
+    on_data {|data| logger.print data}
+  end
+
+  logger.print(process_end)
+end
