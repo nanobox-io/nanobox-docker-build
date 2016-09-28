@@ -29,8 +29,6 @@ end
 
 link CODE_DIR do
   to LOCAL_CODE_SRC_DIR
-  owner 'gonano'
-  group 'gonano'
 end
 
 # 2 - Ensure the boxfile actually exists
