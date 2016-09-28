@@ -38,19 +38,6 @@ logger.print(bullet('Cleaning up any previous builds...'))
   end
 end
 
-# 2 - Link the app dir
-
-# remove /app if it already exists
-directory APP_DIR do
-  action :delete
-end
-
-link CODE_DIR do
-  from LOCAL_CODE_SRC_DIR
-  owner 'gonano'
-  group 'gonano'
-end
-
 # 2 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 
