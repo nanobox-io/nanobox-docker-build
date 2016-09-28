@@ -61,22 +61,11 @@
 }
 
 @test "Run fetch hook" {
+  
+  # link /mnt/app to /app
+  run docker exec build bash -c "cp -a /share/code/* /app"
+  
   run run_hook "fetch" "$(payload fetch)"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify the code was copied over
-  run docker exec build bash -c "[ -f /app/package.json ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify the .nanoignore was ignored
-  run docker exec build bash -c "[ ! -f /app/.nanoignore ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify the contents of .nanoignore was ignored
-  run docker exec build bash -c "[ ! -f /app/badfile ]"
   print_output
   [ "$status" -eq 0 ]
 
@@ -122,47 +111,18 @@
   [ "$status" -eq 0 ]
 }
 
-@test "Run prepare hook" {
-  run run_hook "prepare" "$(payload prepare)"
+@test "Run build hook" {
+  run run_hook "build" "$(payload build)"
   print_output
   [ "$status" -eq 0 ]
 
-  # verify prepare hook ran?
+  # verify build hook ran?
   run docker exec build bash -c "[ -f /data/bin/node ]"
   print_output
   [ "$status" -eq 0 ]
 
   # second run, don't break
-  run run_hook "prepare" "$(payload prepare)"
-  print_output
-  [ "$status" -eq 0 ]
-}
-
-@test "Run compile hook" {
-  run run_hook "compile" "$(payload compile)"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify build hook?
-
-  # second run, don't break
-  run run_hook "compile" "$(payload compile)"
-  print_output
-  [ "$status" -eq 0 ]
-}
-
-@test "Run pack-app hook" {
-  run run_hook "pack-app" "$(payload pack-app)"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # Verify
-  run docker exec build bash -c "[ -f /mnt/app/server.js ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # second run, don't break
-  run run_hook "pack-app" "$(payload pack-app)"
+  run run_hook "build" "$(payload build)"
   print_output
   [ "$status" -eq 0 ]
 }
@@ -211,6 +171,52 @@
 
   # second run, don't break
   run run_hook "pack-deploy" "$(payload pack-deploy)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run compile hook" {
+  
+  # remove /app/* from build
+  run docker exec build bash -c "rm -rf /app/*"
+  
+  run run_hook "compile" "$(payload compile)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the code was copied over
+  run docker exec build bash -c "[ -f /app/package.json ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the .nanoignore was ignored
+  run docker exec build bash -c "[ ! -f /app/.nanoignore ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the contents of .nanoignore was ignored
+  run docker exec build bash -c "[ ! -f /app/badfile ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "compile" "$(payload compile)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run pack-app hook" {
+  run run_hook "pack-app" "$(payload pack-app)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # Verify
+  run docker exec build bash -c "[ -f /mnt/app/server.js ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "pack-app" "$(payload pack-app)"
   print_output
   [ "$status" -eq 0 ]
 }

@@ -79,7 +79,7 @@ run_build() {
   /opt/nanobox/hooks/fetch "$(cat payloads/fetch.json)"
   /opt/nanobox/hooks/setup "$(cat payloads/setup.json)"
   /opt/nanobox/hooks/boxfile "$(cat payloads/boxfile.json)" > /dev/null
-  /opt/nanobox/hooks/prepare "$(cat payloads/prepare.json)"
+  /opt/nanobox/hooks/build "$(cat payloads/build.json)"
   /opt/nanobox/hooks/compile "$(cat payloads/compile.json)"
   /opt/nanobox/hooks/pack-app "$(cat payloads/pack-app.json)"
   /opt/nanobox/hooks/pack-build "$(cat payloads/pack-build.json)"

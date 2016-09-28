@@ -7,7 +7,7 @@
 # mounted into the dev container.
 #
 # 1 - rsync /data to /mnt/build
-# 2 - rsync lib_dirs into cache
+# 2 - rsync engine into cache
 # 3 - rsync pkgsrc cache into cache
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
@@ -36,32 +36,32 @@ execute "rsync build" do
   user 'gonano'
 end
 
-# 2 - rsync lib_dirs into cache
-build[:lib_dirs].each do |dir|
+# 2 - copy engine into cache
 
-  # ensure the lib_dir exists in cache
-  directory "#{LIB_CACHE_DIR}/#{dir}" do
-    recursive true
-    owner 'gonano'
-    group 'gonano'
+# remove the previous engine if it exists
+if ::File.exist? "#{CACHE_DIR}/engine"
+  directory "#{CACHE_DIR}/engine" do
+    action :delete
   end
+end
 
-  if ::File.exist? "#{CODE_DIR}/#{dir}"
+# create the engine cache directory
+directory "#{CACHE_DIR}/engine" do
+  owner 'gonano'
+  group 'gonano'
+  recursive true
+end
 
-    logger.print(bullet("Stashing lib_dir '#{dir}'..."))
-
-    execute "rsync #{dir}" do
-      command <<-EOF
-        rsync \
-          -a \
-          --delete \
-          #{CODE_DIR}/#{dir}/ \
-          #{LIB_CACHE_DIR}/#{dir}
-      EOF
-      user 'gonano'
-    end
-
-  end
+# copy the current engine into cache
+execute "rsync engine" do
+  command <<-EOF
+    rsync \
+      -a \
+      --delete \
+      #{ENGINE_DIR}/ \
+      #{CACHE_DIR}/engine
+  EOF
+  user 'gonano'
 end
 
 # 3 - rsync pkgsrc cache into cache

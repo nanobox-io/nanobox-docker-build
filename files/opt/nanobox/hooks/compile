@@ -2,9 +2,12 @@
 
 # Compile the application
 #
-# 1 - Run boxfile.yml before_compile
-# 2 - Run engine build script
-# 3 - Run boxfile.yml after_compile
+# 1 - Remove previous app release if any
+# 2 - extract the engine from cache
+# 3 - rsync the code from /share/code
+# 4 - Run boxfile.yml before_compile
+# 5 - Run engine compile script
+# 6 - Run boxfile.yml after_compile
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift '/opt/gonano/hookit/vendor/bundle'
@@ -21,7 +24,53 @@ include Nanobox::Hook
 
 logger.print(bullet("Running compile hook..."), 'debug')
 
-# 1 - Run before_compile
+# 1 - Clear the APP_DIR
+logger.print(bullet('Cleaning up any previous releases...'))
+
+execute "Purge #{APP_DIR}" do
+  command "rm -rf #{APP_DIR}/*"
+end
+
+# 2 - extract the engine from cache
+execute "rsync engine" do
+  command <<-EOF
+    rsync \
+      -a \
+      --delete \
+      #{CACHE_DIR}/engine/ \
+      #{ENGINE_DIR}
+  EOF
+  user 'gonano'
+end
+
+
+# 3 - rsync the code from /share/code
+logger.print(bullet('Copying code...'))
+if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
+  execute "rsync code" do
+    command <<-EOF
+      rsync \
+        -a \
+        --exclude-from '#{LOCAL_CODE_SRC_DIR}/.nanoignore' \
+        --exclude '.nanoignore' \
+        #{LOCAL_CODE_SRC_DIR}/ \
+        #{CODE_DIR}
+    EOF
+    user 'gonano'
+  end
+else
+  execute "rsync code" do
+    command <<-EOF
+      rsync \
+        -a \
+        #{LOCAL_CODE_SRC_DIR}/ \
+        #{CODE_DIR}
+    EOF
+    user 'gonano'
+  end
+end
+
+# 4 - Run before_compile
 build[:before_compile].each_with_index do |cmd, i|
 
   logger.print(process_start("Before compile hook #{i + 1}"))
@@ -43,7 +92,7 @@ build[:before_compile].each_with_index do |cmd, i|
   logger.print(process_end)
 end
 
-# 2 - Run engine compile script
+# 5 - Run engine compile script
 if ::File.exist? "#{ENGINE_DIR}/bin/compile"
 
   logger.print(bullet("Compile script detected, running now..."), 'debug')
@@ -59,7 +108,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/compile"
   end
 end
 
-# 3 - Run after_compile
+# 6 - Run after_compile
 build[:after_compile].each_with_index do |cmd, i|
 
   logger.print(process_start("After compile hook #{i + 1}"))

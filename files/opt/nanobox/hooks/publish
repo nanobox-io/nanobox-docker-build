@@ -33,8 +33,14 @@ if payload[:previous_build] and not payload[:previous_build].empty?
     previous = "#{part}-#{payload[:previous_build]}.tgz"
     current  = "#{part}-#{payload[:build]}.tgz"
 
+    if part == 'deploy'
+      logger.print(bullet("Syncing runtime..."))
+    else
+      logger.print(bullet("Syncing app..."))
+    end
+
+    
     # register a stage with slurp
-    logger.print(process_start("Extract previous #{part} on warehouse"))
     execute "create stage for #{part}" do
       command <<-EOF
         siphon --prefix '  ' -- bash -c "\
@@ -44,14 +50,9 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             https://#{payload[:warehouse]}:1566/stages \
             -d '{\\\"old-id\\\": \\\"#{previous}\\\", \\\"new-id\\\": \\\"#{current}\\\"}' > /dev/null"
       EOF
-      stream true
-      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
-
     # sync
-    logger.print(process_start("Sync changes to #{part}"))
     execute "sync #{part}" do
       command <<-EOF
         siphon --prefix '   sync: ' -- bash -c "\
@@ -64,14 +65,9 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       EOF
       user 'gonano'
       cwd dir
-      stream true
-      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
-
     # commit to warehouse
-    logger.print(process_start("Commit #{part} to warehouse"))
     execute "commit #{part} stage" do
       command <<-EOF
         siphon --prefix '  ' -- bash -c "\
@@ -81,11 +77,8 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             https://#{payload[:warehouse]}:1566/stages/#{current} \
             -X PUT > /dev/null"
       EOF
-      stream true
-      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
   end
 
 else
@@ -96,7 +89,12 @@ else
 
   { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
 
-    logger.print(process_start("Generating compressed tarball of #{part}"))
+    if part == 'deploy'
+      logger.print(bullet("Sending runtime..."))
+    else
+      logger.print(bullet("Sending app..."))
+    end
+
     execute "create #{part} tarball" do
       command <<-EOF
         siphon --prefix '  ' -- bash -c "\
@@ -107,13 +105,8 @@ else
                   > /var/tmp/#{part}-#{payload[:build]}.tgz"
       EOF
       cwd dir
-      stream true
-      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
-
-    logger.print(process_start("Uploading #{part} tarball to warehouse"))
     execute "publish deploy" do
       command <<-EOF
         siphon --prefix '  ' -- bash -c "\
@@ -123,10 +116,7 @@ else
             https://#{payload[:warehouse]}:7410/blobs/#{part}-#{payload[:build]}.tgz \
             --data-binary @/var/tmp/#{part}-#{payload[:build]}.tgz > /dev/null"
       EOF
-      stream true
-      on_data { |data| logger.print data }
     end
 
-    logger.print(process_end)
   end
 end
