@@ -127,52 +127,6 @@
   [ "$status" -eq 0 ]
 }
 
-@test "Run compile hook" {
-  
-  # remove /app/* from build
-  run docker exec build bash -c "rm -rf /app/*"
-  
-  run run_hook "compile" "$(payload compile)"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify the code was copied over
-  run docker exec build bash -c "[ -f /app/package.json ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify the .nanoignore was ignored
-  run docker exec build bash -c "[ ! -f /app/.nanoignore ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # verify the contents of .nanoignore was ignored
-  run docker exec build bash -c "[ ! -f /app/badfile ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # second run, don't break
-  run run_hook "compile" "$(payload compile)"
-  print_output
-  [ "$status" -eq 0 ]
-}
-
-@test "Run pack-app hook" {
-  run run_hook "pack-app" "$(payload pack-app)"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # Verify
-  run docker exec build bash -c "[ -f /mnt/app/server.js ]"
-  print_output
-  [ "$status" -eq 0 ]
-
-  # second run, don't break
-  run run_hook "pack-app" "$(payload pack-app)"
-  print_output
-  [ "$status" -eq 0 ]
-}
-
 @test "Run pack-build hook" {
   run run_hook "pack-build" "$(payload pack-build)"
   print_output
@@ -217,6 +171,52 @@
 
   # second run, don't break
   run run_hook "pack-deploy" "$(payload pack-deploy)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run compile hook" {
+  
+  # remove /app/* from build
+  run docker exec build bash -c "rm -rf /app/*"
+  
+  run run_hook "compile" "$(payload compile)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the code was copied over
+  run docker exec build bash -c "[ -f /app/package.json ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the .nanoignore was ignored
+  run docker exec build bash -c "[ ! -f /app/.nanoignore ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the contents of .nanoignore was ignored
+  run docker exec build bash -c "[ ! -f /app/badfile ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "compile" "$(payload compile)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
+@test "Run pack-app hook" {
+  run run_hook "pack-app" "$(payload pack-app)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # Verify
+  run docker exec build bash -c "[ -f /mnt/app/server.js ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # second run, don't break
+  run run_hook "pack-app" "$(payload pack-app)"
   print_output
   [ "$status" -eq 0 ]
 }
