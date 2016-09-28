@@ -63,7 +63,7 @@
 @test "Run fetch hook" {
   
   # link /mnt/app to /app
-  run docker exec build bash -c "cp -a /mnt/app/* /app"
+  run docker exec build bash -c "cp -a /share/code/* /app"
   
   run run_hook "fetch" "$(payload fetch)"
   print_output
