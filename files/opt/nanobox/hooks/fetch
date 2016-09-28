@@ -2,7 +2,7 @@
 
 # Fetch the codebase and cache
 #
-#   1 - rsync the code from /share/code
+#   1 - symlink the code from /share/code
 #   2 - Validate and enfore boxfile.yml
 #   3 - Read the boxfile.yml and set it in the registry
 #   4 - Validate an engine is specified in the boxfile.yml
@@ -19,6 +19,19 @@ require 'hookit/setup'
 include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
+
+# 1 - Link the app dir
+
+# remove /app if it already exists
+directory CODE_DIR do
+  action :delete
+end
+
+link CODE_DIR do
+  to LOCAL_CODE_SRC_DIR
+  owner 'gonano'
+  group 'gonano'
+end
 
 # 2 - Ensure the boxfile actually exists
 if not ::File.exists? "#{CODE_DIR}/boxfile.yml"

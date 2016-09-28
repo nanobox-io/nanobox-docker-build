@@ -43,8 +43,6 @@ logger.print(bullet('Setting up directories and permissions...'))
     recursive true
   end
   
-  # Some of the directories might already exist. Chown everything, unless it's a mount
-  execute "chown gonano #{dir}" do
-    only_if { `mount | grep " #{dir}"`.empty? }
-  end
+  # Some of the directories might already exist
+  execute "chown gonano #{dir}"
 end
