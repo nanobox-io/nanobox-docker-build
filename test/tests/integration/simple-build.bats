@@ -62,9 +62,6 @@
 
 @test "Run fetch hook" {
   
-  # link /mnt/app to /app
-  run docker exec build bash -c "cp -a /share/code/* /app"
-  
   run run_hook "fetch" "$(payload fetch)"
   print_output
   [ "$status" -eq 0 ]
@@ -177,8 +174,8 @@
 
 @test "Run compile hook" {
   
-  # remove /app/* from build
-  run docker exec build bash -c "rm -rf /app/*"
+  # remove /app from symlink
+  run docker exec build bash -c "rm -f /app"
   
   run run_hook "compile" "$(payload compile)"
   print_output
