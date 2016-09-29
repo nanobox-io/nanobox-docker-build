@@ -52,7 +52,7 @@ if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
       rsync \
         -a \
         --exclude-from '#{LOCAL_CODE_SRC_DIR}/.nanoignore' \
-        --exclude '.nanoignore' \
+        #{((['.nanoignore'] + build[:lib_dirs]).map {|dir| "--exclude '#{dir}'"}).join(' ')} \
         #{LOCAL_CODE_SRC_DIR}/ \
         #{CODE_DIR}
     EOF
