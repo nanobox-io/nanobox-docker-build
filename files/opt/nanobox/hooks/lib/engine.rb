@@ -29,6 +29,10 @@ module Nanobox
     # The ENV_DIR contains environment variables available to the
     # application in the live environment
     ENV_DIR = "#{DATA_DIR}/etc/env.d"
+    
+    # The DEV_ENV_DIR contains environment variables available to the 
+    # application in the dev environment
+    DEV_ENV_DIR = "/etc/env.d"
 
     # The PROFILE_DIR contains scripts used to setup the user profile.
     PROFILE_DIR = "#{DATA_DIR}/etc/profile.d"
