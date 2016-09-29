@@ -108,6 +108,24 @@
   [ "$status" -eq 0 ]
 }
 
+@test "Run mount hook" {
+  run run_hook "mount" "$(payload mount)"
+  print_output
+  [ "$status" -eq 0 ]
+
+  # verify the output
+  # [ "${lines[0]}" = "--- " ]
+  # [ "${lines[1]}" = "code.build: " ]
+  # [ "${lines[2]}" = "  engine: nodejs#refactor/v1 " ]
+  # [ "${lines[3]}" = "  lib_dirs: " ]
+  # [ "${lines[4]}" = "    - node_modules " ]
+
+  # second run, don't break
+  run run_hook "mount" "$(payload mount)"
+  print_output
+  [ "$status" -eq 0 ]
+}
+
 @test "Run build hook" {
   run run_hook "build" "$(payload build)"
   print_output
