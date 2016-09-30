@@ -11,4 +11,18 @@ before_install:
   - docker pull nanobox/hoarder
   - docker build -t nanobox/build .
 
-script: sudo stdbuf -o0 test/run_all.sh
+script:
+  - sudo stdbuf -o0 test/run_all.sh
+  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+
+after_success:
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  - docker build -t ${NAMESPACE}/build .
+  - docker tag ${NAMESPACE}/build ${NAMESPACE}/build:beta;
+  - docker push ${NAMESPACE}/build:beta;
+  - if [ "$BRANCH" == "master" ]; then
+    docker push ${NAMESPACE}/build;
+    else
+    docker tag ${NAMESPACE}/build ${NAMESPACE}/build:${BRANCH//\//_};
+    docker push ${NAMESPACE}/build:${BRANCH//\//_};
+    fi
