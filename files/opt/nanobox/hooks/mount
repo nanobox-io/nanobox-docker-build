@@ -23,21 +23,19 @@ logger.print(bullet("Running mount hook..."), 'debug')
 
 # 1 - iterate through lib_dirs
 build[:lib_dirs].each do |dir|
-  # a - ensure the source exists (with proper permissions)
+  # ensure the source exists
   directory "#{LIB_CACHE_DIR}/#{dir}" do
     recursive true
   end
 
+  # ensure it's owned by gonano
   execute "chown gonano #{LIB_CACHE_DIR}/#{dir}"
 
-  # b - ensure the destination exists (with proper permissions)
-
+  # ensure the destination exists
   directory "#{CODE_DIR}/#{dir}" do
     recursive true
   end
 
-  execute "chown gonano #{CODE_DIR}/#{dir}"
-  # c - bind mount
-
+  # bind mount the source onto the destination
   execute "mount -o bind #{LIB_CACHE_DIR}/#{dir} #{CODE_DIR}/#{dir}"
 end
