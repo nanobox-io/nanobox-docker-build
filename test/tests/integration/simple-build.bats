@@ -246,6 +246,11 @@
 }
 
 @test "Run publish hook" {
+  # Publishing and failing to upload should fail
+  run run_hook "publish" "$(payload publish-bad)"
+  print_output
+  [ "$status" -eq 1 ]
+
   run run_hook "publish" "$(payload publish)"
   print_output
   [ "$status" -eq 0 ]
