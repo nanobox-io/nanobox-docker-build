@@ -43,8 +43,6 @@
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /app ]"
-  [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/app ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/lib_dirs ]"
@@ -61,6 +59,10 @@
 }
 
 @test "Run fetch hook" {
+  
+  # manually copy the source to simulate a direct mount
+  run docker exec build bash -c "mkdir /app && chown gonano:gonano /app && cp -a /share/code/* /app/"
+  print_output
   
   run run_hook "fetch" "$(payload fetch)"
   print_output
@@ -193,7 +195,7 @@
 @test "Run compile hook" {
   
   # remove /app from symlink
-  run docker exec build bash -c "rm -f /app"
+  run docker exec build bash -c "rm -rf /app"
   
   # create an empty /app dir
   run docker exec build bash -c "mkdir /app && chown gonano:gonano /app"
