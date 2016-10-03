@@ -42,14 +42,14 @@ if payload[:previous_build] and not payload[:previous_build].empty?
     
     # register a stage with slurp
     execute "create stage for #{part}" do
-      command <<-EOF
-        siphon --prefix '  ' -- bash -c "\
-          curl \
+      command "siphon --prefix '  ' -- curl \
             -k \
+            -f \
+            -o /dev/null \
             -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
-            https://#{payload[:warehouse]}:1566/stages \
-            -d '{\\\"old-id\\\": \\\"#{previous}\\\", \\\"new-id\\\": \\\"#{current}\\\"}' > /dev/null"
-      EOF
+            -d '{\"old-id\": \"#{previous}\", \"new-id\": \"#{current}\"}' \
+            https://#{payload[:warehouse]}:1566/stages"
+
     end
 
     # sync
@@ -69,14 +69,13 @@ if payload[:previous_build] and not payload[:previous_build].empty?
 
     # commit to warehouse
     execute "commit #{part} stage" do
-      command <<-EOF
-        siphon --prefix '  ' -- bash -c "\
-          curl \
+      command "siphon --prefix '  ' -- curl \
             -k \
+            -f \
+            -o /dev/null \
             -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
-            https://#{payload[:warehouse]}:1566/stages/#{current} \
-            -X PUT > /dev/null"
-      EOF
+            -X PUT \
+            https://#{payload[:warehouse]}:1566/stages/#{current}"
     end
 
   end
@@ -108,14 +107,13 @@ else
     end
 
     execute "publish deploy" do
-      command <<-EOF
-        siphon --prefix '  ' -- bash -c "\
-          curl \
+      command "siphon --prefix '  ' -- curl \
             -k \
+            -f \
+            -o /dev/null \
             -H 'x-auth-token: #{payload[:warehouse_token]}' \
-            https://#{payload[:warehouse]}:7410/blobs/#{part}-#{payload[:build]}.tgz \
-            --data-binary @/var/tmp/#{part}-#{payload[:build]}.tgz > /dev/null"
-      EOF
+            --data-binary @/var/tmp/#{part}-#{payload[:build]}.tgz \
+            https://#{payload[:warehouse]}:7410/blobs/#{part}-#{payload[:build]}.tgz"
     end
 
   end
