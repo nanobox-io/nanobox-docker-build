@@ -61,7 +61,7 @@
 @test "Run fetch hook" {
   
   # manually copy the source to simulate a direct mount
-  run docker exec build bash -c "mkdir /app && chown gonano:gonano /app && cp -a /share/code/* /app"
+  run docker exec build bash -c "mkdir /app && chown gonano:gonano /app && cp -a /share/code/* /app/"
   
   run run_hook "fetch" "$(payload fetch)"
   print_output
