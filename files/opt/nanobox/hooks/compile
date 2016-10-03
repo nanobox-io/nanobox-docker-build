@@ -46,6 +46,17 @@ end
 
 # 3 - rsync the code from /share/code
 logger.print(bullet('Copying code...'))
+
+# make sure the directory exists and is owned by gonano first
+
+# create the dir if it doesn't exist
+directory CODE_DIR do
+  recursive true
+end
+
+# Some of the directories might already exist
+execute "chown gonano #{CODE_DIR}"
+
 if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
   execute "rsync code" do
     command <<-EOF
