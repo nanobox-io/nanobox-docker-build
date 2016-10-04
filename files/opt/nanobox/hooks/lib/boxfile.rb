@@ -22,15 +22,16 @@ module Nanobox
         engine:         {type: :string, default: nil},
         image:          {type: :string, default: nil},
         lib_dirs:       {type: :array, of: :folders, default: []},
-        extra_packages: {type: :array, of: :strings, default: nil},
-        dev_packages:   {type: :array, of: :strings, default: nil},
+        extra_packages: {type: :array, of: :string, default: []},
+        dev_packages:   {type: :array, of: :string, default: []},
+        paths:          {type: :array, of: :string, default: []},
 
-        before_setup:     {type: :array, of: :string, default: []},
-        after_setup:      {type: :array, of: :string, default: []},
+        before_setup:   {type: :array, of: :string, default: []},
+        after_setup:    {type: :array, of: :string, default: []},
         before_build:   {type: :array, of: :string, default: []},
         after_build:    {type: :array, of: :string, default: []},
-        before_compile:   {type: :array, of: :string, default: []},
-        after_compile:    {type: :array, of: :string, default: []}
+        before_compile: {type: :array, of: :string, default: []},
+        after_compile:  {type: :array, of: :string, default: []}
       }
     }
 
@@ -62,7 +63,7 @@ module Nanobox
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:       {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}}
       }
     }
 
@@ -74,7 +75,7 @@ module Nanobox
         start:          {type: :string, default: nil},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:       {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}}
       }
     }
 
@@ -83,12 +84,12 @@ module Nanobox
       default: {},
       template: {
         image:          {type: :string, default: nil},
-        start:          {type: :array, of: :string, default: nil},
+        start:          {type: :array, of: :string, default: []},
         routes:         {type: :array, of: :string, default: []},
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:       {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}}
       }
     }
 
@@ -97,10 +98,10 @@ module Nanobox
       default: {},
       template: {
         image:          {type: :string, default: nil},
-        start:          {type: :array, of: :string, default: nil},
+        start:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:       {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}}
       }
     }
 
@@ -114,7 +115,7 @@ module Nanobox
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:       {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}}
       }
     }
 
@@ -126,7 +127,7 @@ module Nanobox
         start:          {type: :hash, default: {}},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:       {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}}
       }
     }
 
@@ -136,18 +137,18 @@ module Nanobox
     }
 
     BOXFILE_BUILD_VALIDATOR = {
-      config:           { types: [:hash] },
-      engine:           { types: [:string], required: true },
-      image:            { types: [:string] },
-      lib_dirs:         { types: [:array_of_strings] },
-      extra_packages:   { types: [:array_of_strings] },
-      dev_packages:     { types: [:array_of_strings] },
-      before_setup:     { types: [:string, :array_of_strings] },
-      after_setup:      { types: [:string, :array_of_strings] },
+      config:         { types: [:hash] },
+      engine:         { types: [:string], required: true },
+      image:          { types: [:string] },
+      lib_dirs:       { types: [:array_of_strings] },
+      extra_packages: { types: [:array_of_strings] },
+      dev_packages:   { types: [:array_of_strings] },
+      before_setup:   { types: [:string, :array_of_strings] },
+      after_setup:    { types: [:string, :array_of_strings] },
       before_build:   { types: [:string, :array_of_strings] },
       after_build:    { types: [:string, :array_of_strings] },
-      before_compile:   { types: [:string, :array_of_strings] },
-      after_compile:    { types: [:string, :array_of_strings] }
+      before_compile: { types: [:string, :array_of_strings] },
+      after_compile:  { types: [:string, :array_of_strings] }
     }
 
     BOXFILE_DEPLOY_VALIDATOR = {

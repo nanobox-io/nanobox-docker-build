@@ -34,6 +34,10 @@ if [[ -n $PATH ]]; then
   export PATH=${PATH}:
 fi
 
+if [[ -n $EXTRA_PATHS ]]; then
+  export PATH=${PATH}${EXTRA_PATHS}:
+fi
+
 # if we have a base bootstrap, then let's add that first
 if [ -d /data ]; then
   export PATH=${PATH}/data/sbin:/data/bin:
