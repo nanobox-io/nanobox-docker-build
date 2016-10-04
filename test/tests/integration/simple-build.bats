@@ -142,6 +142,14 @@
   run run_hook "build" "$(payload build)"
   print_output
   [ "$status" -eq 0 ]
+
+  run docker exec build bash -c "[ -f /data/etc/env.d/EXTRA_PATHS ]"
+  print_output
+  [ "$status" -eq 0 ]
+
+  run docker exec build cat /data/etc/env.d/EXTRA_PATHS
+  print_output
+  [ "$output" = "/tmp:/var/tmp" ]
 }
 
 @test "Run pack-build hook" {

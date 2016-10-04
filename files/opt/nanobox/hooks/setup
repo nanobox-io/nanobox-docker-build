@@ -6,9 +6,7 @@
 # 2 - Extract the pkgin db from the cache
 # 3 - Update pkgin db
 # 4 - Install user-requested packages and dev_packages
-# 5 - Run before_setup
-# 6 - Run engine setup script
-# 7 - Run after_setup
+# 5 - Run engine setup script
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -100,29 +98,7 @@ if packages.any?
   logger.print(process_end)
 end
 
-# 5 - Run before_setup
-(build[:before_setup] || []).each_with_index do |cmd, i|
-
-  logger.print(process_start("Before setup hook #{i + 1}"))
-  logger.print("   $ #{cmd}\n")
-
-  execute "Before setup: #{cmd}" do
-    command <<-EOF
-      stdbuf -o0 \
-        siphon --prefix '  ' -- \
-          bash -i -l -c "#{escape cmd}"
-    EOF
-    cwd CODE_DIR
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logger.print data}
-  end
-
-  logger.print(process_end)
-end
-
-# 6 - Run engine setup script
+# 5 - Run engine setup script
 if ::File.exist? "#{ENGINE_DIR}/bin/setup"
 
   execute "setup environment" do
@@ -134,26 +110,4 @@ if ::File.exist? "#{ENGINE_DIR}/bin/setup"
     stream true
     on_data {|data| logger.print data}
   end
-end
-
-# 7 - Run after_setup
-(build[:after_setup] || []).each_with_index do |cmd, i|
-
-  logger.print(process_start("After setup hook #{i + 1}"))
-  logger.print("   $ #{cmd}\n")
-
-  execute "After setup: #{cmd}" do
-    command <<-EOF
-      stdbuf -o0 \
-        siphon --prefix '  ' -- \
-          bash -i -l -c "#{escape cmd}"
-    EOF
-    cwd CODE_DIR
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logger.print data}
-  end
-
-  logger.print(process_end)
 end

@@ -26,8 +26,6 @@ module Nanobox
         dev_packages:   {type: :array, of: :string, default: []},
         paths:          {type: :array, of: :string, default: []},
 
-        before_setup:   {type: :array, of: :string, default: []},
-        after_setup:    {type: :array, of: :string, default: []},
         before_build:   {type: :array, of: :string, default: []},
         after_build:    {type: :array, of: :string, default: []},
         before_compile: {type: :array, of: :string, default: []},
@@ -143,8 +141,7 @@ module Nanobox
       lib_dirs:       { types: [:array_of_strings] },
       extra_packages: { types: [:array_of_strings] },
       dev_packages:   { types: [:array_of_strings] },
-      before_setup:   { types: [:string, :array_of_strings] },
-      after_setup:    { types: [:string, :array_of_strings] },
+      paths:          { types: [:array_of_strings] },
       before_build:   { types: [:string, :array_of_strings] },
       after_build:    { types: [:string, :array_of_strings] },
       before_compile: { types: [:string, :array_of_strings] },
