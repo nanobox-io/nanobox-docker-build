@@ -29,7 +29,6 @@ logger.print(bullet('Setting up directories and permissions...'))
   "#{PROFILE_DIR}",
   "#{BUILD_DIR}",
   "#{DEPLOY_DIR}",
-  "#{CODE_DIR}",
   "#{APP_DIR}",
   "#{CACHE_DIR}",
   "#{APP_CACHE_DIR}",

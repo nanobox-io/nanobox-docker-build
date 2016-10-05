@@ -2,11 +2,10 @@
 
 # Fetch the codebase and cache
 #
-#   1 - symlink the code from /share/code
-#   2 - Validate and enfore boxfile.yml
-#   3 - Read the boxfile.yml and set it in the registry
-#   4 - Validate an engine is specified in the boxfile.yml
-#   5 - Fetch or copy the engine if specified
+#   1 - Validate and enfore boxfile.yml
+#   2 - Read the boxfile.yml and set it in the registry
+#   3 - Validate an engine is specified in the boxfile.yml
+#   4 - Fetch or copy the engine if specified
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -20,31 +19,20 @@ include Nanobox::Engine
 include Nanobox::Output
 include Nanobox::Boxfile
 
-# 1 - Link the app dir
-
-# remove /app if it already exists
-directory CODE_DIR do
-  action :delete
-end
-
-link CODE_DIR do
-  to LOCAL_CODE_SRC_DIR
-end
-
-# 2 - Ensure the boxfile actually exists
+# 1 - Ensure the boxfile actually exists
 if not ::File.exists? "#{CODE_DIR}/boxfile.yml"
   # print a fatal explaining that boxfile is required.
   logger.print missing_boxfile
   exit 1
 end
 
-# 3 - Read the boxfile.yml
+# 2 - Read the boxfile.yml
 app_boxfile = begin
   (YAML::load(File.open("#{CODE_DIR}/boxfile.yml")) rescue {})
     .deep_symbolize_keys
 end
 
-# 4 - Validate the boxfile
+# 3 - Validate the boxfile
 errors = validate_boxfile(app_boxfile)
 
 if errors != {}
@@ -52,7 +40,7 @@ if errors != {}
   exit 1
 end
 
-# 5 - Persist the boxfile in the registry
+# 4 - Persist the boxfile in the registry
 
 # set the raw app boxfile for later use
 registry('raw_app_boxfile', app_boxfile)

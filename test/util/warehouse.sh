@@ -15,10 +15,20 @@ start_warehouse() {
     warehouse \
     /opt/nanobox/hooks/configure "$(configure_payload)"
 
+  sleep 2
+
   # start
   docker exec \
     warehouse \
     /opt/nanobox/hooks/start "$(start_payload)"
+  sleep 1
+  docker exec \
+    warehouse \
+    /opt/gonano/sbin/sv stop hoarder
+  sleep 1
+  docker exec \
+    warehouse \
+    /opt/gonano/sbin/sv start hoarder
 }
 
 stop_warehouse() {

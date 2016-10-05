@@ -43,7 +43,6 @@ execute "rsync engine" do
   user 'gonano'
 end
 
-
 # 3 - rsync the code from /share/code
 logger.print(bullet('Copying code...'))
 if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
