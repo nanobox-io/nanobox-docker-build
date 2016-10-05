@@ -1,3 +1,6 @@
 code.build:
   # engine: nodejs -> nanobox-io/nanobox-engine-nodejs
   engine: nodejs
+  paths:
+    - /tmp
+    - /var/tmp
