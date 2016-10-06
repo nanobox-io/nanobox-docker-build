@@ -101,6 +101,27 @@ END
   [ "$output" = "$expected" ]
 }
 
+@test "Merging boxfile arrays" {
+  payload1='{"code.build":{"lib_dirs":["test"]}}'
+  payload2='{"code.build":{"lib_dirs":["next"]}}'
+  
+  run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
+  
+  expected=$(cat <<-END
+---
+code.build:
+  lib_dirs:
+  - test
+  - next
+
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
 @test "Stop Container" {
   stop_container
 }

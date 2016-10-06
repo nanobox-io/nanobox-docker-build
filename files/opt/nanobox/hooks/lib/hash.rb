@@ -6,7 +6,13 @@ class Hash
   def deep_merge!(other_hash)
     other_hash.each_pair do |k,v|
       tv = self[k]
-      self[k] = tv.is_a?(Hash) && v.is_a?(Hash) ? tv.deep_merge(v) : v
+      if tv.is_a?(Array) && v.is_a?(Array)
+        self[k] = (tv + v).uniq
+      elsif tv.is_a?(Hash) && v.is_a?(Hash)
+        self[k] = tv.deep_merge(v)
+      else
+        self[k] = v
+      end
     end
     self
   end
