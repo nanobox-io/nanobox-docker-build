@@ -28,6 +28,11 @@ end
 # and that it's owned by gonano
 execute "chown gonano #{DEV_ENV_DIR}"
 
+execute "iptables forward rule" do
+	command "iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080"
+	only_if {`iptables -t nat -C PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080 2>&1`.include?("iptables: No chain/target/match by that name.")}
+end
+
 (payload[:env] || {}).each do |key, value|
 
   if not key.empty?
