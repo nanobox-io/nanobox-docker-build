@@ -18,6 +18,14 @@
 ^/lib/libmenu
 ^/lib/libncurses
 ^/lib/libpanel
+# bzip2
+^/lib/libbz2
+# lzma
+^/lib/liblzma
+# sqlite
+^/lib/libsqlite
+# intl
+^/lib/libintl
 # openssl
 ^/etc/openssl
 ^/lib/engines
