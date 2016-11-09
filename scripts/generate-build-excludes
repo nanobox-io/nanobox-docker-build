@@ -9,3 +9,6 @@ for entry in $(cat /var/nanobox/build-exceptions.txt | grep -v '#'); do
   rule=$(echo $entry | sed 's/\//\\\//g')
   sed -i "/${rule}/d" /var/nanobox/build-excludes.txt
 done
+
+# 3) Exclude the user's ssh folder to prevent it from being published to production servers
+echo "/var/home/gonano/.ssh" >> /var/nanobox/build-excludes.txt

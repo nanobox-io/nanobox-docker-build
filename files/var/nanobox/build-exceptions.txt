@@ -13,6 +13,7 @@
 ^/sbin$
 ^/var$
 ^/var/db$
+^/var/home
 # ncurses
 ^/lib/libform
 ^/lib/libmenu
