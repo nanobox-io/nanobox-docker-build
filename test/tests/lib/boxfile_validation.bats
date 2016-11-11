@@ -40,7 +40,7 @@ END
 
 @test "Should be empty when there aren't errors" {
   payload=$(cat <<-END
-code.build:
+run.config:
   engine: ruby
 END
 )
@@ -54,7 +54,7 @@ END
 
 @test "Should require an engine" {
   payload=$(cat <<-END
-code.build:
+run.config:
   config: {}
 END
 )
@@ -63,7 +63,7 @@ END
 
   expected=$(cat <<-END
 --- 
-code.build: 
+run.config: 
   engine: "Cannot be empty"
 END
 )
@@ -75,7 +75,7 @@ END
 
 @test "Should enforce proper types" {
   payload=$(cat <<-END
-code.build:
+run.config:
   engine: 1
   
 web.main:
@@ -88,7 +88,7 @@ END
 
   expected=$(cat <<-END
 --- 
-code.build: 
+run.config: 
   engine: "Must be a string"
 web.main: 
   log_watch: "Must be a hash"
@@ -103,7 +103,7 @@ END
 
 @test "Ensures writable dirs reference actual components" {
   payload=$(cat <<-END
-code.build:
+run.config:
     engine: ruby
     
 web.main:
@@ -143,7 +143,7 @@ END
 
 @test "Validates all required nodes" {
   payload=$(cat <<-END
-code.build: {}
+run.config: {}
 
 web.main: {}
 
@@ -157,10 +157,10 @@ END
   
   expected=$(cat <<-END
 --- 
-code.build: 
-  engine: "Cannot be empty"
 data.db: 
   image: "Cannot be empty"
+run.config: 
+  engine: "Cannot be empty"
 web.main: 
   start: "Cannot be empty"
 worker.main: 

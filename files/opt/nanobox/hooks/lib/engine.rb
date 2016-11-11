@@ -119,10 +119,10 @@ module Nanobox
       '/bin'
     ].join (':')
 
-    # Extract the 'code.build' section of the payload, which is only the
-    # 'code.build' section of the Boxfile provided by the app
+    # Extract the 'run.config' section of the payload, which is only the
+    # 'run.config' section of the Boxfile provided by the app
     def build
-      boxfile[:"code.build"] || {}
+      boxfile[:"run.config"] || {}
     end
 
     # extract engine from the env payload
@@ -140,7 +140,7 @@ module Nanobox
         cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,
-        config: build[:config] || {}
+        config: build[:"engine.config"] || {}
       }.to_json
     end
 
@@ -158,7 +158,7 @@ module Nanobox
 
       # for each of the values in config, we'll generate environment variables
       # prefixed with CONFIG_ that the engine can use.
-      config = (build[:config] || {}).to_json
+      config = (build[:"engine.config"] || {}).to_json
       lines = `echo "#{config.gsub(/"/, "\\\"")}" | shon | sed -e "s/^/CONFIG_/"`
 
       lines.split.each do |line|

@@ -43,14 +43,14 @@ END
 }
 
 @test "Deep merge child nodes" {
-  payload1='{"code.build":{"engine":"engine"}}'
-  payload2='{"code.build":{"before_build":["echo hello"]}}'
+  payload1='{"run.config":{"engine":"engine"}}'
+  payload2='{"run.config":{"before_build":["echo hello"]}}'
   
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   
   expected=$(cat <<-END
 ---
-code.build:
+run.config:
   engine: engine
   before_build:
   - echo hello
@@ -63,14 +63,14 @@ END
 }
 
 @test "Merged boxfile includes nodes from both boxfiles" {
-  payload1='{"code.build":{},"web":{}}'
+  payload1='{"run.config":{},"web":{}}'
   payload2='{"worker":{},"data":{"image":"nanobox/mysql"}}'
   
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   
   expected=$(cat <<-END
 ---
-code.build: {}
+run.config: {}
 web: {}
 worker: {}
 data:
@@ -84,14 +84,14 @@ END
 }
 
 @test "Second boxfile values replace first one" {
-  payload1='{"code.build":{"engine":"test"}}'
-  payload2='{"code.build":{"engine":"replaced"}}'
+  payload1='{"run.config":{"engine":"test"}}'
+  payload2='{"run.config":{"engine":"replaced"}}'
   
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   
   expected=$(cat <<-END
 ---
-code.build:
+run.config:
   engine: replaced
 END
 )
@@ -102,14 +102,14 @@ END
 }
 
 @test "Merging boxfile arrays" {
-  payload1='{"code.build":{"lib_dirs":["test"]}}'
-  payload2='{"code.build":{"lib_dirs":["next"]}}'
+  payload1='{"run.config":{"lib_dirs":["test"]}}'
+  payload2='{"run.config":{"lib_dirs":["next"]}}'
   
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   
   expected=$(cat <<-END
 ---
-code.build:
+run.config:
   lib_dirs:
   - test
   - next

@@ -5,9 +5,8 @@
 # 1 - Remove previous app release if any
 # 2 - extract the engine from cache
 # 3 - rsync the code from /share/code
-# 4 - Run boxfile.yml before_compile
-# 5 - Run engine compile script
-# 6 - Run boxfile.yml after_compile
+# 4 - Run engine compile script
+# 5 - Run boxfile.yml extra_steps
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift '/opt/gonano/hookit/vendor/bundle'
@@ -69,28 +68,6 @@ else
   end
 end
 
-# 4 - Run before_compile
-build[:before_compile].each_with_index do |cmd, i|
-
-  logger.print(process_start("Before compile hook #{i + 1}"))
-  logger.print("   $ #{cmd}\n")
-
-  execute "Before compile: #{cmd}" do
-    command <<-EOF
-      stdbuf -o0 \
-        siphon --prefix '  ' -- \
-          bash -i -l -c "#{escape cmd}"
-    EOF
-    cwd CODE_DIR
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logger.print data}
-  end
-
-  logger.print(process_end)
-end
-
 # 5 - Run engine compile script
 if ::File.exist? "#{ENGINE_DIR}/bin/compile"
 
@@ -107,8 +84,8 @@ if ::File.exist? "#{ENGINE_DIR}/bin/compile"
   end
 end
 
-# 6 - Run after_compile
-build[:after_compile].each_with_index do |cmd, i|
+# 6 - Run extra_steps
+build[:extra_steps].each_with_index do |cmd, i|
 
   logger.print(process_start("After compile hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")

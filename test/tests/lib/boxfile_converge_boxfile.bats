@@ -37,7 +37,7 @@ END
 }
 
 @test "Test string start commands" {
-  payload='{"code.build":{},"web.site":{"start":"something"},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{},"web.site":{"start":"something"},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   
   expected=$(cat <<-END
@@ -57,7 +57,7 @@ END
 }
 
 @test "Test hash start commands" {
-  payload='{"code.build":{},"web.site":{"start":{"worker":"something"}},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{},"web.site":{"start":{"worker":"something"}},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   
   expected=$(cat <<-END
@@ -79,7 +79,7 @@ END
 }
 
 @test "Test string and hash start commands" {
-  payload='{"code.build":{},"web.site":{"start":"something"},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{},"web.site":{"start":"something"},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   
   expected=$(cat <<-END
@@ -100,13 +100,13 @@ END
 }
 
 @test "Converge using complex names for services" {
-  payload='{"code.deploy":{"before_deploy":{"web.site":["echo hi"]}},"web.site":{},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"deploy.config":{"before_live":{"web.site":["echo hi"]}},"web.site":{},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   
   expected=$(cat <<-END
 ---
-code.deploy:
-  before_deploy:
+deploy.config:
+  before_live:
     web.site:
     - echo hi
 data.db:

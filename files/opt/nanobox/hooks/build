@@ -31,29 +31,7 @@ if build[:paths] && build[:paths].length > 0
   end
 end
 
-# 2 - Run before_build
-build[:before_build].each_with_index do |cmd, i|
-
-  logger.print(process_start("Before build hook #{i + 1}"))
-  logger.print("   $ #{cmd}\n")
-
-  execute "Before build: #{cmd}" do
-    command <<-EOF
-      stdbuf -o0 \
-        siphon --prefix '  ' -- \
-          bash -i -l -c "#{escape cmd}"
-    EOF
-    cwd CODE_DIR
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data { |data| logger.print data }
-  end
-
-  logger.print(process_end)
-end
-
-# 3 - Run engine build script
+# 2 - Run engine build script
 logger.print(bullet("Running build hook..."), 'debug')
 
 if ::File.exist? "#{ENGINE_DIR}/bin/build"
@@ -72,8 +50,8 @@ if ::File.exist? "#{ENGINE_DIR}/bin/build"
 
 end
 
-# 4 - Run after_build
-build[:after_build].each_with_index do |cmd, i|
+# 3 - Run after_build
+build[:extra_steps].each_with_index do |cmd, i|
 
   logger.print(process_start("After build hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")
