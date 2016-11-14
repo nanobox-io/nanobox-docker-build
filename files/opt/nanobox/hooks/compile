@@ -50,7 +50,7 @@ if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
       rsync \
         -a \
         --exclude-from '#{LOCAL_CODE_SRC_DIR}/.nanoignore' \
-        #{((['.nanoignore'] + build[:lib_dirs]).map {|dir| "--exclude '#{dir}'"}).join(' ')} \
+        #{((['.nanoignore'] + run_config[:cache_dirs]).map {|dir| "--exclude '#{dir}'"}).join(' ')} \
         #{LOCAL_CODE_SRC_DIR}/ \
         #{CODE_DIR}
     EOF
@@ -85,23 +85,25 @@ if ::File.exist? "#{ENGINE_DIR}/bin/compile"
 end
 
 # 6 - Run extra_steps
-build[:extra_steps].each_with_index do |cmd, i|
+if deploy_config[:extra_steps]
+  deploy_config[:extra_steps].each_with_index do |cmd, i|
 
-  logger.print(process_start("After compile hook #{i + 1}"))
-  logger.print("   $ #{cmd}\n")
+    logger.print(process_start("After compile hook #{i + 1}"))
+    logger.print("   $ #{cmd}\n")
 
-  execute "After compile: #{cmd}" do
-    command <<-EOF
-      stdbuf -o0 \
-        siphon --prefix '  ' -- \
-          bash -i -l -c "#{escape cmd}"
-    EOF
-    cwd CODE_DIR
-    path GONANO_PATH
-    user 'gonano'
-    stream true
-    on_data {|data| logger.print data}
+    execute "After compile: #{cmd}" do
+      command <<-EOF
+        stdbuf -o0 \
+          siphon --prefix '  ' -- \
+            bash -i -l -c "#{escape cmd}"
+      EOF
+      cwd CODE_DIR
+      path GONANO_PATH
+      user 'gonano'
+      stream true
+      on_data {|data| logger.print data}
+    end
+
+    logger.print(process_end)
   end
-
-  logger.print(process_end)
 end

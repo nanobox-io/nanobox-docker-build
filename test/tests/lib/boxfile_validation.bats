@@ -77,7 +77,6 @@ END
   payload=$(cat <<-END
 run.config:
   engine: 1
-  
 web.main:
   start: true
   log_watch: ok

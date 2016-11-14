@@ -22,9 +22,9 @@ include Nanobox::Hook
 logger.print(bullet("Running build hook..."), 'debug')
 
 # 1 - Add custom paths environment variable
-if build[:paths] && build[:paths].length > 0
+if run_config[:extra_path_dirs] && run_config[:extra_path_dirs].length > 0
   file "/data/etc/env.d/EXTRA_PATHS" do
-    content build[:paths].join(":")
+    content run_config[:extra_path_dirs].join(":")
     owner 'gonano'
     group 'gonano'
     mode 0444
@@ -51,7 +51,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/build"
 end
 
 # 3 - Run after_build
-build[:extra_steps].each_with_index do |cmd, i|
+run_config[:extra_steps].each_with_index do |cmd, i|
 
   logger.print(process_start("After build hook #{i + 1}"))
   logger.print("   $ #{cmd}\n")

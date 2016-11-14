@@ -18,16 +18,16 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
-        "engine.config":  {type: :hash, default: {}},
-        engine:         {type: :string, default: nil},
-        image:          {type: :string, default: nil},
-        lib_dirs:       {type: :array, of: :folders, default: []},
-        extra_packages: {type: :array, of: :string, default: []},
-        dev_packages:   {type: :array, of: :string, default: []},
-        paths:          {type: :array, of: :string, default: []},
-        extra_steps:    {type: :array, of: :string, default: []},
-        cwd:            {type: :folder, default: nil},
-        fs_watch:       {type: :on_off, default: nil}
+        "engine.config": {type: :hash, default: {}},
+        engine:          {type: :string, default: nil},
+        image:           {type: :string, default: nil},
+        cache_dirs:      {type: :array, of: :folders, default: []},
+        extra_packages:  {type: :array, of: :string, default: []},
+        dev_packages:    {type: :array, of: :string, default: []},
+        extra_path_dirs: {type: :array, of: :string, default: []},
+        extra_steps:     {type: :array, of: :string, default: []},
+        cwd:             {type: :folder, default: nil},
+        fs_watch:        {type: :on_off, default: nil}
       }
     }
 
@@ -35,7 +35,7 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
-        extra_steps:    {type: :array, of: :string, default: []},
+        extra_steps:          {type: :array, of: :string, default: []},
         deploy_hook_timeout:  {type: :integer, default: nil},
         transform:            {type: :array, of: :string, default: []}
       }
@@ -124,32 +124,27 @@ module Nanobox
       config: { types: [:hash] }
     }
 
-    BOXFILE_BUILD_VALIDATOR = {
-      config:         { types: [:hash] },
-      engine:         { types: [:string], required: true },
-      image:          { types: [:string] },
-      lib_dirs:       { types: [:array_of_strings] },
-      extra_packages: { types: [:array_of_strings] },
-      dev_packages:   { types: [:array_of_strings] },
-      paths:          { types: [:array_of_strings] },
-      before_build:   { types: [:string, :array_of_strings] },
-      after_build:    { types: [:string, :array_of_strings] },
-      before_compile: { types: [:string, :array_of_strings] },
-      after_compile:  { types: [:string, :array_of_strings] }
+    BOXFILE_RUN_VALIDATOR = {
+      config:          { types: [:hash] },
+      engine:          { types: [:string], required: true },
+      image:           { types: [:string] },
+      cache_dirs:      { types: [:array_of_strings] },
+      extra_packages:  { types: [:array_of_strings] },
+      dev_packages:    { types: [:array_of_strings] },
+      extra_path_dirs: { types: [:array_of_strings] },
+      extra_steps:     { types: [:string, :array_of_strings] },
+      cwd:      { types: [:string] },
+      fs_watch: { types: [:boolean] }
     }
 
     BOXFILE_DEPLOY_VALIDATOR = {
-      deploy_hook_timeout:  { types: [:integer] },
-      transform:            { types: [:string, :array_of_strings] },
-      before_live:        { types: [:hash] },
-      before_live_all:    { types: [:hash] },
-      after_live:         { types: [:hash] },
-      after_live_all:     { types: [:hash] }
-    }
-
-    BOXFILE_DEV_VALIDATOR = {
-      cwd:      { types: [:string] },
-      fs_watch: { types: [:boolean] }
+      deploy_hook_timeout: { types: [:integer] },
+      transform:           { types: [:string, :array_of_strings] },
+      extra_steps:         { types: [:string, :array_of_strings] },
+      before_live:         { types: [:hash] },
+      before_live_all:     { types: [:hash] },
+      after_live:          { types: [:hash] },
+      after_live_all:      { types: [:hash] }
     }
 
     BOXFILE_WEB_VALIDATOR = {
@@ -190,13 +185,8 @@ module Nanobox
 
       boxfile.each_pair do |key, value|
         case key
-        when /^dev$/
-          dev_errors = validate_section(value, BOXFILE_DEV_VALIDATOR)
-          if dev_errors != {}
-            errors[key] = dev_errors
-          end
         when /^run\.config$/
-          build_errors = validate_section(value, BOXFILE_BUILD_VALIDATOR)
+          build_errors = validate_section(value, BOXFILE_RUN_VALIDATOR)
           if build_errors != {}
             errors[key] = build_errors
           end
@@ -272,7 +262,7 @@ module Nanobox
         # verify deploy hooks point to actual web or woker components
         if key =~ /^deploy.config$/
           value.each_pair do |k2, v2|
-            if k2 =~ /(before|after)_deploy($|_all$)/
+            if k2 =~ /(before|after)_live($|_all$)/
               v2.keys.each do |component|
                 if not component =~ /^(web|worker)\./ or boxfile[component].nil?
                   if errors[key].nil?

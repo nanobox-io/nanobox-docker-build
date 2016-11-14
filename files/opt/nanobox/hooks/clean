@@ -37,7 +37,7 @@ if ::File.exist? "#{ENGINE_DIR}/bin/cleanup"
 end
 
 # 2 - Uninstall user-requested dev_packages
-packages = build[:dev_packages] || []
+packages = run_config[:dev_packages] || []
 
 if packages.any?
   logger.print(process_start("Uninstalling user-requested dev packages"))

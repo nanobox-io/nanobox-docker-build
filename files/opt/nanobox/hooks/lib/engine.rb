@@ -85,9 +85,9 @@ module Nanobox
     # The app cache directory is the directory exposed to the engine
     # for general use
     APP_CACHE_DIR = "#{CACHE_DIR}/app"
-    # The lib_dirs cache dir is an internal directory whose purpose is to
-    # facilitate the storage/retrieval of lib_dirs like ruby's gems
-    LIB_CACHE_DIR = "#{CACHE_DIR}/lib_dirs"
+    # The cache_dirs cache dir is an internal directory whose purpose is to
+    # facilitate the storage/retrieval of cache_dirs like ruby's gems
+    LIB_CACHE_DIR = "#{CACHE_DIR}/cache_dirs"
 
     # The NANOBOX_DIR is a parent directory which contains engines, hooks, and
     # other utilities
@@ -121,13 +121,17 @@ module Nanobox
 
     # Extract the 'run.config' section of the payload, which is only the
     # 'run.config' section of the Boxfile provided by the app
-    def build
+    def run_config
       boxfile[:"run.config"] || {}
+    end
+
+    def deploy_config
+      boxfile[:"deploy.config"] || {}
     end
 
     # extract engine from the env payload
     def engine
-      $engine ||= build[:engine]
+      $engine ||= run_config[:engine]
     end
 
     # This payload will serialized as JSON and passed into each of the
@@ -140,7 +144,7 @@ module Nanobox
         cache_dir: APP_CACHE_DIR,
         etc_dir: ETC_DIR,
         env_dir: ENV_DIR,
-        config: build[:"engine.config"] || {}
+        config: run_config[:"engine.config"] || {}
       }.to_json
     end
 
@@ -158,7 +162,7 @@ module Nanobox
 
       # for each of the values in config, we'll generate environment variables
       # prefixed with CONFIG_ that the engine can use.
-      config = (build[:"engine.config"] || {}).to_json
+      config = (run_config[:"engine.config"] || {}).to_json
       lines = `echo "#{config.gsub(/"/, "\\\"")}" | shon | sed -e "s/^/CONFIG_/"`
 
       lines.split.each do |line|

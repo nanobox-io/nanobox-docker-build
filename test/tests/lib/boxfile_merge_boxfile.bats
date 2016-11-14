@@ -102,15 +102,15 @@ END
 }
 
 @test "Merging boxfile arrays" {
-  payload1='{"run.config":{"lib_dirs":["test"]}}'
-  payload2='{"run.config":{"lib_dirs":["next"]}}'
+  payload1='{"run.config":{"cache_dirs":["test"]}}'
+  payload2='{"run.config":{"cache_dirs":["next"]}}'
   
   run docker exec build bash -c "/tmp/merge_boxfile '${payload1}' '${payload2}'"
   
   expected=$(cat <<-END
 ---
 run.config:
-  lib_dirs:
+  cache_dirs:
   - test
   - next
 

@@ -45,7 +45,7 @@
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/app ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /mnt/cache/lib_dirs ]"
+  run docker exec build bash -c "[ -d /mnt/cache/cache_dirs ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /opt/nanobox/engine ]"
   [ "$status" -eq 0 ]
@@ -101,7 +101,7 @@
   # [ "${lines[0]}" = "--- " ]
   # [ "${lines[1]}" = "run.config: " ]
   # [ "${lines[2]}" = "  engine: nodejs#refactor/v1 " ]
-  # [ "${lines[3]}" = "  lib_dirs: " ]
+  # [ "${lines[3]}" = "  cache_dirs: " ]
   # [ "${lines[4]}" = "    - node_modules " ]
 
   # second run, don't break
@@ -119,7 +119,7 @@
   # [ "${lines[0]}" = "--- " ]
   # [ "${lines[1]}" = "run.config: " ]
   # [ "${lines[2]}" = "  engine: nodejs#refactor/v1 " ]
-  # [ "${lines[3]}" = "  lib_dirs: " ]
+  # [ "${lines[3]}" = "  cache_dirs: " ]
   # [ "${lines[4]}" = "    - node_modules " ]
 
   # second run, don't break
