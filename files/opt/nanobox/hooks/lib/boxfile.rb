@@ -125,7 +125,7 @@ module Nanobox
     }
 
     BOXFILE_RUN_VALIDATOR = {
-      config:          { types: [:hash] },
+      "engine.config": { types: [:hash] },
       engine:          { types: [:string], required: true },
       image:           { types: [:string] },
       cache_dirs:      { types: [:array_of_strings] },
@@ -289,6 +289,10 @@ module Nanobox
 
       # first let's iterate through the provided configuration
       conf.each_pair do |key, value|
+        # Tell users when they are using old nodes
+        if ["dev", "code.build", "code.deploy"].include? key
+          errors[key] = 'Deprecated node'
+        end
         # let's make sure the conf is supported
         if validator[key].nil?
           errors[key] = 'Invalid node'

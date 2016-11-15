@@ -55,7 +55,7 @@ END
 @test "Should require an engine" {
   payload=$(cat <<-END
 run.config:
-  config: {}
+  engine.config: {}
 END
 )
 
