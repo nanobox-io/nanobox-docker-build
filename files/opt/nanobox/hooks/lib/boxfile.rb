@@ -473,5 +473,18 @@ module Nanobox
       converge(template_boxfile(original), original)
     end
 
+    # check to see if boxfile.yml contains legacy configuration
+    def legacy_boxfile(boxfile)
+      
+      # look for old keys
+      boxfile.keys.each do |key|
+        if ["dev", "code.build", "code.deploy"].include? key
+          return true
+        end
+      end
+      
+      false
+    end
+
   end
 end
