@@ -474,7 +474,7 @@ module Nanobox
     end
 
     # check to see if boxfile.yml contains legacy configuration
-    def legacy_boxfile(boxfile)
+    def boxfile_has_legacy_config(boxfile)
       
       # look for old keys
       boxfile.keys.each do |key|

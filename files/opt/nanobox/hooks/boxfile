@@ -51,7 +51,7 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   merged_boxfile = engine_boxfile.deep_merge(app_boxfile)
 
   # 3 - Check for legacy configuration
-  if legacy_boxfile(merged_boxfile)
+  if boxfile_has_legacy_config(merged_boxfile)
     # print a fatal explaining that upgrade is required
     logger.print legacy_boxfile
     exit 1
