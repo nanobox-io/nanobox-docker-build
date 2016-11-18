@@ -53,14 +53,14 @@ registry('boxfile', converge_boxfile(app_boxfile))
 # If the engine is specified, we're gonna fetch it from one of 4 sources.
 # Once the engine is fetched, we'll put it in the ENGINE_DIR as "custom"
 
-case engine_url_type(build[:engine])
+case engine_url_type(run_config[:engine])
 when 'none'
   # do nothing, not having an engine was intentional
 when 'git'
 
   logger.print(process_start("Cloning engine"))
 
-  repo = engine_git_url(build[:engine])
+  repo = engine_git_url(run_config[:engine])
 
   execute "cloning #{repo}" do
     command "siphon --prefix '  ' -- git clone #{repo} engine"
@@ -73,7 +73,7 @@ when 'git'
 
   logger.print(process_end)
 
-  commit = engine_git_commitish(build[:engine])
+  commit = engine_git_commitish(run_config[:engine])
 
   if commit
     logger.print(process_start("Checking out: #{commit}"))
@@ -93,7 +93,7 @@ when 'github'
 
   logger.print(process_start("Cloning engine from github"))
 
-  repo = engine_git_url(build[:engine])
+  repo = engine_git_url(run_config[:engine])
   url = "https://github.com/#{repo}.git"
 
   execute "cloning #{repo}" do
@@ -107,7 +107,7 @@ when 'github'
 
   logger.print(process_end)
 
-  commit = engine_git_commitish(build[:engine])
+  commit = engine_git_commitish(run_config[:engine])
 
   if commit
     logger.print(process_start("Checking out: #{commit}"))
@@ -127,7 +127,7 @@ when 'nanobox'
 
   logger.print(process_start("Cloning engine"))
 
-  repo = engine_nanobox_url(build[:engine])
+  repo = engine_nanobox_url(run_config[:engine])
 
   execute "cloning #{repo}" do
     command "siphon --prefix '  ' -- git clone #{repo} engine"
@@ -140,7 +140,7 @@ when 'nanobox'
 
   logger.print(process_end)
 
-  commit = engine_git_commitish(build[:engine])
+  commit = engine_git_commitish(run_config[:engine])
 
   if commit
     logger.print(process_start("Checking out: #{commit}"))

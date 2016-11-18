@@ -231,6 +231,21 @@ If you're curious, here are the issues:
 #{failure}
       END
     end
+    
+    # If a boxfile.yml contains legacy configuration, this function can
+    # be called to print the errors and inform the user of next steps
+    def legacy_boxfile
+      message = <<-END
+We have been working on some exciting changes! It looks like you need to
+upgrade to take advantage of the new workflow and simpler configuration.
+      
+Check out this guide to walk you through this quick upgrade:
+
+https://gist.github.com/tylerflint/3262228c3e8a29addd382f53de9aa2ea
+      END
+      
+      fatal "legacy boxfile.yml", message
+    end
 
     def invalid_engine(engine)
       message = <<-END

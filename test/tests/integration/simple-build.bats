@@ -45,7 +45,7 @@
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /mnt/cache/app ]"
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -d /mnt/cache/lib_dirs ]"
+  run docker exec build bash -c "[ -d /mnt/cache/cache_dirs ]"
   [ "$status" -eq 0 ]
   run docker exec build bash -c "[ -d /opt/nanobox/engine ]"
   [ "$status" -eq 0 ]
@@ -99,9 +99,9 @@
 
   # verify the output
   # [ "${lines[0]}" = "--- " ]
-  # [ "${lines[1]}" = "code.build: " ]
+  # [ "${lines[1]}" = "run.config: " ]
   # [ "${lines[2]}" = "  engine: nodejs#refactor/v1 " ]
-  # [ "${lines[3]}" = "  lib_dirs: " ]
+  # [ "${lines[3]}" = "  cache_dirs: " ]
   # [ "${lines[4]}" = "    - node_modules " ]
 
   # second run, don't break
@@ -117,9 +117,9 @@
 
   # verify the output
   # [ "${lines[0]}" = "--- " ]
-  # [ "${lines[1]}" = "code.build: " ]
+  # [ "${lines[1]}" = "run.config: " ]
   # [ "${lines[2]}" = "  engine: nodejs#refactor/v1 " ]
-  # [ "${lines[3]}" = "  lib_dirs: " ]
+  # [ "${lines[3]}" = "  cache_dirs: " ]
   # [ "${lines[4]}" = "    - node_modules " ]
 
   # second run, don't break
@@ -149,7 +149,7 @@
 
   run docker exec build cat /data/etc/env.d/EXTRA_PATHS
   print_output
-  [ "$output" = "/tmp:/var/tmp" ]
+  [ "$output" = "/app/node_modules/.bin:/tmp:/var/tmp" ]
 }
 
 @test "Run pack-build hook" {

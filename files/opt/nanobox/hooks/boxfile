@@ -2,9 +2,10 @@
 
 # 1 - Run the engine boxfile script
 # 2 - Merge the boxfile script output with app's boxfile
-# 3 - Validate the merged boxfile
-# 4 - Persist the converged boxfile in the cache
-# 5 - Return result
+# 3 - Check for legacy configuration
+# 5 - Validate the merged boxfile
+# 5 - Persist the converged boxfile in the cache
+# 6 - Return result
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -49,7 +50,14 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   app_boxfile = registry('raw_app_boxfile')
   merged_boxfile = engine_boxfile.deep_merge(app_boxfile)
 
-  # 3 - Validate the merged boxfile
+  # 3 - Check for legacy configuration
+  if boxfile_has_legacy_config(merged_boxfile)
+    # print a fatal explaining that upgrade is required
+    logger.print legacy_boxfile
+    exit 1
+  end
+
+  # 4 - Validate the merged boxfile
   errors = validate_boxfile(merged_boxfile)
 
   if errors != {}
@@ -57,7 +65,7 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
     exit 1
   end
 
-  # 4 - Persist the boxfile in the cache
+  # 5 - Persist the boxfile in the cache
   
   # converge the app_boxfile and the engine_boxfile
   converged_boxfile = converge_boxfile(merged_boxfile)
@@ -78,7 +86,7 @@ if not ::File.exists? "#{CACHE_DIR}/boxfile.yml"
   end
 end
 
-# 5 - return the result
+# 6 - return the result
 
 # load the contents of the cached boxfile
 data = ::File.read "#{CACHE_DIR}/boxfile.yml" 

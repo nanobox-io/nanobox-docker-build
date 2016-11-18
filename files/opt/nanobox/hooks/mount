@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Mount files  
-# 1 - iterate through lib_dirs
+# 1 - iterate through cache_dirs
 #   a - ensure the source exists (with proper permissions) 
 #   b - ensure the destination exists (with proper permissions)
 #   c - bind mount
@@ -32,8 +32,8 @@ if not ::File.exist? CODE_DIR
   execute "chown gonano #{CODE_DIR}"
 end
 
-# 2 - iterate through lib_dirs
-build[:lib_dirs].each do |dir|
+# 2 - iterate through cache_dirs
+run_config[:cache_dirs].each do |dir|
   # ensure the source exists
   execute "mkdir -p #{LIB_CACHE_DIR}/#{dir}" do
     user 'gonano'

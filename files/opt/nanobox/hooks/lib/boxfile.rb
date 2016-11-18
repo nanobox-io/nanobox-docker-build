@@ -14,22 +14,20 @@ module Nanobox
       }
     }
 
-    BOXFILE_BUILD_DEFAULTS = {
+    BOXFILE_RUN_DEFAULTS = {
       type: :hash,
       default: {},
       template: {
-        config:         {type: :hash, default: {}},
-        engine:         {type: :string, default: nil},
-        image:          {type: :string, default: nil},
-        lib_dirs:       {type: :array, of: :folders, default: []},
-        extra_packages: {type: :array, of: :string, default: []},
-        dev_packages:   {type: :array, of: :string, default: []},
-        paths:          {type: :array, of: :string, default: []},
-
-        before_build:   {type: :array, of: :string, default: []},
-        after_build:    {type: :array, of: :string, default: []},
-        before_compile: {type: :array, of: :string, default: []},
-        after_compile:  {type: :array, of: :string, default: []}
+        "engine.config": {type: :hash, default: {}},
+        engine:          {type: :string, default: nil},
+        image:           {type: :string, default: nil},
+        cache_dirs:      {type: :array, of: :folders, default: []},
+        extra_packages:  {type: :array, of: :string, default: []},
+        dev_packages:    {type: :array, of: :string, default: []},
+        extra_path_dirs: {type: :array, of: :string, default: []},
+        extra_steps:     {type: :array, of: :string, default: []},
+        cwd:             {type: :folder, default: nil},
+        fs_watch:        {type: :on_off, default: nil}
       }
     }
 
@@ -37,17 +35,9 @@ module Nanobox
       type: :hash,
       default: {},
       template: {
+        extra_steps:          {type: :array, of: :string, default: []},
         deploy_hook_timeout:  {type: :integer, default: nil},
         transform:            {type: :array, of: :string, default: []}
-      }
-    }
-
-    BOXFILE_DEV_DEFAULTS = {
-      type: :hash,
-      default: {},
-      template: {
-        cwd:      {type: :folder, default: nil},
-        fs_watch: {type: :on_off, default: nil}
       }
     }
 
@@ -134,32 +124,27 @@ module Nanobox
       config: { types: [:hash] }
     }
 
-    BOXFILE_BUILD_VALIDATOR = {
-      config:         { types: [:hash] },
-      engine:         { types: [:string], required: true },
-      image:          { types: [:string] },
-      lib_dirs:       { types: [:array_of_strings] },
-      extra_packages: { types: [:array_of_strings] },
-      dev_packages:   { types: [:array_of_strings] },
-      paths:          { types: [:array_of_strings] },
-      before_build:   { types: [:string, :array_of_strings] },
-      after_build:    { types: [:string, :array_of_strings] },
-      before_compile: { types: [:string, :array_of_strings] },
-      after_compile:  { types: [:string, :array_of_strings] }
+    BOXFILE_RUN_VALIDATOR = {
+      "engine.config": { types: [:hash] },
+      engine:          { types: [:string], required: true },
+      image:           { types: [:string] },
+      cache_dirs:      { types: [:array_of_strings] },
+      extra_packages:  { types: [:array_of_strings] },
+      dev_packages:    { types: [:array_of_strings] },
+      extra_path_dirs: { types: [:array_of_strings] },
+      extra_steps:     { types: [:string, :array_of_strings] },
+      cwd:      { types: [:string] },
+      fs_watch: { types: [:boolean] }
     }
 
     BOXFILE_DEPLOY_VALIDATOR = {
-      deploy_hook_timeout:  { types: [:integer] },
-      transform:            { types: [:string, :array_of_strings] },
-      before_deploy:        { types: [:hash] },
-      before_deploy_all:    { types: [:hash] },
-      after_deploy:         { types: [:hash] },
-      after_deploy_all:     { types: [:hash] }
-    }
-
-    BOXFILE_DEV_VALIDATOR = {
-      cwd:      { types: [:string] },
-      fs_watch: { types: [:boolean] }
+      deploy_hook_timeout: { types: [:integer] },
+      transform:           { types: [:string, :array_of_strings] },
+      extra_steps:         { types: [:string, :array_of_strings] },
+      before_live:         { types: [:hash] },
+      before_live_all:     { types: [:hash] },
+      after_live:          { types: [:hash] },
+      after_live_all:      { types: [:hash] }
     }
 
     BOXFILE_WEB_VALIDATOR = {
@@ -200,17 +185,12 @@ module Nanobox
 
       boxfile.each_pair do |key, value|
         case key
-        when /^dev$/
-          dev_errors = validate_section(value, BOXFILE_DEV_VALIDATOR)
-          if dev_errors != {}
-            errors[key] = dev_errors
-          end
-        when /^code\.build$/
-          build_errors = validate_section(value, BOXFILE_BUILD_VALIDATOR)
+        when /^run\.config$/
+          build_errors = validate_section(value, BOXFILE_RUN_VALIDATOR)
           if build_errors != {}
             errors[key] = build_errors
           end
-        when /^code\.deploy$/
+        when /^deploy\.config$/
           deploy_errors = validate_section(value, BOXFILE_DEPLOY_VALIDATOR)
           if deploy_errors != {}
             errors[key] = deploy_errors
@@ -280,9 +260,9 @@ module Nanobox
         end
 
         # verify deploy hooks point to actual web or woker components
-        if key =~ /^code.deploy$/
+        if key =~ /^deploy.config$/
           value.each_pair do |k2, v2|
-            if k2 =~ /(before|after)_deploy($|_all$)/
+            if k2 =~ /(before|after)_live($|_all$)/
               v2.keys.each do |component|
                 if not component =~ /^(web|worker)\./ or boxfile[component].nil?
                   if errors[key].nil?
@@ -309,6 +289,10 @@ module Nanobox
 
       # first let's iterate through the provided configuration
       conf.each_pair do |key, value|
+        # Tell users when they are using old nodes
+        if ["dev", "code.build", "code.deploy"].include? key
+          errors[key] = 'Deprecated node'
+        end
         # let's make sure the conf is supported
         if validator[key].nil?
           errors[key] = 'Invalid node'
@@ -418,23 +402,22 @@ module Nanobox
     # off of the existing nodes and the default nodes
     def template_boxfile(boxfile)
       template = {}
-      # Add default nodes for the code.build, code.deploy,
+      # Add default nodes for the run.config, deploy.config,
       # and dev nodes
-      template[:'code.build'] = BOXFILE_BUILD_DEFAULTS
-      template[:'code.deploy'] = BOXFILE_DEPLOY_DEFAULTS
-      template[:'code.deploy'][:template][:before_deploy] = boxfile_deploy_hooks_defaults(boxfile)
-      template[:'code.deploy'][:template][:before_deploy_all] = boxfile_deploy_hooks_defaults(boxfile)
-      template[:'code.deploy'][:template][:after_deploy] = boxfile_deploy_hooks_defaults(boxfile)
-      template[:'code.deploy'][:template][:after_deploy_all] = boxfile_deploy_hooks_defaults(boxfile)
-      template[:'dev'] = BOXFILE_DEV_DEFAULTS
+      template[:'run.config'] = BOXFILE_RUN_DEFAULTS
+      template[:'deploy.config'] = BOXFILE_DEPLOY_DEFAULTS
+      template[:'deploy.config'][:template][:before_live] = boxfile_deploy_hooks_defaults(boxfile)
+      template[:'deploy.config'][:template][:before_live_all] = boxfile_deploy_hooks_defaults(boxfile)
+      template[:'deploy.config'][:template][:after_live] = boxfile_deploy_hooks_defaults(boxfile)
+      template[:'deploy.config'][:template][:after_live_all] = boxfile_deploy_hooks_defaults(boxfile)
       # Step through the boxfile and add validation for
       # code and data nodes.
       boxfile.keys.each do |key|
         case key
         when /^data\./
           template[key] = BOXFILE_DATA_DEFAULTS
-        when /^code\.build$/
-        when /^code\.deploy$/
+        when /^run\.config$/
+        when /^deploy\.config$/
         when /^dev$/
         when /^web\./
           if boxfile[key][:start].nil?
@@ -488,6 +471,19 @@ module Nanobox
     # Helper to converge a boxfile
     def converge_boxfile(original)
       converge(template_boxfile(original), original)
+    end
+
+    # check to see if boxfile.yml contains legacy configuration
+    def boxfile_has_legacy_config(boxfile)
+      
+      # look for old keys
+      boxfile.keys.each do |key|
+        if ["dev", "code.build", "code.deploy"].include? key
+          return true
+        end
+      end
+      
+      false
     end
 
   end

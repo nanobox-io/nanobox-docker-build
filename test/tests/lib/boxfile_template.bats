@@ -37,62 +37,56 @@ END
 }
 
 @test "test string start commands" {
-  payload='{"code.build":{"config":{"test":"value"}},"web.site":{"start":"something"},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{"config":{"test":"value"}},"web.site":{"start":"something"},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
   
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
   
   expected=$(cat <<-END
-{:"code.build"=>
+{:"run.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:config=>{:type=>:hash, :default=>{}},
+    {:"engine.config"=>{:type=>:hash, :default=>{}},
      :engine=>{:type=>:string, :default=>nil},
      :image=>{:type=>:string, :default=>nil},
-     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :cache_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :dev_packages=>{:type=>:array, :of=>:string, :default=>[]},
-     :paths=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
- :"code.deploy"=>
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+    {:extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :deploy_hook_timeout=>{:type=>:integer, :default=>nil},
      :transform=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_deploy=>
+     :before_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :before_deploy_all=>
+     :before_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy=>
+     :after_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy_all=>
+     :after_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}}}},
- :dev=>
-  {:type=>:hash,
-   :default=>{},
-   :template=>
-    {:cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -128,62 +122,56 @@ END
 }
 
 @test "test string array start commands" {
-  payload='{"code.build":{"config":{"test":"value"}},"web.site":{"start":["something", "something2"]},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{"config":{"test":"value"}},"web.site":{"start":["something", "something2"]},"worker.jobs":{"start":"something"},"data.db":{"image":"nanobox/mysql"}}'
   
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
   
   expected=$(cat <<-END
-{:"code.build"=>
+{:"run.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:config=>{:type=>:hash, :default=>{}},
+    {:"engine.config"=>{:type=>:hash, :default=>{}},
      :engine=>{:type=>:string, :default=>nil},
      :image=>{:type=>:string, :default=>nil},
-     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :cache_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :dev_packages=>{:type=>:array, :of=>:string, :default=>[]},
-     :paths=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
- :"code.deploy"=>
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+    {:extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :deploy_hook_timeout=>{:type=>:integer, :default=>nil},
      :transform=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_deploy=>
+     :before_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :before_deploy_all=>
+     :before_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy=>
+     :after_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy_all=>
+     :after_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}}}},
- :dev=>
-  {:type=>:hash,
-   :default=>{},
-   :template=>
-    {:cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -219,61 +207,55 @@ END
 }
 
 @test "test hash start commands" {
-  payload='{"code.build":{"config":{"test":"value"}},"web.site":{"start":{"test":"value"}},"worker.jobs":{"start":{"test":"value"}},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{"config":{"test":"value"}},"web.site":{"start":{"test":"value"}},"worker.jobs":{"start":{"test":"value"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
   
   expected=$(cat <<-END
-{:"code.build"=>
+{:"run.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:config=>{:type=>:hash, :default=>{}},
+    {:"engine.config"=>{:type=>:hash, :default=>{}},
      :engine=>{:type=>:string, :default=>nil},
      :image=>{:type=>:string, :default=>nil},
-     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :cache_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :dev_packages=>{:type=>:array, :of=>:string, :default=>[]},
-     :paths=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
- :"code.deploy"=>
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+    {:extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :deploy_hook_timeout=>{:type=>:integer, :default=>nil},
      :transform=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_deploy=>
+     :before_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :before_deploy_all=>
+     :before_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy=>
+     :after_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy_all=>
+     :after_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}}}},
- :dev=>
-  {:type=>:hash,
-   :default=>{},
-   :template=>
-    {:cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -309,61 +291,55 @@ END
 }
 
 @test "test string and hash start commands" {
-  payload='{"code.build":{"config":{"test":"value"}},"web.site":{"start":"something"},"worker.jobs":{"start":{"test":"value"}},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{"config":{"test":"value"}},"web.site":{"start":"something"},"worker.jobs":{"start":{"test":"value"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
   
   expected=$(cat <<-END
-{:"code.build"=>
+{:"run.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:config=>{:type=>:hash, :default=>{}},
+    {:"engine.config"=>{:type=>:hash, :default=>{}},
      :engine=>{:type=>:string, :default=>nil},
      :image=>{:type=>:string, :default=>nil},
-     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :cache_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :dev_packages=>{:type=>:array, :of=>:string, :default=>[]},
-     :paths=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
- :"code.deploy"=>
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+    {:extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :deploy_hook_timeout=>{:type=>:integer, :default=>nil},
      :transform=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_deploy=>
+     :before_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :before_deploy_all=>
+     :before_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy=>
+     :after_live=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}},
-     :after_deploy_all=>
+     :after_live_all=>
       {:type=>:hash,
        :default=>{},
        :template=>
         {:"web.site"=>{:type=>:array, :of=>:string, :default=>[]},
          :"worker.jobs"=>{:type=>:array, :of=>:string, :default=>[]}}}}},
- :dev=>
-  {:type=>:hash,
-   :default=>{},
-   :template=>
-    {:cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
  :"web.site"=>
   {:type=>:hash,
    :default=>{},
@@ -403,37 +379,31 @@ END
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
   
   expected=$(cat <<-END
-{:"code.build"=>
+{:"run.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:config=>{:type=>:hash, :default=>{}},
+    {:"engine.config"=>{:type=>:hash, :default=>{}},
      :engine=>{:type=>:string, :default=>nil},
      :image=>{:type=>:string, :default=>nil},
-     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :cache_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :dev_packages=>{:type=>:array, :of=>:string, :default=>[]},
-     :paths=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
- :"code.deploy"=>
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+    {:extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :deploy_hook_timeout=>{:type=>:integer, :default=>nil},
      :transform=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_deploy=>{:type=>:hash, :default=>{}, :template=>{}},
-     :before_deploy_all=>{:type=>:hash, :default=>{}, :template=>{}},
-     :after_deploy=>{:type=>:hash, :default=>{}, :template=>{}},
-     :after_deploy_all=>{:type=>:hash, :default=>{}, :template=>{}}}},
- :dev=>
-  {:type=>:hash,
-   :default=>{},
-   :template=>
-    {:cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}}}
+     :before_live=>{:type=>:hash, :default=>{}, :template=>{}},
+     :before_live_all=>{:type=>:hash, :default=>{}, :template=>{}},
+     :after_live=>{:type=>:hash, :default=>{}, :template=>{}},
+     :after_live_all=>{:type=>:hash, :default=>{}, :template=>{}}}}}
 END
 )
 
@@ -447,37 +417,31 @@ END
   run docker exec build bash -c "/tmp/template_boxfile '$payload'"
   
   expected=$(cat <<-END
-{:"code.build"=>
+{:"run.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:config=>{:type=>:hash, :default=>{}},
+    {:"engine.config"=>{:type=>:hash, :default=>{}},
      :engine=>{:type=>:string, :default=>nil},
      :image=>{:type=>:string, :default=>nil},
-     :lib_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
+     :cache_dirs=>{:type=>:array, :of=>:folders, :default=>[]},
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :dev_packages=>{:type=>:array, :of=>:string, :default=>[]},
-     :paths=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_build=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_compile=>{:type=>:array, :of=>:string, :default=>[]},
-     :after_compile=>{:type=>:array, :of=>:string, :default=>[]}}},
- :"code.deploy"=>
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cwd=>{:type=>:folder, :default=>nil},
+     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+ :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
    :template=>
-    {:deploy_hook_timeout=>{:type=>:integer, :default=>nil},
+    {:extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :deploy_hook_timeout=>{:type=>:integer, :default=>nil},
      :transform=>{:type=>:array, :of=>:string, :default=>[]},
-     :before_deploy=>{:type=>:hash, :default=>{}, :template=>{}},
-     :before_deploy_all=>{:type=>:hash, :default=>{}, :template=>{}},
-     :after_deploy=>{:type=>:hash, :default=>{}, :template=>{}},
-     :after_deploy_all=>{:type=>:hash, :default=>{}, :template=>{}}}},
- :dev=>
-  {:type=>:hash,
-   :default=>{},
-   :template=>
-    {:cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}}}
+     :before_live=>{:type=>:hash, :default=>{}, :template=>{}},
+     :before_live_all=>{:type=>:hash, :default=>{}, :template=>{}},
+     :after_live=>{:type=>:hash, :default=>{}, :template=>{}},
+     :after_live_all=>{:type=>:hash, :default=>{}, :template=>{}}}}}
 END
 )
 

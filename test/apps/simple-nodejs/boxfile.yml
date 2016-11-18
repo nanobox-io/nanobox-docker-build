@@ -1,6 +1,6 @@
-code.build:
+run.config:
   # engine: nodejs -> nanobox-io/nanobox-engine-nodejs
-  engine: nodejs
-  paths:
+  engine: nodejs#feature/workflow-refactor
+  extra_path_dirs:
     - /tmp
     - /var/tmp
