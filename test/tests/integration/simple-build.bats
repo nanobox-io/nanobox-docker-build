@@ -149,7 +149,7 @@
 
   run docker exec build cat /data/etc/env.d/EXTRA_PATHS
   print_output
-  [ "$output" = "/tmp:/var/tmp" ]
+  [ "$output" = "/app/node_modules/.bin:/tmp:/var/tmp" ]
 }
 
 @test "Run pack-build hook" {
