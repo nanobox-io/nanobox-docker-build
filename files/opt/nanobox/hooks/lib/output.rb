@@ -190,7 +190,7 @@ module Nanobox
 Nanobox is looking for a boxfile.yml config file. You might want to 
 check out our getting-started guide on configuring your app:
 
-http://guides.nanobox.io/
+https://guides.nanobox.io/
       END
 
       fatal "missing boxfile.yml", message
