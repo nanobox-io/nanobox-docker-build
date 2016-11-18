@@ -22,7 +22,7 @@ logger.print(bullet('Running user hook...'), 'debug')
 logger.print(bullet('Copying ssh keys into the build environment...'))
 
 # ensure the gonano .ssh directory exists
-directory "/home/gonano/.ssh" do
+directory "/data/var/home/gonano/.ssh" do
   recursive true
   mode 0700
   owner 'gonano'
@@ -30,7 +30,7 @@ directory "/home/gonano/.ssh" do
 end
 
 # set custom ssh configuration
-hook_file "/home/gonano/.ssh/config" do
+hook_file "/data/var/home/gonano/.ssh/config" do
   source 'ssh/config'
   mode 0600
   owner 'gonano'
@@ -40,7 +40,7 @@ end
 # create file for each file passed in
 (payload[:ssh_files] || {}).each do |name, body|
 
-  file "/home/gonano/.ssh/#{name}" do
+  file "/data/var/home/gonano/.ssh/#{name}" do
     content body
     mode 0600
     owner 'gonano'

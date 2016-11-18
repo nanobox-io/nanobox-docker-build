@@ -12,9 +12,9 @@
   [ "$status" -eq 0 ]
 
   # ensure the keys were installed
-  run docker exec build bash -c "[ -f /home/gonano/.ssh/id_rsa ] "
+  run docker exec build bash -c "[ -f /data/var/home/gonano/.ssh/id_rsa ] "
   [ "$status" -eq 0 ]
-  run docker exec build bash -c "[ -f /home/gonano/.ssh/id_rsa.pub ] "
+  run docker exec build bash -c "[ -f /data/var/home/gonano/.ssh/id_rsa.pub ] "
   [ "$status" -eq 0 ]
 
   # second run, don't break
