@@ -190,7 +190,7 @@ module Nanobox
 Nanobox is looking for a boxfile.yml config file. You might want to 
 check out our getting-started guide on configuring your app:
 
-http://docs.nanobox.io/getting-started/configure-app
+https://guides.nanobox.io/
       END
 
       fatal "missing boxfile.yml", message
@@ -252,7 +252,7 @@ https://gist.github.com/tylerflint/3262228c3e8a29addd382f53de9aa2ea
 Uh oh, the engine provided is not something we can retrieve. You might
 want to check out our getting-started guide on specifying an engine:
 
-http://docs/nanobox.io/app-config/boxfile/code-build/
+https://docs.nanobox.io/boxfile/run-config/
       END
       
       fatal "invalid engine", message
