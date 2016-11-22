@@ -36,6 +36,30 @@ logger.print(bullet('Cleaning up any previous builds...'))
   end
 end
 
+# 1B - Extract the user's home from the cache
+if ::File.exist? "#{CACHE_DIR}/home"
+
+  directory "#{DATA_DIR}/var/home/gonano" do
+    owner 'gonano'
+    group 'gonano'
+    recursive true
+  end
+
+  logger.print(bullet('Extracting home cache...'))
+
+  # fetch the pkgin cache & db from cache for a quick deploy
+  execute "extract home from cache for quick access" do
+    command <<-EOF
+      rsync \
+        -a \
+        #{CACHE_DIR}/home/ \
+        #{DATA_DIR}/var/home/gonano
+    EOF
+    user 'gonano'
+  end
+
+end
+
 # 2 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 

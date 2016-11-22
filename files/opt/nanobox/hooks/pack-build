@@ -64,6 +64,31 @@ execute "rsync engine" do
   user 'gonano'
 end
 
+# 2B - Copy user's home into the cache
+if ::File.exist? "#{DATA_DIR}/var/home/gonano"
+  directory "#{CACHE_DIR}/home" do
+    owner 'gonano'
+    group 'gonano'
+    recursive true
+  end
+
+  logger.print(bullet('Stashing home into cache...'))
+
+  execute "Insert user's home into cache for quick access" do
+    command <<-EOF
+      rsync \
+        -a \
+        --delete \
+        --exclude '.ssh' \
+        #{DATA_DIR}/var/home/gonano/ \
+        #{CACHE_DIR}/home
+    EOF
+    user 'gonano'
+  end
+
+end
+
+
 # 3 - rsync pkgsrc cache into cache
 if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
   directory "#{CACHE_DIR}/pkgin" do
@@ -74,7 +99,7 @@ if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
 
   logger.print(bullet('Stashing pkg cache...'))
 
-  execute "Insert pkgin packages from cache for quick access" do
+  execute "Insert pkgin packages into cache for quick access" do
     command <<-EOF
       rsync \
         -a \
