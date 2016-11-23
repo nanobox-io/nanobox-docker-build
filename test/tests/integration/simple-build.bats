@@ -222,6 +222,11 @@
   print_output
   [ "$status" -eq 0 ]
 
+  # verify the node_modules/bad was ignored
+  run docker exec build bash -c "[ ! -f /app/node_modules/bad ]"
+  print_output
+  [ "$status" -eq 0 ]
+
   # verify the contents of .nanoignore was ignored
   run docker exec build bash -c "[ ! -f /app/badfile ]"
   print_output

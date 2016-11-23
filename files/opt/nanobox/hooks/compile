@@ -61,6 +61,7 @@ else
     command <<-EOF
       rsync \
         -a \
+        #{(run_config[:cache_dirs].map {|dir| "--exclude '#{dir}'"}).join(' ')} \
         #{LOCAL_CODE_SRC_DIR}/ \
         #{CODE_DIR}
     EOF
