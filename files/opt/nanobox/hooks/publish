@@ -33,12 +33,14 @@ if payload[:previous_build] and not payload[:previous_build].empty?
     previous = "#{part}-#{payload[:previous_build]}.tgz"
     current  = "#{part}-#{payload[:build]}.tgz"
 
+    prefix = ""
     if part == 'deploy'
-      logger.print(bullet("Syncing runtime..."))
+      prefix = "Syncing runtime"
     else
-      logger.print(bullet("Syncing app..."))
+      prefix = "Syncing app"
     end
 
+    logger.print(bullet("#{prefix}..."))
     
     # register a stage with slurp
     execute "create stage for #{part}" do
@@ -49,15 +51,15 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
             -d '{\"old-id\": \"#{previous}\", \"new-id\": \"#{current}\"}' \
             https://#{payload[:warehouse]}:1566/stages"
-
     end
 
     # sync
     execute "sync #{part}" do
       command <<-EOF
-        siphon --prefix '   sync: ' -- bash -c "\
+        siphon --prefix '   #{prefix}: ' -- bash -c "\
           rsync \
             -a \
+            -v
             --delete \
             . \
             -e 'ssh -p 1567' \
@@ -65,6 +67,8 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       EOF
       user 'gonano'
       cwd dir
+      stream true
+      on_data { |data| logger.print data }
     end
 
     # commit to warehouse
@@ -72,6 +76,7 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       command "siphon --prefix '  ' -- curl \
             -k \
             -f \
+            --progress-bar \
             -o /dev/null \
             -H 'X-AUTH-TOKEN: #{payload[:warehouse_token]}' \
             -X PUT \
@@ -88,11 +93,14 @@ else
 
   { 'app' => APP_DIR, 'deploy' => DEPLOY_DIR }.each_pair do |part, dir|
 
+    prefix = ""
     if part == 'deploy'
-      logger.print(bullet("Sending runtime..."))
+      prefix = "Sending runtime"
     else
-      logger.print(bullet("Sending app..."))
+      prefix = "Sending app"
     end
+
+    logger.print(bullet("#{prefix}..."))
 
     execute "create #{part} tarball" do
       command <<-EOF
@@ -104,16 +112,21 @@ else
                   > /var/tmp/#{part}-#{payload[:build]}.tgz"
       EOF
       cwd dir
+      stream true
+      on_data { |data| logger.print data }
     end
 
     execute "publish deploy" do
-      command "siphon --prefix '  ' -- curl \
+      command "siphon --prefix '  #{prefix}: ' -- curl \
             -k \
             -f \
+            --progress-bar \
             -o /dev/null \
             -H 'x-auth-token: #{payload[:warehouse_token]}' \
             --data-binary @/var/tmp/#{part}-#{payload[:build]}.tgz \
             https://#{payload[:warehouse]}:7410/blobs/#{part}-#{payload[:build]}.tgz"
+      stream true
+      on_data { |data| logger.print data }
     end
 
   end
