@@ -59,7 +59,7 @@ if payload[:previous_build] and not payload[:previous_build].empty?
         siphon --prefix '   #{prefix}: ' -- bash -c "\
           rsync \
             -a \
-            -v
+            -v \
             --delete \
             . \
             -e 'ssh -p 1567' \
