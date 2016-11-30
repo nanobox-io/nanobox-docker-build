@@ -64,6 +64,7 @@ when 'git'
 
   execute "cloning #{repo}" do
     command "siphon --prefix '  ' -- git clone #{repo} engine"
+    timeout 30
     cwd NANOBOX_DIR
     user 'gonano'
     stream true
@@ -80,6 +81,7 @@ when 'git'
 
     execute "Checkout commitish point" do
       command "siphon --prefix '  ' -- git checkout #{commit}"
+      timeout 30
       cwd ENGINE_DIR
       user 'gonano'
       stream true
@@ -98,6 +100,7 @@ when 'github'
 
   execute "cloning #{repo}" do
     command "siphon --prefix '  ' -- git clone #{url} engine"
+    timeout 30
     cwd NANOBOX_DIR
     user 'gonano'
     stream true
@@ -114,6 +117,7 @@ when 'github'
 
     execute "Checkout commitish point" do
       command "siphon --prefix '  ' -- git checkout #{commit}"
+      timeout 30
       cwd ENGINE_DIR
       user 'gonano'
       stream true
@@ -131,6 +135,7 @@ when 'nanobox'
 
   execute "cloning #{repo}" do
     command "siphon --prefix '  ' -- git clone #{repo} engine"
+    timeout 30
     cwd NANOBOX_DIR
     user 'gonano'
     stream true
@@ -147,6 +152,7 @@ when 'nanobox'
 
     execute "Checkout commitish point" do
       command "siphon --prefix '  ' -- git checkout #{commit}"
+      timeout 30
       cwd ENGINE_DIR
       user 'gonano'
       stream true
