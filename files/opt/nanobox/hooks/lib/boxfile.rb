@@ -27,7 +27,8 @@ module Nanobox
         extra_path_dirs: {type: :array, of: :string, default: []},
         extra_steps:     {type: :array, of: :string, default: []},
         cwd:             {type: :folder, default: nil},
-        fs_watch:        {type: :on_off, default: nil}
+        fs_watch:        {type: :on_off, default: nil},
+        build_triggers:  {type: :array, of: :string, default: []}
       }
     }
 
@@ -133,8 +134,9 @@ module Nanobox
       dev_packages:    { types: [:array_of_strings] },
       extra_path_dirs: { types: [:array_of_strings] },
       extra_steps:     { types: [:string, :array_of_strings] },
-      cwd:      { types: [:string] },
-      fs_watch: { types: [:boolean] }
+      cwd:             { types: [:string] },
+      fs_watch:        { types: [:boolean] },
+      build_triggers:  { types: [:array_of_strings] }
     }
 
     BOXFILE_DEPLOY_VALIDATOR = {
