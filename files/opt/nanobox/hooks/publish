@@ -41,6 +41,12 @@ if payload[:previous_build] and not payload[:previous_build].empty?
     end
 
     logger.print(bullet("#{prefix}..."))
+
+    if part == 'deploy'
+      logger.print(bullet("Extracting runtime from previous deploy..."))
+    else
+      logger.print(bullet("Extracting app from previous deploy..."))
+    end
     
     # register a stage with slurp
     execute "create stage for #{part}" do
@@ -69,6 +75,12 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       cwd dir
       stream true
       on_data { |data| logger.print data }
+    end
+
+    if part == 'deploy'
+      logger.print(bullet("Committing runtime..."))
+    else
+      logger.print(bullet("Committing app..."))
     end
 
     # commit to warehouse
@@ -102,6 +114,12 @@ else
 
     logger.print(bullet("#{prefix}..."))
 
+    if part == 'deploy'
+      logger.print(bullet("Generating compressed tarball of runtime..."))
+    else
+      logger.print(bullet("Generating compressed tarball of app..."))
+    end
+
     execute "create #{part} tarball" do
       command <<-EOF
         siphon --prefix '  ' -- bash -c "\
@@ -112,8 +130,6 @@ else
                   > /var/tmp/#{part}-#{payload[:build]}.tgz"
       EOF
       cwd dir
-      stream true
-      on_data { |data| logger.print data }
     end
 
     execute "publish deploy" do
