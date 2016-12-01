@@ -55,7 +55,8 @@ END
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
      :cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+     :fs_watch=>{:type=>:on_off, :default=>nil},
+     :build_triggers=>{:type=>:array, :of=>:string, :default=>[]}}},
  :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
@@ -140,7 +141,8 @@ END
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
      :cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+     :fs_watch=>{:type=>:on_off, :default=>nil},
+     :build_triggers=>{:type=>:array, :of=>:string, :default=>[]}}},
  :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
@@ -224,7 +226,8 @@ END
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
      :cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+     :fs_watch=>{:type=>:on_off, :default=>nil},
+     :build_triggers=>{:type=>:array, :of=>:string, :default=>[]}}},
  :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
@@ -308,7 +311,8 @@ END
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
      :cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+     :fs_watch=>{:type=>:on_off, :default=>nil},
+     :build_triggers=>{:type=>:array, :of=>:string, :default=>[]}}},
  :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
@@ -392,7 +396,8 @@ END
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
      :cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+     :fs_watch=>{:type=>:on_off, :default=>nil},
+     :build_triggers=>{:type=>:array, :of=>:string, :default=>[]}}},
  :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
@@ -430,7 +435,8 @@ END
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
      :cwd=>{:type=>:folder, :default=>nil},
-     :fs_watch=>{:type=>:on_off, :default=>nil}}},
+     :fs_watch=>{:type=>:on_off, :default=>nil},
+     :build_triggers=>{:type=>:array, :of=>:string, :default=>[]}}},
  :"deploy.config"=>
   {:type=>:hash,
    :default=>{},
