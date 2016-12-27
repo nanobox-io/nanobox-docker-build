@@ -66,6 +66,7 @@ if payload[:previous_build] and not payload[:previous_build].empty?
           rsync \
             -a \
             -v \
+            --ignore-case \
             --delete \
             . \
             -e 'ssh -p 1567' \
