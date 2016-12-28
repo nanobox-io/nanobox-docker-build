@@ -65,13 +65,13 @@ if payload[:boxfile]
     # ensure the source exists
     execute "mkdir -p #{LIB_CACHE_DIR}/#{dir}" do
       user 'gonano'
-      only_if {!:File.exists?("#{LIB_CACHE_DIR}/#{dir}")}
+      only_if {!::File.exists?("#{LIB_CACHE_DIR}/#{dir}")}
     end
 
     # ensure the destination exists
     execute "mkdir -p #{CODE_DIR}/#{dir}" do
       user 'gonano'
-      only_if {!:File.exists?("#{CODE_DIR}/#{dir}")}
+      only_if {!::File.exists?("#{CODE_DIR}/#{dir}")}
     end
 
     # bind mount the source onto the destination
