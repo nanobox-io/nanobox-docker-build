@@ -29,7 +29,6 @@ execute "rsync build" do
   command <<-EOF
     rsync \
       -a \
-      --ignore-case \
       --delete \
       #{DATA_DIR}/ \
       #{BUILD_DIR}
@@ -58,7 +57,6 @@ execute "rsync engine" do
   command <<-EOF
     rsync \
       -a \
-      --ignore-case \
       --delete \
       #{ENGINE_DIR}/ \
       #{CACHE_DIR}/engine
@@ -80,7 +78,6 @@ if ::File.exist? "#{DATA_DIR}/var/home/gonano"
     command <<-EOF
       rsync \
         -a \
-        --ignore-case \
         --delete \
         --exclude '.ssh' \
         #{DATA_DIR}/var/home/gonano/ \
@@ -106,7 +103,6 @@ if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
     command <<-EOF
       rsync \
         -a \
-        --ignore-case \
         --delete \
         #{DATA_DIR}/var/db/pkgin/cache/ \
         #{CACHE_DIR}/pkgin

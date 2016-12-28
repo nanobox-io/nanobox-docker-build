@@ -30,7 +30,6 @@ execute "rsync deploy" do
   command <<-EOF
     rsync \
       -a \
-      --ignore-case \
       --delete \
       --exclude-from=/var/nanobox/build-excludes.txt \
       #{DATA_DIR}/ \
