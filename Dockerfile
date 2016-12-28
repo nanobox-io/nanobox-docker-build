@@ -3,13 +3,13 @@ FROM nanobox/runit
 # install gcc and build tools and other utilities
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-      iptables build-essential git openssh-client pv && \
+      iptables build-essential git rsync openssh-client pv && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/*
 
 # install other tools required for engine
 RUN rm -rf /var/gonano/db/pkgin && /opt/gonano/bin/pkgin -y up && \
-    /opt/gonano/bin/pkgin -y in shon mustache rsync siphon hookit && \
+    /opt/gonano/bin/pkgin -y in shon mustache siphon hookit && \
     rm -rf /var/gonano/db/pkgin/cache && \
     gem install ya2yaml --no-ri --no-rdoc
 
