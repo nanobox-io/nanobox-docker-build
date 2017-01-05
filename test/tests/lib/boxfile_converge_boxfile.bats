@@ -119,6 +119,38 @@ END
   [ "$output" = "$expected" ]
 }
 
+@test "Test cron jobs" {
+  payload='{"run.config":{},"web.site":{"start":"something","cron":[{"id":"one","schedule":"1 2 3 4 5","command":"echo hi"}]},"worker.jobs":{"start":"something","cron":[{"id":"one","schedule":"1 2 3 4 5","command":"echo hi"},{"id":"two","schedule":"1 2 3 4 5","command":"echo bye"}]},"data.db":{"image":"nanobox/mysql"}}'
+  run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
+  
+  expected=$(cat <<-END
+---
+web.site:
+  start: something
+  cron:
+  - id: one
+    schedule: 1 2 3 4 5
+    command: echo hi
+worker.jobs:
+  start: something
+  cron:
+  - id: one
+    schedule: 1 2 3 4 5
+    command: echo hi
+  - id: two
+    schedule: 1 2 3 4 5
+    command: echo bye
+data.db:
+  image: nanobox/mysql
+
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
 @test "Filter out bad nodes" {
   payload='{"games":{},"people":{},"books":{},"junk":{}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"

@@ -42,6 +42,17 @@ module Nanobox
       }
     }
 
+    BOXFILE_CRON_DEFAULTS = {
+      type: :array,
+      of: :hash,
+      default: [],
+      template: {
+        id:       { type: :string, default: nil },
+        schedule: { type: :string, default: nil },
+        command:  { type: :string, default: nil }
+      }
+    }
+
     BOXFILE_WEB_STRING_DEFAULTS = {
       type: :hash,
       default: {},
@@ -52,7 +63,8 @@ module Nanobox
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:      {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}},
+        cron:           BOXFILE_CRON_DEFAULTS
       }
     }
 
@@ -64,7 +76,8 @@ module Nanobox
         start:          {type: :string, default: nil},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:      {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}},
+        cron:           BOXFILE_CRON_DEFAULTS
       }
     }
 
@@ -78,7 +91,8 @@ module Nanobox
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:      {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}},
+        cron:           BOXFILE_CRON_DEFAULTS
       }
     }
 
@@ -90,7 +104,8 @@ module Nanobox
         start:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:      {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}},
+        cron:           BOXFILE_CRON_DEFAULTS
       }
     }
 
@@ -104,7 +119,8 @@ module Nanobox
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:      {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}},
+        cron:           BOXFILE_CRON_DEFAULTS
       }
     }
 
@@ -116,7 +132,8 @@ module Nanobox
         start:          {type: :hash, default: {}},
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
-        log_watch:      {type: :hash, default: {}}
+        log_watch:      {type: :hash, default: {}},
+        cron:           BOXFILE_CRON_DEFAULTS
       }
     }
 

@@ -98,7 +98,15 @@ END
      :ports=>{:type=>:array, :of=>:string, :default=>[]},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"worker.jobs"=>
   {:type=>:hash,
    :default=>{},
@@ -107,7 +115,15 @@ END
      :start=>{:type=>:string, :default=>nil},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"data.db"=>
   {:type=>:hash,
    :default=>{},
@@ -184,7 +200,15 @@ END
      :ports=>{:type=>:array, :of=>:string, :default=>[]},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"worker.jobs"=>
   {:type=>:hash,
    :default=>{},
@@ -193,7 +217,15 @@ END
      :start=>{:type=>:string, :default=>nil},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"data.db"=>
   {:type=>:hash,
    :default=>{},
@@ -269,7 +301,15 @@ END
      :ports=>{:type=>:array, :of=>:string, :default=>[]},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"worker.jobs"=>
   {:type=>:hash,
    :default=>{},
@@ -278,7 +318,15 @@ END
      :start=>{:type=>:hash, :default=>{}},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"data.db"=>
   {:type=>:hash,
    :default=>{},
@@ -354,7 +402,15 @@ END
      :ports=>{:type=>:array, :of=>:string, :default=>[]},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"worker.jobs"=>
   {:type=>:hash,
    :default=>{},
@@ -363,7 +419,15 @@ END
      :start=>{:type=>:hash, :default=>{}},
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
-     :log_watch=>{:type=>:hash, :default=>{}}}},
+     :log_watch=>{:type=>:hash, :default=>{}},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}},
  :"data.db"=>
   {:type=>:hash,
    :default=>{},
