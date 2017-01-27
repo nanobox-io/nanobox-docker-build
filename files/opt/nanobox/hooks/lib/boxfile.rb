@@ -5,12 +5,27 @@ module Nanobox
 
     # Base templates for the different nodes in the boxfile.
 
+    BOXFILE_CRON_DEFAULTS = {
+      type: :array,
+      of: :hash,
+      default: [],
+      template: {
+        id:       { type: :string, default: nil },
+        schedule: { type: :string, default: nil },
+        command:  { type: :string, default: nil }
+      }
+    }
+
     BOXFILE_DATA_DEFAULTS = {
       type: :hash,
       default: {},
       template:  {
-        config:         {type: :hash, default: {}},
-        image:          {type: :string, default: nil}
+        config:          {type: :hash, default: {}},
+        image:           {type: :string, default: nil},
+        extra_packages:  {type: :array, of: :string, default: []},
+        extra_path_dirs: {type: :array, of: :string, default: []},
+        extra_steps:     {type: :array, of: :string, default: []},
+        cron:            BOXFILE_CRON_DEFAULTS
       }
     }
 
@@ -39,17 +54,6 @@ module Nanobox
         extra_steps:          {type: :array, of: :string, default: []},
         deploy_hook_timeout:  {type: :integer, default: nil},
         transform:            {type: :array, of: :string, default: []}
-      }
-    }
-
-    BOXFILE_CRON_DEFAULTS = {
-      type: :array,
-      of: :hash,
-      default: [],
-      template: {
-        id:       { type: :string, default: nil },
-        schedule: { type: :string, default: nil },
-        command:  { type: :string, default: nil }
       }
     }
 
@@ -139,7 +143,12 @@ module Nanobox
 
     BOXFILE_DATA_VALIDATOR = {
       image:  { types: [:string], required: true },
-      config: { types: [:hash] }
+      config: { types: [:hash] },
+      cron:            { types: [:array_of_hashes] },
+      extra_packages:  { types: [:array_of_strings] },
+      extra_path_dirs: { types: [:array_of_strings] },
+      extra_steps:     { types: [:string, :array_of_strings] },
+
     }
 
     BOXFILE_RUN_VALIDATOR = {
@@ -244,6 +253,15 @@ module Nanobox
           end
         when /^data\./
           data_errors = validate_section(value, BOXFILE_DATA_VALIDATOR)
+          if not value[:cron].nil? and value[:cron].is_a? Array
+            value[:cron].each do |cron|
+              errors = validate_section(cron, BOXFILE_CRON_VALIDATOR)
+              if errors != {}
+                data_errors[:cron] = "Invalid cron format"
+                break
+              end
+            end
+          end
           if data_errors != {}
             errors[key] = data_errors
           end
