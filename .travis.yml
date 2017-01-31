@@ -8,6 +8,8 @@ before_install:
   - docker version
   - docker network create --driver=bridge --subnet=192.168.0.0/16 --opt="com.docker.network.driver.mtu=1450" --opt="com.docker.network.bridge.name=redd0" nanobox
   - ifconfig
+  - sudo apt-get -y install python-pip
+  - sudo pip install docker-squash
   - docker pull nanobox/hoarder
   - docker build -t nanobox/build .
 
@@ -18,11 +20,12 @@ after_success:
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
   - docker build -t ${NAMESPACE}/build .
-  - docker tag ${NAMESPACE}/build ${NAMESPACE}/build:beta;
+  - docker-squash -t ${NAMESPACE}/build:squashed -f nanobox/runit --tmp-dir /var/tmp/squasher ${NAMESPACE}/build
+  - docker tag ${NAMESPACE}/build:squashed ${NAMESPACE}/build:beta;
   - docker push ${REMOTE}${NAMESPACE}/build:beta;
   - if [ "$BRANCH" == "master" ]; then
     docker push ${REMOTE}${NAMESPACE}/build;
     else
-    docker tag ${NAMESPACE}/build ${NAMESPACE}/build:${BRANCH//\//_};
+    docker tag ${NAMESPACE}/build:squashed ${NAMESPACE}/build:${BRANCH//\//_};
     docker push ${REMOTE}${NAMESPACE}/build:${BRANCH//\//_};
     fi
