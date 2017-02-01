@@ -64,16 +64,12 @@
   run docker exec build bash -c "mkdir /app && chown gonano:gonano /app && cp -a /share/code/* /app/"
   print_output
 
-  run docker exec build bash -c "echo '192.168.0.1	github.com' >> /etc/hosts"
-  print_output
-  [ "$status" -eq 0 ]
-
-  netcat -l 443 -q 45 &
+  run docker exec build bash -c "rm /app/boxfile.yml && touch /app/boxfile.yml"
   
   run run_hook "fetch" "$(payload fetch)"
   print_output
   [ "$status" -eq 1 ]
-  [[ "$output" =~ "failed to return within 30 seconds" ]]
+  [[ "$output" =~ "issue trying to parse the boxfile.yml" ]]
 }
 
 @test "Stop Container" {
