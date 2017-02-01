@@ -24,6 +24,7 @@ after_success:
   - docker tag ${NAMESPACE}/build:squashed ${NAMESPACE}/build:beta;
   - docker push ${REMOTE}${NAMESPACE}/build:beta;
   - if [ "$BRANCH" == "master" ]; then
+    docker tag ${NAMESPACE}/build:squashed ${NAMESPACE}/build;
     docker push ${REMOTE}${NAMESPACE}/build;
     else
     docker tag ${NAMESPACE}/build:squashed ${NAMESPACE}/build:${BRANCH//\//_};
