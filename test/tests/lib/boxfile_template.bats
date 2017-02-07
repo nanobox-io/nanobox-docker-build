@@ -129,7 +129,18 @@ END
    :default=>{},
    :template=>
     {:config=>{:type=>:hash, :default=>{}},
-     :image=>{:type=>:string, :default=>nil}}}}
+     :image=>{:type=>:string, :default=>nil},
+     :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}}}
 END
 )
 
@@ -231,7 +242,18 @@ END
    :default=>{},
    :template=>
     {:config=>{:type=>:hash, :default=>{}},
-     :image=>{:type=>:string, :default=>nil}}}}
+     :image=>{:type=>:string, :default=>nil},
+     :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}}}
 END
 )
 
@@ -332,7 +354,18 @@ END
    :default=>{},
    :template=>
     {:config=>{:type=>:hash, :default=>{}},
-     :image=>{:type=>:string, :default=>nil}}}}
+     :image=>{:type=>:string, :default=>nil},
+     :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}}}
 END
 )
 
@@ -433,7 +466,18 @@ END
    :default=>{},
    :template=>
     {:config=>{:type=>:hash, :default=>{}},
-     :image=>{:type=>:string, :default=>nil}}}}
+     :image=>{:type=>:string, :default=>nil},
+     :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
+     :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :cron=>
+      {:type=>:array,
+       :of=>:hash,
+       :default=>[],
+       :template=>
+        {:id=>{:type=>:string, :default=>nil},
+         :schedule=>{:type=>:string, :default=>nil},
+         :command=>{:type=>:string, :default=>nil}}}}}}
 END
 )
 
