@@ -195,6 +195,18 @@ https://guides.nanobox.io/
 
       fatal "missing boxfile.yml", message
     end
+
+    # If a boxfile.yaml is provided but fails to parse, this function can
+    # be called to print the error and inform the user of the next step
+    def unparseable_boxfile
+      message = <<-END
+Nanobox had an issue trying to parse the boxfile.yml config file. Please
+ensure that it is valid yaml. Please refer to the guides for help:
+
+https://guides.nanobox.io/
+      END
+      fatal "unparseable boxfile.yml", message
+    end
     
     # If a boxfile.yml is provided but fails validation, this function can
     # be called to print the errors and inform the user of next steps
