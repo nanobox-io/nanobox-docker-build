@@ -59,12 +59,12 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             https://#{payload[:warehouse]}:1566/stages"
     end
 
-    # create a temporary key file
-    execute "ssh-kegen #{part}" do
-      command <<-EOF
-      ssh-keygen -f /var/tmp/id_rsa -N ""
-      EOF
-      user 'gonano'
+    # set custom ssh configuration
+    hook_file "/var/tmp/id_rsa" do
+      source 'ssh/id_rsa'
+      mode 0600
+      owner 'gonano'
+      group 'gonano'
     end
 
     # sync
