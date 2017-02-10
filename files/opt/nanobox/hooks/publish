@@ -59,6 +59,13 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             https://#{payload[:warehouse]}:1566/stages"
     end
 
+    # set custom ssh key
+    execute "create custom ssh key for slurp" do
+      command '/opt/nanobox/hooks/files/ssh/ssh-keygen'
+      user 'gonano'
+      only_if { ! ::File.exists? "/var/tmp/id_rsa" }
+    end
+
     # sync
     execute "sync #{part}" do
       command <<-EOF
@@ -68,7 +75,7 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             -v \
             --delete \
             . \
-            -e 'ssh -p 1567' \
+            -e 'ssh -p 1567 -i /var/tmp/id_rsa' \
             #{current}@#{payload[:warehouse]}:#{current}"
       EOF
       user 'gonano'
