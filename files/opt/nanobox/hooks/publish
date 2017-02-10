@@ -59,12 +59,11 @@ if payload[:previous_build] and not payload[:previous_build].empty?
             https://#{payload[:warehouse]}:1566/stages"
     end
 
-    # set custom ssh configuration
-    hook_file "/var/tmp/id_rsa" do
-      source 'ssh/id_rsa'
-      mode 0600
-      owner 'gonano'
-      group 'gonano'
+    # set custom ssh key
+    execute "create custom ssh key for slurp" do
+      command '/opt/nanobox/hooks/files/ssh/ssh-keygen'
+      user 'gonano'
+      only_if { ! ::File.exists? "/var/tmp/id_rsa" }
     end
 
     # sync

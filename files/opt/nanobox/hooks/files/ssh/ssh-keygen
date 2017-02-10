@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh-keygen -t rsa -N "" -f /var/tmp/id_rsa
