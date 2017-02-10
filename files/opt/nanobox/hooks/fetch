@@ -29,7 +29,10 @@ end
 # 2 - Read the boxfile.yml
 app_boxfile = begin
   (YAML::load(File.open("#{CODE_DIR}/boxfile.yml")) rescue {})
-    .deep_symbolize_keys
+    .deep_symbolize_keys 
+rescue
+  logger.print unparseable_boxfile()
+  exit 1
 end
 
 # 3 - Validate the boxfile

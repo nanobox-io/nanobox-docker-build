@@ -15,6 +15,9 @@ require 'hookit/setup'
 include Nanobox::Engine
 include Nanobox::Output
 
+require 'yaml'
+require 'ya2yaml'
+
 logger.print(bullet('Running dev hook...'), 'debug')
 
 # 1 - Set all environment variables
@@ -43,4 +46,38 @@ end
       mode 0444
     end
   end
+end
+
+if payload[:boxfile]
+  if not ::File.exist? CODE_DIR
+    # create the dir if it doesn't exist
+    directory CODE_DIR do
+      recursive true
+    end
+
+    # change the owner to gonano
+    execute "chown gonano #{CODE_DIR}"
+  end
+  payload_boxfile = (YAML::load(payload[:boxfile]) || {}).deep_symbolize_keys
+  payload_boxfile_run_config = payload_boxfile[:"run.config"] || {}
+  (payload_boxfile_run_config[:cache_dirs] || []).each do |dir|
+    # 1 - Ensure the CODE_DIR exists
+    # ensure the source exists
+    execute "mkdir -p #{LIB_CACHE_DIR}/#{dir}" do
+      user 'gonano'
+      only_if {!::File.exists?("#{LIB_CACHE_DIR}/#{dir}")}
+    end
+
+    # ensure the destination exists
+    execute "mkdir -p #{CODE_DIR}/#{dir}" do
+      user 'gonano'
+      only_if {!::File.exists?("#{CODE_DIR}/#{dir}")}
+    end
+
+    # bind mount the source onto the destination
+    execute "mount -o bind #{LIB_CACHE_DIR}/#{dir} #{CODE_DIR}/#{dir}" do
+      only_if {`mountpoint #{CODE_DIR}/#{dir}`.include?("#{CODE_DIR}/#{dir} is not a mountpoint")}
+    end
+  end
+
 end
