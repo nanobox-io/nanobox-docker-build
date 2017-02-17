@@ -64,6 +64,7 @@ run_config[:extra_steps].each_with_index do |cmd, i|
     EOF
     cwd CODE_DIR
     path GONANO_PATH
+    environment engine_env
     user 'gonano'
     stream true
     on_data {|data| logger.print data}
