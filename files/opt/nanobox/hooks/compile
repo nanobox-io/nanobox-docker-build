@@ -30,6 +30,8 @@ execute "Purge #{APP_DIR}" do
   command "rm -rf #{APP_DIR}/*"
 end
 
+cache_dirs = (run_config[:cache_dirs] || []).map {|dir| dir[0] == '/' ? dir : "/#{dir}"}
+
 # 2 - extract the engine from cache
 execute "rsync engine" do
   command <<-EOF
@@ -50,7 +52,7 @@ if ::File.exists? "#{LOCAL_CODE_SRC_DIR}/.nanoignore"
       rsync \
         -a \
         --exclude-from '#{LOCAL_CODE_SRC_DIR}/.nanoignore' \
-        #{((['.nanoignore'] + run_config[:cache_dirs]).map {|dir| "--exclude '#{dir}'"}).join(' ')} \
+        #{((['.nanoignore'] + cache_dirs).map {|dir| "--exclude '#{dir}'"}).join(' ')} \
         #{LOCAL_CODE_SRC_DIR}/ \
         #{CODE_DIR}
     EOF
@@ -61,7 +63,7 @@ else
     command <<-EOF
       rsync \
         -a \
-        #{(run_config[:cache_dirs].map {|dir| "--exclude '#{dir}'"}).join(' ')} \
+        #{(cache_dirs.map {|dir| "--exclude '#{dir}'"}).join(' ')} \
         #{LOCAL_CODE_SRC_DIR}/ \
         #{CODE_DIR}
     EOF

@@ -21,6 +21,8 @@ include Nanobox::Hook
 
 logger.print(bullet("Running mount hook..."), 'debug')
 
+cache_dirs = (run_config[:cache_dirs] || []).map {|dir| dir[0] == '/' ? dir : "/#{dir}"}
+
 # 1 - Ensure the CODE_DIR exists
 if not ::File.exist? CODE_DIR
   # create the dir if it doesn't exist
@@ -33,14 +35,14 @@ if not ::File.exist? CODE_DIR
 end
 
 # 2 - iterate through cache_dirs
-run_config[:cache_dirs].each do |dir|
+cache_dirs.each do |dir|
   # ensure the source exists
-  execute "mkdir -p #{LIB_CACHE_DIR}/#{dir}" do
+  execute "mkdir -p #{LIB_CACHE_DIR}#{dir}" do
     user 'gonano'
   end
 
   # ensure the destination exists
-  execute "mkdir -p #{CODE_DIR}/#{dir}" do
+  execute "mkdir -p #{CODE_DIR}#{dir}" do
     user 'gonano'
   end
 
