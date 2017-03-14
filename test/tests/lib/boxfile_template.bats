@@ -99,6 +99,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -116,6 +117,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -133,6 +135,7 @@ END
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -212,6 +215,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -229,6 +233,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -246,6 +251,7 @@ END
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -324,6 +330,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -341,6 +348,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -358,6 +366,7 @@ END
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -436,6 +445,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -453,6 +463,7 @@ END
      :writable_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :network_dirs=>{:type=>:hash, :default=>{}},
      :log_watch=>{:type=>:hash, :default=>{}},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,
@@ -470,6 +481,7 @@ END
      :extra_packages=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_path_dirs=>{:type=>:array, :of=>:string, :default=>[]},
      :extra_steps=>{:type=>:array, :of=>:string, :default=>[]},
+     :local_only=>{:type=>:on_off, :default=>nil},
      :cron=>
       {:type=>:array,
        :of=>:hash,

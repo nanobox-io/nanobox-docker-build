@@ -25,6 +25,7 @@ module Nanobox
         extra_packages:  {type: :array, of: :string, default: []},
         extra_path_dirs: {type: :array, of: :string, default: []},
         extra_steps:     {type: :array, of: :string, default: []},
+        local_only:      {type: :on_off, default: nil},
         cron:            BOXFILE_CRON_DEFAULTS
       }
     }
@@ -68,6 +69,7 @@ module Nanobox
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
         log_watch:      {type: :hash, default: {}},
+        local_only:     {type: :on_off, default: nil},
         cron:           BOXFILE_CRON_DEFAULTS
       }
     }
@@ -81,6 +83,7 @@ module Nanobox
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
         log_watch:      {type: :hash, default: {}},
+        local_only:     {type: :on_off, default: nil},
         cron:           BOXFILE_CRON_DEFAULTS
       }
     }
@@ -96,6 +99,7 @@ module Nanobox
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
         log_watch:      {type: :hash, default: {}},
+        local_only:     {type: :on_off, default: nil},
         cron:           BOXFILE_CRON_DEFAULTS
       }
     }
@@ -109,6 +113,7 @@ module Nanobox
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
         log_watch:      {type: :hash, default: {}},
+        local_only:     {type: :on_off, default: nil},
         cron:           BOXFILE_CRON_DEFAULTS
       }
     }
@@ -124,6 +129,7 @@ module Nanobox
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
         log_watch:      {type: :hash, default: {}},
+        local_only:     {type: :on_off, default: nil},
         cron:           BOXFILE_CRON_DEFAULTS
       }
     }
@@ -137,6 +143,7 @@ module Nanobox
         writable_dirs:  {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
         log_watch:      {type: :hash, default: {}},
+        local_only:     {type: :on_off, default: nil},
         cron:           BOXFILE_CRON_DEFAULTS
       }
     }
@@ -148,7 +155,7 @@ module Nanobox
       extra_packages:  { types: [:array_of_strings] },
       extra_path_dirs: { types: [:array_of_strings] },
       extra_steps:     { types: [:string, :array_of_strings] },
-
+      local_only:      { types: [:boolean] }
     }
 
     BOXFILE_RUN_VALIDATOR = {
@@ -183,7 +190,8 @@ module Nanobox
       cron:           { types: [:array_of_hashes] },
       log_watch:      { types: [:hash] },
       network_dirs:   { types: [:hash] },
-      writable_dirs:  { types: [:array_of_strings] }
+      writable_dirs:  { types: [:array_of_strings] },
+      local_only:     { types: [:boolean] }
     }
 
     BOXFILE_WORKER_VALIDATOR = {
@@ -192,7 +200,8 @@ module Nanobox
       cron:           { types: [:array_of_hashes] },
       log_watch:      { types: [:hash] },
       network_dirs:   { types: [:hash] },
-      writable_dirs:  { types: [:array_of_strings] }
+      writable_dirs:  { types: [:array_of_strings] },
+      local_only:     { types: [:boolean] }
     }
 
     BOXFILE_CRON_VALIDATOR = {
