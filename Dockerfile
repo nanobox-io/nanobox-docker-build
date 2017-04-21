@@ -42,9 +42,6 @@ RUN mkdir -p /opt/nanobox/nos && \
             --strip-components=1 \
             -C /opt/nanobox/nos/
 
-# Install engines
-RUN /var/tmp/install-engines
-
 # Cleanup disk
 RUN rm -rf /tmp/* /var/tmp/*
 
