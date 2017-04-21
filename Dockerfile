@@ -42,6 +42,8 @@ RUN mkdir -p /opt/nanobox/nos && \
             --strip-components=1 \
             -C /opt/nanobox/nos/
 
+RUN mkdir /app && chown gonano:gonano /app
+
 # Cleanup disk
 RUN rm -rf /tmp/* /var/tmp/*
 
