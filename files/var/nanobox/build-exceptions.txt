@@ -42,3 +42,6 @@
 ^/lib/libgmpxx
 # oddly, jruby puts it's libs in share/jruby-*
 ^/share/jruby
+# pkg_alternatives - java uses these
+^/libdata$
+^/libdata/pkg_alternatives
