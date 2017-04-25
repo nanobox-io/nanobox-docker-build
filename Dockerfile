@@ -42,10 +42,11 @@ RUN mkdir -p /opt/nanobox/nos && \
             --strip-components=1 \
             -C /opt/nanobox/nos/
 
-# Install engines
-RUN /var/tmp/install-engines
+RUN mkdir /app && chown gonano:gonano /app
 
 # Cleanup disk
 RUN rm -rf /tmp/* /var/tmp/*
+
+WORKDIR /app
 
 CMD [ "/opt/gonano/bin/nanoinit", "/bin/sleep", "365d" ]
