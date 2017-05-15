@@ -43,5 +43,5 @@ logger.print(bullet('Setting up directories and permissions...'))
   end
   
   # Some of the directories might already exist
-  execute "chown gonano #{dir}"
+  execute "chown -R gonano #{dir}"
 end

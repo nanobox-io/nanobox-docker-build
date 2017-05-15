@@ -27,10 +27,10 @@ if not ::File.exist? CODE_DIR
   directory CODE_DIR do
     recursive true
   end
-
-  # change the owner to gonano
-  execute "chown gonano #{CODE_DIR}"
 end
+
+# change the owner to gonano
+execute "chown gonano #{CODE_DIR}"
 
 # 2 - iterate through cache_dirs
 run_config[:cache_dirs].each do |dir|
