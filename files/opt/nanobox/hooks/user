@@ -20,8 +20,12 @@ include Nanobox::Output
 logger.print(bullet('Running user hook...'), 'debug')
 
 # Set gonano userid (fixes docker native user id issues)
-# todo: get id of owner
-execute "usermod -o -u $(stat -c '%u' /app) gonano"
+# provider ==  "native" || "docker-machine"
+# GOOS == "windows" || "darwin" || "linux"
+# if payload[:os] != "windows" || payload[:provider] != "docker-machine"
+if payload[:os] == "linux" && payload[:provider] == "native"
+  execute "usermod -o -u $(stat -c '%u' /app) gonano"
+end
 
 logger.print(bullet('Copying ssh keys into the build environment...'))
 
