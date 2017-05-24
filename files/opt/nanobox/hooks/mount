@@ -27,10 +27,20 @@ if not ::File.exist? CODE_DIR
   directory CODE_DIR do
     recursive true
   end
+
+  # change the owner to gonano
+  execute "chown gonano #{CODE_DIR}"
 end
 
-# change the owner to gonano
-execute "chown gonano #{CODE_DIR}"
+# For some reason windows and mac with netfs complain when this hook
+# chowns the code_dir. however, if a user runs `nanobox build --debug`
+# and `chown gonano /app` themselves, it works. For now we'll just take
+# it back out for those systems. (Additional note: windows+cifs mounts
+# as 0(root). osx+nfs mounts as user 514)
+if registry("usermodded")
+  # change the owner to gonano's new user id
+  execute "chown gonano #{CODE_DIR}"
+end
 
 # 2 - iterate through cache_dirs
 run_config[:cache_dirs].each do |dir|
