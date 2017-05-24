@@ -64,16 +64,19 @@
   run docker exec build bash -c "mkdir -p /app && chown gonano:gonano /app && cp -a /share/code/* /app/"
   print_output
 
-  run docker exec build bash -c "echo '192.168.0.1	github.com' >> /etc/hosts"
+  run docker exec build bash -c "echo '192.168.0.2	github.com' >> /etc/hosts"
   print_output
   [ "$status" -eq 0 ]
 
-  netcat -l 443 -q 45 &
-  
+  run docker exec -d build bash -c "netcat -l -p 443 -q 45"
+  print_output
+  [ "$status" -eq 0 ]
+
   run run_hook "fetch" "$(payload fetch)"
   print_output
   [ "$status" -eq 1 ]
   [[ "$output" =~ "failed to return within 30 seconds" ]]
+
 }
 
 @test "Stop Container" {
