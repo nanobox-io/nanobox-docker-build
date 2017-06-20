@@ -66,19 +66,28 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       only_if { ! ::File.exists? "/var/tmp/id_rsa" }
     end
 
+    if part == 'deploy'
+      logger.print(bullet("Syncing runtime over previous deploy..."))
+    else
+      logger.print(bullet("Syncing app over previous deploy..."))
+    end
+
+    isVerbose = ""
+    if payload[:verbose]
+      isVerbose = "-v"
+    end
+
     # sync
     execute "sync #{part}" do
       command <<-EOF
         siphon --prefix '   #{prefix}: ' -- bash -c "\
           rsync \
-            -a \
-            -v \
+            -a #{isVerbose} \
             --delete \
             . \
-            -e 'ssh -p 1567 -i /var/tmp/id_rsa' \
+            -e 'ssh -p 1567 -i /var/tmp/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
             #{current}@#{payload[:warehouse]}:#{current}"
       EOF
-      user 'gonano'
       cwd dir
       stream true
       on_data { |data| logger.print data }
@@ -137,6 +146,12 @@ else
                   > /var/tmp/#{part}-#{payload[:build]}.tgz"
       EOF
       cwd dir
+    end
+
+    if part == 'deploy'
+      logger.print(bullet("Uploading compressed tarball of runtime..."))
+    else
+      logger.print(bullet("Uploading compressed tarball of app..."))
     end
 
     execute "publish deploy" do
