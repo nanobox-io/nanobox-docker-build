@@ -72,15 +72,20 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       logger.print(bullet("Syncing app over previous deploy..."))
     end
 
+    isVerbose = ""
+    if payload[:verbose]
+      isVerbose = "-v"
+    end
+
     # sync
     execute "sync #{part}" do
       command <<-EOF
         siphon --prefix '   #{prefix}: ' -- bash -c "\
           rsync \
-            -a \
+            -a #{isVerbose} \
             --delete \
             . \
-            -e 'ssh -p 1567 -i /var/tmp/id_rsa' \
+            -e 'ssh -p 1567 -i /var/tmp/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' \
             #{current}@#{payload[:warehouse]}:#{current}"
       EOF
       cwd dir
