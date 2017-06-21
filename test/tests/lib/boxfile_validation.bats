@@ -172,6 +172,134 @@ END
   [ "$output" = "$expected" ]
 }
 
+@test "Validate ports" {
+  payload=$(cat <<-END
+run.config:
+    engine: ruby
+    
+web.main:
+  start: bash
+  ports:
+    - 123456
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  ports: "Invalid port format - 123456"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+    engine: ruby
+    
+web.main:
+  start: bash
+  ports:
+    - 12345:123456
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  ports: "Invalid port format - 12345:123456"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+    engine: ruby
+    
+web.main:
+  start: bash
+  ports:
+    - tcp:1234:123456
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  ports: "Invalid port format - tcp:1234:123456"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+    payload=$(cat <<-END
+run.config:
+    engine: ruby
+    
+web.main:
+  start: bash
+  ports:
+    - garbage
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  ports: "Invalid port format - garbage"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+    payload=$(cat <<-END
+run.config:
+    engine: ruby
+    
+web.main:
+  start: bash
+  ports:
+    - "1234"
+    - 2345:6789
+    - tcp:123:456
+    - udp:678:901
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
 @test "Stop Container" {
   stop_container
 }
