@@ -249,6 +249,14 @@ module Nanobox
               end
             end
           end
+          if not value[:ports].nil? and value[:ports].is_a? Array
+            value[:ports].each do |port|
+              if not port.to_s =~ /^(\d{1,5}|\d{1,5}:\d{1,5}|tcp:\d{1,5}:\d{1,5}|udp:\d{1,5}:\d{1,5})$/
+                web_errors[:ports] = "Invalid port format - #{port}"
+                break
+              end
+            end
+          end
           if web_errors != {}
             errors[key] = web_errors
           end
