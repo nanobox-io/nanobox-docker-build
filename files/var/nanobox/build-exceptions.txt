@@ -40,6 +40,8 @@
 # gmp
 ^/lib/libgmp
 ^/lib/libgmpxx
+# proj
+^/share/proj
 # oddly, jruby puts it's libs in share/jruby-*
 ^/share/jruby
 # pkg_alternatives - java uses these
