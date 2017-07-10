@@ -11,6 +11,7 @@
 ^/lib$
 ^/libexec$
 ^/sbin$
+^/share$
 ^/var$
 ^/var/db$
 ^/var/home
