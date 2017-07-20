@@ -72,9 +72,9 @@ if payload[:previous_build] and not payload[:previous_build].empty?
       logger.print(bullet("Syncing app over previous deploy..."))
     end
 
-    isVerbose = "-v"
-    if ENV["QUIET_SYNC"] == "true"
-      isVerbose = ""
+    isVerbose = ""
+    if payload[:sync_verbose] == "true"
+      isVerbose = "-v"
     end
 
     # sync
