@@ -283,16 +283,16 @@ module Nanobox
             end
           end
           if value[:start].is_a? String
-            if value[:cwd] && not value[:cwd].is_a? String
+            if (value[:cwd] && ! value[:cwd].is_a?(String))
               web_errors[:cwd] = "cwd needs to be a string"
             end
-            if value[:stop] && not value[:stop].is_a? String
+            if (value[:stop] && ! value[:stop].is_a?(String))
               web_errors[:stop] = "stop needs to be a string"
             end
-            if value[:stop_timeout] && not value[:stop_timeout].is_a? Integer
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Integer))
               web_errors[:stop_timeout] = "stop_timeout needs to be an integer"
             end
-            if value[:stop_force] && not (value[:stop_force].is_a? TrueClass || value[:stop_force].is_a? FalseClass)
+            if (value[:stop_force] && ! (value[:stop_force].is_a?(TrueClass) || value[:stop_force].is_a?(FalseClass)))
               web_errors[:stop_force] = "stop_force needs to be true or false"
             end
           elsif value[:start].is_a? Array
@@ -309,7 +309,7 @@ module Nanobox
               web_errors[:stop_force] = "stop_force is invalid when start is an array, convert to hash syntax"
             end
           elsif value[:start].is_a? Hash
-            if value[:cwd] && not value[:cwd].is_a? Hash
+            if value[:cwd] && ! value[:cwd].is_a?(Hash)
               web_errors[:cwd] = "cwd needs to be a hash"
             else
               value[:cwd].each_pair do |k, v|
@@ -321,7 +321,7 @@ module Nanobox
                 end 
               end
             end
-            if value[:stop] && not value[:stop].is_a? Hash
+            if (value[:stop] && ! value[:stop].is_a?(Hash))
               web_errors[:stop] = "stop needs to be a hash"
             else
               value[:stop].each_pair do |k, v|
@@ -333,7 +333,7 @@ module Nanobox
                 end 
               end
             end
-            if value[:stop_timeout] && not value[:stop_timeout].is_a? Hash
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash))
               web_errors[:stop_timeout] = "stop_timeout needs to be an hash"
             else
               value[:stop_timeout].each_pair do |k, v|
@@ -345,14 +345,14 @@ module Nanobox
                 end 
               end
             end
-            if value[:stop_force] && not value[:stop_timeout].is_a? Hash
+            if (value[:stop_force] && ! value[:stop_force].is_a?(Hash))
               web_errors[:stop_force] = "stop_force needs to be a hash"
             else
               value[:stop_force].each_pair do |k, v|
                 if not value[:start][k]
                   web_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
                 end
-                if not (v.is_a? TrueClass || v.is_a? FalseClass)
+                if not (v.is_a?(TrueClass) || v.is_a?(FalseClass))
                   web_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be either true or false"
                 end 
               end
@@ -367,8 +367,84 @@ module Nanobox
             value[:cron].each do |cron|
               errors = validate_section(cron, BOXFILE_CRON_VALIDATOR)
               if errors != {}
-                web_errors[:cron] = "Invalid cron format"
+                worker_errors[:cron] = "Invalid cron format"
                 break
+              end
+            end
+          end
+          if value[:start].is_a? String
+            if (value[:cwd] && ! value[:cwd].is_a?(String))
+              worker_errors[:cwd] = "cwd needs to be a string"
+            end
+            if (value[:stop] && ! value[:stop].is_a?(String))
+              worker_errors[:stop] = "stop needs to be a string"
+            end
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Integer))
+              worker_errors[:stop_timeout] = "stop_timeout needs to be an integer"
+            end
+            if (value[:stop_force] && ! (value[:stop_force].is_a?(TrueClass) || value[:stop_force].is_a?(FalseClass)))
+              worker_errors[:stop_force] = "stop_force needs to be true or false"
+            end
+          elsif value[:start].is_a? Array
+            if value[:cwd]
+              worker_errors[:cwd] = "cwd is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop]
+              worker_errors[:stop] = "stop is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop_timeout]
+              worker_errors[:stop_timeout] = "stop_timeout is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop_force]
+              worker_errors[:stop_force] = "stop_force is invalid when start is an array, convert to hash syntax"
+            end
+          elsif value[:start].is_a? Hash
+            if value[:cwd] && ! value[:cwd].is_a?(Hash)
+              worker_errors[:cwd] = "cwd needs to be a hash"
+            else
+              value[:cwd].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+                end
+                if not v.is_a? String
+                  worker_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
+                end 
+              end
+            end
+            if (value[:stop] && ! value[:stop].is_a?(Hash))
+              worker_errors[:stop] = "stop needs to be a hash"
+            else
+              value[:stop].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+                end
+                if not v.is_a? String
+                  worker_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
+                end 
+              end
+            end
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash))
+              worker_errors[:stop_timeout] = "stop_timeout needs to be an hash"
+            else
+              value[:stop_timeout].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+                end
+                if not v.is_a? Integer
+                  worker_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an interger"
+                end 
+              end
+            end
+            if (value[:stop_force] && ! value[:stop_force].is_a?(Hash))
+              worker_errors[:stop_force] = "stop_force needs to be a hash"
+            else
+              value[:stop_force].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+                end
+                if not (v.is_a?(TrueClass) || v.is_a?(FalseClass))
+                  worker_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be either true or false"
+                end 
               end
             end
           end
