@@ -248,7 +248,7 @@ END
   
   [ "$output" = "$expected" ]
 
-    payload=$(cat <<-END
+  payload=$(cat <<-END
 run.config:
     engine: ruby
     
@@ -273,7 +273,7 @@ END
   
   [ "$output" = "$expected" ]
 
-    payload=$(cat <<-END
+  payload=$(cat <<-END
 run.config:
     engine: ruby
     
@@ -284,6 +284,517 @@ web.main:
     - 2345:6789
     - tcp:123:456
     - udp:678:901
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate start and stop commands as bad hashes" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_blob: "stop blob needs a matching key in start"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop_force:
+    app: true
+    blob: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_force_blob: "stop_force blob needs a matching key in start"
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  cwd:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  cwd_blob: "cwd blob needs a matching key in start"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop_timeout:
+    app: 10
+    blob: 20
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_timeout_blob: "stop_timeout blob needs a matching key in start"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate start and stop commands mismatch string and hash" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  stop:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop: "stop needs to be a string"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  stop_force:
+    app: true
+    blob: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_force: "stop_force needs to be true or false"
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  cwd:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  cwd: "cwd needs to be a string"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  stop_timeout:
+    app: 10
+    blob: 20
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_timeout: "stop_timeout needs to be an integer"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate start and stop commands mismatch hash and string" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop: "stop needs to be a hash"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop_force: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_force: "stop_force needs to be a hash"
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  cwd: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  cwd: "cwd needs to be a hash"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop_timeout: 20
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+web.main: 
+  stop_timeout: "stop_timeout needs to be an hash"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate start and stop commands as good hashes" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop:
+    app: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop_force:
+    app: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  cwd:
+    app: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start:
+    app: this
+  stop_timeout:
+    app: 10
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate start and stop commands as good strings" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  stop: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  stop_force: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  cwd: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+web.main:
+  start: this
+  stop_timeout: 10
 
 END
 )

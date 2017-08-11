@@ -89,9 +89,10 @@ web.site:
 worker.jobs:
   start:
     worker: something
+  stop:
+    bob: stop
 data.db:
   image: nanobox/mysql
-END
 )
 
   echo "$output"

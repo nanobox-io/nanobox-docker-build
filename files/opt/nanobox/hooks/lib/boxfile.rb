@@ -311,7 +311,7 @@ module Nanobox
           elsif value[:start].is_a? Hash
             if value[:cwd] && ! value[:cwd].is_a?(Hash)
               web_errors[:cwd] = "cwd needs to be a hash"
-            else
+            elsif value[:cwd]
               value[:cwd].each_pair do |k, v|
                 if not value[:start][k]
                   web_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
@@ -321,9 +321,9 @@ module Nanobox
                 end 
               end
             end
-            if (value[:stop] && ! value[:stop].is_a?(Hash))
+            if value[:stop] && ! value[:stop].is_a?(Hash)
               web_errors[:stop] = "stop needs to be a hash"
-            else
+            elsif value[:stop]
               value[:stop].each_pair do |k, v|
                 if not value[:start][k]
                   web_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
@@ -333,9 +333,9 @@ module Nanobox
                 end 
               end
             end
-            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash))
+            if value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash)
               web_errors[:stop_timeout] = "stop_timeout needs to be an hash"
-            else
+            elsif value[:stop_timeout]
               value[:stop_timeout].each_pair do |k, v|
                 if not value[:start][k]
                   web_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
@@ -345,9 +345,9 @@ module Nanobox
                 end 
               end
             end
-            if (value[:stop_force] && ! value[:stop_force].is_a?(Hash))
+            if value[:stop_force] && ! value[:stop_force].is_a?(Hash)
               web_errors[:stop_force] = "stop_force needs to be a hash"
-            else
+            elsif value[:stop_force]
               value[:stop_force].each_pair do |k, v|
                 if not value[:start][k]
                   web_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
