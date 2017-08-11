@@ -79,7 +79,7 @@ END
 }
 
 @test "Test string and hash start commands" {
-  payload='{"run.config":{},"web.site":{"start":"something"},"worker.jobs":{"start":{"worker":"something"}},"data.db":{"image":"nanobox/mysql"}}'
+  payload='{"run.config":{},"web.site":{"start":"something"},"worker.jobs":{"start":{"worker":"something"},"stop":{"bob":"stop"}},"data.db":{"image":"nanobox/mysql"}}'
   run docker exec build bash -c "/tmp/converge_boxfile '$payload'"
   
   expected=$(cat <<-END
