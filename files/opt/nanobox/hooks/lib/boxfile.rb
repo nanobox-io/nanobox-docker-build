@@ -63,7 +63,11 @@ module Nanobox
       default: {},
       template: {
         image:          {type: :string, default: nil},
+        cwd:            {type: :string, default: nil},
         start:          {type: :string, default: nil},
+        stop:           {type: :string, default: nil},
+        stop_timeout:   {type: :integer, default: nil},
+        stop_force:     {type: :boolean, default: nil},
         routes:         {type: :array, of: :string, default: []},
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
@@ -80,7 +84,11 @@ module Nanobox
       default: {},
       template: {
         image:          {type: :string, default: nil},
+        cwd:            {type: :string, default: nil},
         start:          {type: :string, default: nil},
+        stop:           {type: :string, default: nil},
+        stop_timeout:   {type: :integer, default: nil},
+        stop_force:     {type: :boolean, default: nil},
         writable_dirs:  {type: :array, of: :string, default: []},
         writable_files: {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
@@ -127,7 +135,11 @@ module Nanobox
       default: {},
       template: {
         image:          {type: :string, default: nil},
+        cwd:            {type: :hash, default: nil},
         start:          {type: :hash, default: {}},
+        stop:           {type: :hash, default: {}},
+        stop_timeout:   {type: :hash, default: {}},
+        stop_force:     {type: :hash, default: {}},
         routes:         {type: :array, of: :string, default: []},
         ports:          {type: :array, of: :string, default: []},
         writable_dirs:  {type: :array, of: :string, default: []},
@@ -144,7 +156,11 @@ module Nanobox
       default: {},
       template: {
         image:          {type: :string, default: nil},
+        cwd:            {type: :hash, default: nil},
         start:          {type: :hash, default: {}},
+        stop:           {type: :hash, default: {}},
+        stop_timeout:   {type: :hash, default: {}},
+        stop_force:     {type: :hash, default: {}},
         writable_dirs:  {type: :array, of: :string, default: []},
         writable_files: {type: :array, of: :string, default: []},
         network_dirs:   {type: :hash, default: {}},
@@ -155,8 +171,8 @@ module Nanobox
     }
 
     BOXFILE_DATA_VALIDATOR = {
-      image:  { types: [:string], required: true },
-      config: { types: [:hash] },
+      image:           { types: [:string], required: true },
+      config:          { types: [:hash] },
       cron:            { types: [:array_of_hashes] },
       extra_packages:  { types: [:array_of_strings] },
       extra_path_dirs: { types: [:array_of_strings] },
@@ -190,7 +206,11 @@ module Nanobox
 
     BOXFILE_WEB_VALIDATOR = {
       image:          { types: [:string] },
+      cwd:            { types: [:string, :hash] },
       start:          { types: [:string, :array_of_strings, :hash], required: true },
+      stop:           { types: [:string, :hash], required: false },
+      stop_timeout:   { types: [:integer, :hash], required: false },
+      stop_force:     { types: [:boolean, :hash], required: false },
       routes:         { types: [:array_of_strings] },
       ports:          { types: [:array_of_strings] },
       cron:           { types: [:array_of_hashes] },
@@ -202,7 +222,12 @@ module Nanobox
 
     BOXFILE_WORKER_VALIDATOR = {
       image:          { types: [:string] },
+      cwd:            { types: [:string, :hash] },
       start:          { types: [:string, :array_of_strings, :hash], required: true },
+      stop:           { types: [:string, :hash], required: false },
+      stop_timeout:   { types: [:integer, :hash], required: false },
+      stop_force:     { types: [:boolean, :hash], required: false },
+      routes:         { types: [:array_of_strings] },
       cron:           { types: [:array_of_hashes] },
       log_watch:      { types: [:hash] },
       network_dirs:   { types: [:hash] },
@@ -257,6 +282,82 @@ module Nanobox
               end
             end
           end
+          if value[:start].is_a? String
+            if (value[:cwd] && ! value[:cwd].is_a?(String))
+              web_errors[:cwd] = "cwd needs to be a string"
+            end
+            if (value[:stop] && ! value[:stop].is_a?(String))
+              web_errors[:stop] = "stop needs to be a string"
+            end
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Integer))
+              web_errors[:stop_timeout] = "stop_timeout needs to be an integer"
+            end
+            if (value[:stop_force] && ! (value[:stop_force].is_a?(TrueClass) || value[:stop_force].is_a?(FalseClass)))
+              web_errors[:stop_force] = "stop_force needs to be true or false"
+            end
+          elsif value[:start].is_a? Array
+            if value[:cwd]
+              web_errors[:cwd] = "cwd is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop]
+              web_errors[:stop] = "stop is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop_timeout]
+              web_errors[:stop_timeout] = "stop_timeout is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop_force]
+              web_errors[:stop_force] = "stop_force is invalid when start is an array, convert to hash syntax"
+            end
+          elsif value[:start].is_a? Hash
+            if value[:cwd] && ! value[:cwd].is_a?(Hash)
+              web_errors[:cwd] = "cwd needs to be a hash"
+            elsif value[:cwd]
+              value[:cwd].each_pair do |k, v|
+                if not value[:start][k]
+                  web_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+                end
+                if not v.is_a? String
+                  web_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
+                end 
+              end
+            end
+            if value[:stop] && ! value[:stop].is_a?(Hash)
+              web_errors[:stop] = "stop needs to be a hash"
+            elsif value[:stop]
+              value[:stop].each_pair do |k, v|
+                if not value[:start][k]
+                  web_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+                end
+                if not v.is_a? String
+                  web_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
+                end 
+              end
+            end
+            if value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash)
+              web_errors[:stop_timeout] = "stop_timeout needs to be an hash"
+            elsif value[:stop_timeout]
+              value[:stop_timeout].each_pair do |k, v|
+                if not value[:start][k]
+                  web_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+                end
+                if not v.is_a? Integer
+                  web_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an interger"
+                end 
+              end
+            end
+            if value[:stop_force] && ! value[:stop_force].is_a?(Hash)
+              web_errors[:stop_force] = "stop_force needs to be a hash"
+            elsif value[:stop_force]
+              value[:stop_force].each_pair do |k, v|
+                if not value[:start][k]
+                  web_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+                end
+                if not (v.is_a?(TrueClass) || v.is_a?(FalseClass))
+                  web_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be either true or false"
+                end 
+              end
+            end
+          end
           if web_errors != {}
             errors[key] = web_errors
           end
@@ -266,8 +367,84 @@ module Nanobox
             value[:cron].each do |cron|
               errors = validate_section(cron, BOXFILE_CRON_VALIDATOR)
               if errors != {}
-                web_errors[:cron] = "Invalid cron format"
+                worker_errors[:cron] = "Invalid cron format"
                 break
+              end
+            end
+          end
+          if value[:start].is_a? String
+            if (value[:cwd] && ! value[:cwd].is_a?(String))
+              worker_errors[:cwd] = "cwd needs to be a string"
+            end
+            if (value[:stop] && ! value[:stop].is_a?(String))
+              worker_errors[:stop] = "stop needs to be a string"
+            end
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Integer))
+              worker_errors[:stop_timeout] = "stop_timeout needs to be an integer"
+            end
+            if (value[:stop_force] && ! (value[:stop_force].is_a?(TrueClass) || value[:stop_force].is_a?(FalseClass)))
+              worker_errors[:stop_force] = "stop_force needs to be true or false"
+            end
+          elsif value[:start].is_a? Array
+            if value[:cwd]
+              worker_errors[:cwd] = "cwd is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop]
+              worker_errors[:stop] = "stop is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop_timeout]
+              worker_errors[:stop_timeout] = "stop_timeout is invalid when start is an array, convert to hash syntax"
+            end
+            if value[:stop_force]
+              worker_errors[:stop_force] = "stop_force is invalid when start is an array, convert to hash syntax"
+            end
+          elsif value[:start].is_a? Hash
+            if value[:cwd] && ! value[:cwd].is_a?(Hash)
+              worker_errors[:cwd] = "cwd needs to be a hash"
+            else
+              value[:cwd].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+                end
+                if not v.is_a? String
+                  worker_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
+                end 
+              end
+            end
+            if (value[:stop] && ! value[:stop].is_a?(Hash))
+              worker_errors[:stop] = "stop needs to be a hash"
+            else
+              value[:stop].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+                end
+                if not v.is_a? String
+                  worker_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
+                end 
+              end
+            end
+            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash))
+              worker_errors[:stop_timeout] = "stop_timeout needs to be an hash"
+            else
+              value[:stop_timeout].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+                end
+                if not v.is_a? Integer
+                  worker_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an interger"
+                end 
+              end
+            end
+            if (value[:stop_force] && ! value[:stop_force].is_a?(Hash))
+              worker_errors[:stop_force] = "stop_force needs to be a hash"
+            else
+              value[:stop_force].each_pair do |k, v|
+                if not value[:start][k]
+                  worker_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+                end
+                if not (v.is_a?(TrueClass) || v.is_a?(FalseClass))
+                  worker_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be either true or false"
+                end 
               end
             end
           end
