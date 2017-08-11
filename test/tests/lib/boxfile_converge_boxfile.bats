@@ -93,6 +93,7 @@ worker.jobs:
     bob: stop
 data.db:
   image: nanobox/mysql
+END
 )
 
   echo "$output"
