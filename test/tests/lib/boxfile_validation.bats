@@ -300,7 +300,7 @@ END
   [ "$output" = "$expected" ]
 }
 
-@test "Validate start and stop commands as bad hashes" {
+@test "Validate web start and stop commands as bad hashes" {
   payload=$(cat <<-END
 run.config:
   engine: ruby
@@ -411,7 +411,7 @@ END
   [ "$output" = "$expected" ]
 }
 
-@test "Validate start and stop commands mismatch string and hash" {
+@test "Validate web start and stop commands mismatch string and hash" {
   payload=$(cat <<-END
 run.config:
   engine: ruby
@@ -518,7 +518,7 @@ END
   [ "$output" = "$expected" ]
 }
 
-@test "Validate start and stop commands mismatch hash and string" {
+@test "Validate web start and stop commands mismatch hash and string" {
   payload=$(cat <<-END
 run.config:
   engine: ruby
@@ -612,7 +612,7 @@ END
   expected=$(cat <<-END
 --- 
 web.main: 
-  stop_timeout: "stop_timeout needs to be an hash"
+  stop_timeout: "stop_timeout needs to be a hash"
 END
 )
 
@@ -621,7 +621,7 @@ END
   [ "$output" = "$expected" ]
 }
 
-@test "Validate start and stop commands as good hashes" {
+@test "Validate web start and stop commands as good hashes" {
   payload=$(cat <<-END
 run.config:
   engine: ruby
@@ -720,7 +720,7 @@ END
   [ "$output" = "$expected" ]
 }
 
-@test "Validate start and stop commands as good strings" {
+@test "Validate web start and stop commands as good strings" {
   payload=$(cat <<-END
 run.config:
   engine: ruby
@@ -793,6 +793,517 @@ run.config:
   engine: ruby
     
 web.main:
+  start: this
+  stop_timeout: 10
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate worker start and stop commands as bad hashes" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_blob: "stop blob needs a matching key in start"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop_force:
+    app: true
+    blob: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_force_blob: "stop_force blob needs a matching key in start"
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  cwd:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  cwd_blob: "cwd blob needs a matching key in start"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop_timeout:
+    app: 10
+    blob: 20
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_timeout_blob: "stop_timeout blob needs a matching key in start"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate worker start and stop commands mismatch string and hash" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  stop:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop: "stop needs to be a string"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  stop_force:
+    app: true
+    blob: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_force: "stop_force needs to be true or false"
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  cwd:
+    app: that
+    blob: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  cwd: "cwd needs to be a string"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  stop_timeout:
+    app: 10
+    blob: 20
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_timeout: "stop_timeout needs to be an integer"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate worker start and stop commands mismatch hash and string" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop: "stop needs to be a hash"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop_force: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_force: "stop_force needs to be a hash"
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  cwd: blah
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  cwd: "cwd needs to be a hash"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop_timeout: 20
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- 
+worker.cron: 
+  stop_timeout: "stop_timeout needs to be a hash"
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate worker start and stop commands as good hashes" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop:
+    app: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop_force:
+    app: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  cwd:
+    app: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start:
+    app: this
+  stop_timeout:
+    app: 10
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+}
+
+@test "Validate worker start and stop commands as good strings" {
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  stop: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  stop_force: true
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+  
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
+  start: this
+  cwd: that
+
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+  
+  expected=$(cat <<-END
+--- {}
+END
+)
+
+  echo "$output"
+  
+  [ "$output" = "$expected" ]
+
+  payload=$(cat <<-END
+run.config:
+  engine: ruby
+    
+worker.cron:
   start: this
   stop_timeout: 10
 

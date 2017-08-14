@@ -296,65 +296,66 @@ module Nanobox
               web_errors[:stop_force] = "stop_force needs to be true or false"
             end
           elsif value[:start].is_a? Array
-            if value[:cwd]
-              web_errors[:cwd] = "cwd is invalid when start is an array, convert to hash syntax"
-            end
-            if value[:stop]
-              web_errors[:stop] = "stop is invalid when start is an array, convert to hash syntax"
-            end
-            if value[:stop_timeout]
-              web_errors[:stop_timeout] = "stop_timeout is invalid when start is an array, convert to hash syntax"
-            end
-            if value[:stop_force]
-              web_errors[:stop_force] = "stop_force is invalid when start is an array, convert to hash syntax"
+            [:cwd, :stop, :stop_timeout, :stop_force].each do |i|
+              if value[i]
+                web_errors[i] = "#{i} is invalid when start is an array, convert to hash syntax"
+              end
             end
           elsif value[:start].is_a? Hash
-            if value[:cwd] && ! value[:cwd].is_a?(Hash)
-              web_errors[:cwd] = "cwd needs to be a hash"
-            elsif value[:cwd]
-              value[:cwd].each_pair do |k, v|
-                if not value[:start][k]
-                  web_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+            if value[:cwd]
+              if value[:cwd].is_a?(Hash)
+                value[:cwd].each_pair do |k, v|
+                  if not value[:start][k]
+                    web_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+                  end
+                  if not v.is_a?(String)
+                    web_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
+                  end
                 end
-                if not v.is_a? String
-                  web_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
-                end 
+              else
+                web_errors[:cwd] = "cwd needs to be a hash"
               end
             end
-            if value[:stop] && ! value[:stop].is_a?(Hash)
-              web_errors[:stop] = "stop needs to be a hash"
-            elsif value[:stop]
-              value[:stop].each_pair do |k, v|
-                if not value[:start][k]
-                  web_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+            if value[:stop]
+              if value[:stop].is_a?(Hash)
+                value[:stop].each_pair do |k, v|
+                  if not value[:start][k]
+                    web_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+                  end
+                  if not v.is_a?(String)
+                    web_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
+                  end
                 end
-                if not v.is_a? String
-                  web_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
-                end 
+              else
+                web_errors[:stop] = "stop needs to be a hash"
               end
             end
-            if value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash)
-              web_errors[:stop_timeout] = "stop_timeout needs to be an hash"
-            elsif value[:stop_timeout]
-              value[:stop_timeout].each_pair do |k, v|
-                if not value[:start][k]
-                  web_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+            if value[:stop_timeout]
+              if value[:stop_timeout].is_a?(Hash)
+                value[:stop_timeout].each_pair do |k, v|
+                  if not value[:start][k]
+                    web_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+                  end
+                  if not v.is_a?(Integer)
+                    web_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an integer"
+                  end
                 end
-                if not v.is_a? Integer
-                  web_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an interger"
-                end 
+              else
+                web_errors[:stop_timeout] = "stop_timeout needs to be a hash"
               end
             end
-            if value[:stop_force] && ! value[:stop_force].is_a?(Hash)
-              web_errors[:stop_force] = "stop_force needs to be a hash"
-            elsif value[:stop_force]
-              value[:stop_force].each_pair do |k, v|
-                if not value[:start][k]
-                  web_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+            if value[:stop_force]
+              if value[:stop_force].is_a?(Hash)
+                value[:stop_force].each_pair do |k, v|
+                  if not value[:start][k]
+                    web_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+                  end
+                  if ! (v.is_a?(TrueClass) || v.is_a?(FalseClass))
+                    web_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be a string"
+                  end
                 end
-                if not (v.is_a?(TrueClass) || v.is_a?(FalseClass))
-                  web_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be either true or false"
-                end 
+              else
+                web_errors[:stop_force] = "stop_force needs to be a hash"
               end
             end
           end
@@ -386,65 +387,66 @@ module Nanobox
               worker_errors[:stop_force] = "stop_force needs to be true or false"
             end
           elsif value[:start].is_a? Array
-            if value[:cwd]
-              worker_errors[:cwd] = "cwd is invalid when start is an array, convert to hash syntax"
-            end
-            if value[:stop]
-              worker_errors[:stop] = "stop is invalid when start is an array, convert to hash syntax"
-            end
-            if value[:stop_timeout]
-              worker_errors[:stop_timeout] = "stop_timeout is invalid when start is an array, convert to hash syntax"
-            end
-            if value[:stop_force]
-              worker_errors[:stop_force] = "stop_force is invalid when start is an array, convert to hash syntax"
+            [:cwd, :stop, :stop_timeout, :stop_force].each do |i|
+              if value[i]
+                worker_errors[i] = "#{i} is invalid when start is an array, convert to hash syntax"
+              end
             end
           elsif value[:start].is_a? Hash
-            if value[:cwd] && ! value[:cwd].is_a?(Hash)
-              worker_errors[:cwd] = "cwd needs to be a hash"
-            else
-              value[:cwd].each_pair do |k, v|
-                if not value[:start][k]
-                  worker_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+            if value[:cwd]
+              if value[:cwd].is_a?(Hash)
+                value[:cwd].each_pair do |k, v|
+                  if not value[:start][k]
+                    worker_errors["cwd_#{k}".to_sym] = "cwd #{k} needs a matching key in start"
+                  end
+                  if not v.is_a?(String)
+                    worker_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
+                  end
                 end
-                if not v.is_a? String
-                  worker_errors["cwd_#{k}_value".to_sym] = "cwd #{k} value should be a string"
-                end 
+              else
+                worker_errors[:cwd] = "cwd needs to be a hash"
               end
             end
-            if (value[:stop] && ! value[:stop].is_a?(Hash))
-              worker_errors[:stop] = "stop needs to be a hash"
-            else
-              value[:stop].each_pair do |k, v|
-                if not value[:start][k]
-                  worker_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+            if value[:stop]
+              if value[:stop].is_a?(Hash)
+                value[:stop].each_pair do |k, v|
+                  if not value[:start][k]
+                    worker_errors["stop_#{k}".to_sym] = "stop #{k} needs a matching key in start"
+                  end
+                  if not v.is_a?(String)
+                    worker_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
+                  end
                 end
-                if not v.is_a? String
-                  worker_errors["stop_#{k}_value".to_sym] = "stop #{k} value should be a string"
-                end 
+              else
+                worker_errors[:stop] = "stop needs to be a hash"
               end
             end
-            if (value[:stop_timeout] && ! value[:stop_timeout].is_a?(Hash))
-              worker_errors[:stop_timeout] = "stop_timeout needs to be an hash"
-            else
-              value[:stop_timeout].each_pair do |k, v|
-                if not value[:start][k]
-                  worker_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+            if value[:stop_timeout]
+              if value[:stop_timeout].is_a?(Hash)
+                value[:stop_timeout].each_pair do |k, v|
+                  if not value[:start][k]
+                    worker_errors["stop_timeout_#{k}".to_sym] = "stop_timeout #{k} needs a matching key in start"
+                  end
+                  if not v.is_a?(Integer)
+                    worker_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an integer"
+                  end
                 end
-                if not v.is_a? Integer
-                  worker_errors["stop_timeout_#{k}_value".to_sym] = "stop_timeout #{k} value should be an interger"
-                end 
+              else
+                worker_errors[:stop_timeout] = "stop_timeout needs to be a hash"
               end
             end
-            if (value[:stop_force] && ! value[:stop_force].is_a?(Hash))
-              worker_errors[:stop_force] = "stop_force needs to be a hash"
-            else
-              value[:stop_force].each_pair do |k, v|
-                if not value[:start][k]
-                  worker_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+            if value[:stop_force]
+              if value[:stop_force].is_a?(Hash)
+                value[:stop_force].each_pair do |k, v|
+                  if not value[:start][k]
+                    worker_errors["stop_force_#{k}".to_sym] = "stop_force #{k} needs a matching key in start"
+                  end
+                  if ! (v.is_a?(TrueClass) || v.is_a?(FalseClass))
+                    worker_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be a string"
+                  end
                 end
-                if not (v.is_a?(TrueClass) || v.is_a?(FalseClass))
-                  worker_errors["stop_force_#{k}_value".to_sym] = "stop_force #{k} value should be either true or false"
-                end 
+              else
+                worker_errors[:stop_force] = "stop_force needs to be a hash"
               end
             end
           end
