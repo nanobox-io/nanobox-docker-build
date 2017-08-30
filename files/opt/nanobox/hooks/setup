@@ -6,7 +6,8 @@
 # 2 - Extract the pkgin db from the cache
 # 3 - Update pkgin db
 # 4 - Install user-requested packages and dev_packages
-# 5 - Run engine setup script
+# 5 - Run ldconfig
+# 6 - Run engine setup script
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -122,7 +123,15 @@ if packages.any?
   logger.print(process_end)
 end
 
-# 5 - Run engine setup script
+# 5 - Run ldconfig
+
+execute "ldconfig" do
+  command <<-EOF
+    ldconfig
+  EOF
+end
+
+# 6 - Run engine setup script
 if ::File.exist? "#{ENGINE_DIR}/bin/setup"
 
   execute "setup environment" do
