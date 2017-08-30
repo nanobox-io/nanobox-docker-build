@@ -5,6 +5,7 @@
 # 1 - Run the clean script
 # 2 - Uninstall dev_packages
 # 3 - Remove orphaned pkgsrc dependencies
+# 4 - Run ldconfig
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
@@ -62,7 +63,16 @@ logger.print(bullet("Removing orphaned packages..."))
 
 execute "autoremove pkgin orphans" do
   command <<-EOF
-    bash -c "echo \"Y\\n\" | pkgin ar"
+    bash -c "echo \"Y\\n\" | /data/bin/pkgin ar"
   EOF
   path GONANO_PATH
+  user 'gonano'
+end
+
+# 4 - Run ldconfig
+
+execute "ldconfig" do
+  command <<-EOF
+    ldconfig
+  EOF
 end
