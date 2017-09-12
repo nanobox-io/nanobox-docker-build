@@ -42,11 +42,13 @@ directory "/data/var/home/gonano/.ssh" do
 end
 
 # set custom ssh configuration
-hook_file "/data/var/home/gonano/.ssh/config" do
-  source 'ssh/config'
+template '/data/var/home/gonano/.ssh/config' do
   mode 0600
   owner 'gonano'
   group 'gonano'
+  variables ({
+    ssh_files: payload[:ssh_files].keys
+  })
 end
 
 # create file for each file passed in

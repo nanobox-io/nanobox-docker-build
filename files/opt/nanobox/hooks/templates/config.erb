@@ -1,0 +1,5 @@
+StrictHostKeyChecking no
+UserKnownHostsFile=/dev/null
+<% ssh_files.each do |identity| -%>
+IdentityFile="/data/var/home/gonano/.ssh/<%= identity %>"
+<% end -%>
