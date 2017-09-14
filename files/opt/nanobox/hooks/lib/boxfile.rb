@@ -525,7 +525,9 @@ module Nanobox
     # Validate a section with a validator. Returns any errors
     def validate_section(conf, validator)
       errors = {}
-
+      if ! conf.is_a? Hash
+        return "Should be a hash"
+      end
       # first let's iterate through the provided configuration
       conf.each_pair do |key, value|
         # Tell users when they are using old nodes
