@@ -52,6 +52,25 @@ END
   [ "$output" = "--- {}" ]
 }
 
+@test "Should fail with empty nodes" {
+  payload=$(cat <<-END
+run.config:
+END
+)
+
+  run docker exec build bash -c "/tmp/validate_boxfile '{}' '$payload'"
+
+  expected=$(cat <<-END
+--- 
+run.config: "Should be a hash"
+END
+)
+
+  echo "$output"
+
+  [ "$output" = "$expected" ]
+}
+
 @test "Should require an engine" {
   payload=$(cat <<-END
 run.config:
