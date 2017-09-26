@@ -84,8 +84,11 @@ if payload[:boxfile]
 end
 
 # 2 - run ldconfig 
-execute "ldconfig" do
-  command <<-EOF
-    ldconfig
-  EOF
+execute "ldconfig"
+
+if ! payload[:dns_entries].nil?
+  template '/etc/hosts' do
+    mode 0644
+    variables ({ hosts: payload[:dns_entries] })
+  end
 end
