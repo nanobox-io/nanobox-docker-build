@@ -95,7 +95,7 @@ end
 
 execute "update pkgin packages" do
   command <<-EOF
-    #{DATA_DIR}/bin/pkgin -y up
+    #{DATA_DIR}/bin/pkgin -yV up
   EOF
   user 'gonano'
 end
@@ -112,7 +112,7 @@ if packages.any?
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
-          bash -c "/data/bin/pkgin -y in #{packages.join(' ')}"
+          bash -c "/data/bin/pkgin -yV in #{packages.join(' ')}"
     EOF
     path GONANO_PATH
     user 'gonano'
