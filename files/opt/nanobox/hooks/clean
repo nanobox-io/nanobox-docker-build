@@ -47,7 +47,7 @@ if packages.any?
     command <<-EOF
       stdbuf -o0 \
         siphon --prefix '  ' -- \
-          bash -c "/data/bin/pkgin -y rm #{packages.join(' ')}"
+          bash -c "/data/bin/pkgin -yV rm #{packages.join(' ')}"
     EOF
     path GONANO_PATH
     user 'gonano'
@@ -63,7 +63,7 @@ logger.print(bullet("Removing orphaned packages..."))
 
 execute "autoremove pkgin orphans" do
   command <<-EOF
-    bash -c "echo \"Y\\n\" | /data/bin/pkgin ar"
+    bash -c "echo \"Y\\n\" | /data/bin/pkgin ar -V"
   EOF
   path GONANO_PATH
   user 'gonano'
