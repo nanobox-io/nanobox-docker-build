@@ -61,6 +61,10 @@ if ::File.exist? "#{CACHE_DIR}/home"
 
 end
 
+if payload[:clear_cache]
+  execute "rm -rf #{CACHE_DIR}/pkgin"
+end
+
 # 2 - Extract the pkgin db from the cache
 if ::File.exist? "#{CACHE_DIR}/pkgin"
 

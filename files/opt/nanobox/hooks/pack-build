@@ -88,6 +88,9 @@ if ::File.exist? "#{DATA_DIR}/var/home/gonano"
 
 end
 
+if payload[:clear_cache]
+  execute "rm -rf #{DATA_DIR}/var/db/pkgin/cache"
+end
 
 # 3 - rsync pkgsrc cache into cache
 if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
