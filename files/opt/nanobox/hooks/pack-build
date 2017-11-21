@@ -12,6 +12,7 @@
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'fileutils'
 require 'bundler/setup'
 
 # load hookit/setup to bootstrap hookit and import the dsl
@@ -99,6 +100,8 @@ if ::File.exist? "#{DATA_DIR}/var/db/pkgin/cache"
     group 'gonano'
     recursive true
   end
+
+  FileUtils.cp("#{DATA_DIR}/etc/pkgin/repositories.conf ", "#{CACHE_DIR}/pkgin_repo_version")
 
   logger.print(bullet('Stashing pkg cache...'))
 

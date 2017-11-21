@@ -75,7 +75,7 @@
   run run_hook "fetch" "$(payload fetch)"
   print_output
   [ "$status" -eq 1 ]
-  [[ "$output" =~ "failed to return within 30 seconds" ]]
+  [[ "$output" =~ "failed to return within 30 seconds" || "$output" =~ "gnutls_handshake() failed" ]]
 
 }
 

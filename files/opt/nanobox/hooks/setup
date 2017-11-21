@@ -11,6 +11,7 @@
 
 # hookit is installed as a bundled app, so we need bundler to load it for us
 $:.unshift  '/opt/gonano/hookit/vendor/bundle'
+require 'fileutils'
 require 'bundler/setup'
 
 # load hookit/setup to bootstrap hookit and import the dsl
@@ -62,6 +63,10 @@ if ::File.exist? "#{CACHE_DIR}/home"
 end
 
 if payload[:clear_cache]
+  execute "rm -rf #{CACHE_DIR}/pkgin"
+elsif ! File.exist?("#{CACHE_DIR}/pkgin_repo_version") && Dir.exist?("#{CACHE_DIR}/pkgin")
+  execute "rm -rf #{CACHE_DIR}/pkgin"
+elsif File.exist?("#{CACHE_DIR}/pkgin_repo_version") && ! FileUtils.compare_file("#{DATA_DIR}/etc/pkgin/repositories.conf ", "#{CACHE_DIR}/pkgin_repo_version")
   execute "rm -rf #{CACHE_DIR}/pkgin"
 end
 
