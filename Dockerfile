@@ -1,4 +1,4 @@
-FROM nanobox/runit:feature_release-2017-11
+FROM nanobox/runit
 
 # install gcc and build tools and other utilities
 RUN apt-get update -qq && \
