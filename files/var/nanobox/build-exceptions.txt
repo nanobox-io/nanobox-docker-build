@@ -20,6 +20,9 @@
 ^/lib/libmenu
 ^/lib/libncurses
 ^/lib/libpanel
+^/lib/libgnuform
+^/lib/libgnumenu
+^/lib/libgnupanel
 # bzip2
 ^/lib/libbz2
 # lzma
