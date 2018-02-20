@@ -51,3 +51,5 @@
 # pkg_alternatives - java uses these
 ^/libdata$
 ^/libdata/pkg_alternatives
+# Keep terminfo - makes irb, iex, and others happy
+^/share/terminfo
