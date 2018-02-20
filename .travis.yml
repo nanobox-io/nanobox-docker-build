@@ -20,7 +20,7 @@ after_success:
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
   - docker build -t ${NAMESPACE}/build .
-  - docker-squash -t ${NAMESPACE}/build:squashed -f nanobox/runit:feature_release-2017-11 --tmp-dir /var/tmp/squasher ${NAMESPACE}/build
+  - docker-squash -t ${NAMESPACE}/build:squashed -f nanobox/runit --tmp-dir /var/tmp/squasher ${NAMESPACE}/build
   - docker tag ${NAMESPACE}/build:squashed ${NAMESPACE}/build:beta;
   - docker push ${REMOTE}${NAMESPACE}/build:beta;
   - if [ "$BRANCH" == "master" ]; then
